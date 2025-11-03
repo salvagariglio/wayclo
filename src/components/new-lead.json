@@ -1,0 +1,36 @@
+{
+  "name": "New Lead (Aesthetic)",
+  "nodes": [
+    {
+      "parameters": { "httpMethod": "POST", "path": "new-lead", "options": { "responseMode": "lastNode" } },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [260, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "no-reply@tudominio",
+        "toEmail": "tucorreo@tudominio",
+        "subject": "Nuevo lead — Aesthetic",
+        "text": "Nombre: {{$json.name}}\nLocal: {{$json.venue_name}}\nTeléfono: {{$json.phone}}\nRubro: {{$json.category}}\nConsulta: {{$json.question}}\nIdioma: {{$json.language}}\nFuente: {{$json.source || \"chat\"}}\nCreado: {{$json.created_at || (new Date()).toISOString()}}"
+      },
+      "name": "Email Send",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [560, 300],
+      "credentials": { "smtp": { "id": "__REPLACE__", "name": "SMTP_Aesthetic" } }
+    },
+    {
+      "parameters": { "responseBody": { "ok": true, "message": "Lead recibido" } },
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [820, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": { "main": [[{ "node": "Email Send", "type": "main", "index": 0 }]] },
+    "Email Send": { "main": [[{ "node": "Respond to Webhook", "type": "main", "index": 0 }]] }
+  }
+}
