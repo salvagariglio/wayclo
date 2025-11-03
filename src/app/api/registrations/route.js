@@ -1,4 +1,8 @@
 // app/api/registrations/route.js
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';       // aseguramos Node runtime
+export const preferredRegion = 'auto';  // opcional
+
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { createClient } from "@supabase/supabase-js";
