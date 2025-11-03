@@ -1,8 +1,11 @@
+// src/lib/supabaseServer.js
 import { createClient } from "@supabase/supabase-js";
 
 export function getSupabaseServer() {
     const url = process.env.SUPABASE_URL;
-    const key = process.env.SUPABASE_SERVICE_ROLE;
-    if (!url || !key) throw new Error("Missing Supabase env vars");
+    const key = process.env.SUPABASE_SERVICE_ROLE; // server-only key
+    if (!url || !key) {
+        throw new Error("Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE");
+    }
     return createClient(url, key, { auth: { persistSession: false } });
 }

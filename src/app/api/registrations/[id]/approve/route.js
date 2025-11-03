@@ -1,22 +1,21 @@
-export const dynamic = 'force-dynamic';
-export const runtime = 'nodejs';       // aseguramos Node runtime
-export const preferredRegion = 'auto';  // opcional
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
-import { createClient } from "@supabase/supabase-js";
-
-const resend = new Resend(process.env.RESEND_API_KEY);
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
-const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
+import { getSupabaseServer } from "@/lib/supabaseServer";
 
 export async function POST(req, { params }) {
+    const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
     const auth = req.headers.get("authorization") || "";
-    if (auth !== `Bearer ${ADMIN_TOKEN}`) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (auth !== `Bearer ${ADMIN_TOKEN}`) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const supabase = getSupabaseServer();
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
     const { id } = params;
-
-    // 1) Actualizar estado
     const { data, error } = await supabase
         .from("registrations")
         .update({ status: "approved" })
@@ -24,11 +23,13 @@ export async function POST(req, { params }) {
         .select()
         .single();
 
-    if (error || !data) return NextResponse.json({ error: "DB error" }, { status: 500 });
+    if (error || !data) {
+        console.error(error);
+        return NextResponse.json({ error: "DB error" }, { status: 500 });
+    }
 
-    // 2) Enviar invitación
     await resend.emails.send({
-        from: "Evento <noreply@TU_DOMINIO>",
+        from: "Evento <noreply@tudominio.com>",
         to: data.email,
         subject: "🎟️ ¡Invitación confirmada!",
         text: `Hola ${data.first_name}, tu invitación al evento ha sido APROBADA.\nNos vemos pronto. Detalles en breve.`,
