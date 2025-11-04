@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-export default function RegisterForm({ onClose }) {
+export default function RegisterForm({ onSuccess, onClose }) {
     const [form, setForm] = useState({
         firstName: "",
         lastName: "",
@@ -18,7 +18,8 @@ export default function RegisterForm({ onClose }) {
     const [loading, setLoading] = useState(false);
     const [alreadyRegistered, setAlreadyRegistered] = useState(false);
 
-    const onlyLetters = (v) => /^[A-Za-zÁÉÍÓÚÑáéíóúñ\s'-]+$/.test(v.trim());
+    const onlyLetters = (v) =>
+        /^[A-Za-zÁÉÍÓÚÑáéíóúñ\s'-]+$/.test(v.trim());
 
     const isValid = useMemo(() => {
         const firstOk = form.firstName.trim().length >= 2 && onlyLetters(form.firstName);
@@ -27,7 +28,10 @@ export default function RegisterForm({ onClose }) {
         const phoneOk = form.phone.replace(/\D/g, "").length >= 6;
         const companyOk = form.company.trim().length >= 2; // obligatorio
         const roleOk = form.role.trim().length >= 2;       // obligatorio
-        const dietOk = form.diet !== "Otro" ? !!form.diet : form.dietOther.trim().length >= 2;
+        const dietOk = form.diet !== "Otro"
+            ? !!form.diet
+            : form.dietOther.trim().length >= 2;
+
         return firstOk && lastOk && emailOk && phoneOk && companyOk && roleOk && dietOk;
     }, [form]);
 
@@ -55,16 +59,26 @@ export default function RegisterForm({ onClose }) {
 
             const json = await res.json().catch(() => null);
 
+            // Duplicado -> mantener formulario abierto
             if (res.status === 409 || json?.exists || /duplicate/i.test(json?.message || "")) {
-                // caso duplicado -> mantener formulario abierto
                 setAlreadyRegistered(true);
                 return;
             }
 
             if (res.ok) {
-                // éxito -> avisar y cerrar
-                alert("¡Registro recibido! Tu invitación está pendiente. Te avisaremos por email.");
-                onClose?.(); // cerrar modal
+                // Éxito -> mostrar modal chico (SiteShell) y luego cerrar
+                onSuccess?.();
+                // limpiamos el form para la próxima vez
+                setForm({
+                    firstName: "",
+                    lastName: "",
+                    email: "",
+                    phone: "",
+                    company: "",
+                    role: "",
+                    diet: "Ninguna",
+                    dietOther: "",
+                });
                 return;
             }
 
@@ -84,8 +98,8 @@ export default function RegisterForm({ onClose }) {
             className="relative rounded-2xl border border-white/10 bg-[rgba(15,15,16,0.6)] backdrop-blur-md shadow-[0_10px_30px_rgba(0,0,0,0.35)] p-5 md:p-6 text-white"
             style={{ ["--brand"]: "#FAA896" }}
         >
-            <h3 className="text-white font-semibold leading-tight mb-1">Inscripción al evento</h3>
-            <p className="text-xs text-white/60 mb-4">Todos los campos son obligatorios</p>
+            <h3 className="mb-1 text-white font-semibold leading-tight">Inscripción al evento</h3>
+            <p className="mb-4 text-xs text-white/60">Todos los campos son obligatorios</p>
 
             {alreadyRegistered && (
                 <div className="mb-4 rounded-md border border-amber-400/40 bg-amber-400/10 px-3 py-2 text-sm text-amber-200">
