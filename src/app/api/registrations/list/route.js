@@ -1,4 +1,3 @@
-// src/app/api/registrations/list/route.js
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
@@ -7,27 +6,48 @@ import { getSupabaseServer } from "@/lib/supabaseServer";
 
 export async function GET(req) {
     try {
-        // auth opcional para listar (si querés limitarlo, igual que approve/reject)
+        // Auth opcional (si querés proteger el listado)
         const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
         const auth = req.headers.get("authorization") || "";
         if (ADMIN_TOKEN && auth !== `Bearer ${ADMIN_TOKEN}`) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const supabase = getSupabaseServer(); // ✅ dentro del handler
+        // 🔍 Diagnóstico de envs (booleans, sin exponer valores)
+        const envDiag = {
+            has_SUPABASE_URL: !!process.env.SUPABASE_URL,
+            has_SUPABASE_SERVICE_ROLE: !!process.env.SUPABASE_SERVICE_ROLE,
+        };
+
+        let supabase;
+        try {
+            supabase = getSupabaseServer();
+        } catch (e) {
+            // Si falta alguna env o el helper arroja error, lo mostramos
+            return NextResponse.json(
+                { error: "Supabase init failed", message: e?.message, env: envDiag },
+                { status: 500 }
+            );
+        }
+
         const { data, error } = await supabase
             .from("registrations")
             .select("*")
             .order("created_at", { ascending: false });
 
         if (error) {
-            console.error(error);
-            return NextResponse.json({ error: "DB error" }, { status: 500 });
+            // Devolver detalle para depurar ahora
+            return NextResponse.json(
+                { error: "DB error", code: error.code, message: error.message, details: error.details, env: envDiag },
+                { status: 500 }
+            );
         }
 
-        return NextResponse.json({ rows: data ?? [] });
+        return NextResponse.json({ rows: data ?? [], env: envDiag });
     } catch (e) {
-        console.error(e);
-        return NextResponse.json({ error: "Server error" }, { status: 500 });
+        return NextResponse.json(
+            { error: "Server error", message: e?.message },
+            { status: 500 }
+        );
     }
 }
