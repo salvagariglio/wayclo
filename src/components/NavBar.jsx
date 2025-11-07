@@ -90,7 +90,7 @@ export default function NavBar({ dimmed = false }) {
               dimmed ? "bg-white text-slate-900" : "bg-[var(--brand,#050057)] text-white",
             ].join(" ")}
           >
-            Inscripción
+            INSCRIBITE
           </Button>
         </div>
 
@@ -154,7 +154,7 @@ export default function NavBar({ dimmed = false }) {
                 dimmed ? "bg-white text-slate-900" : "bg-[var(--brand,#050057)] text-white",
               ].join(" ")}
             >
-              Inscripción
+              INSCRIBITE
             </Button>
           </div>
         </div>
