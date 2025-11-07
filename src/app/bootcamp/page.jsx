@@ -1,8 +1,8 @@
 export default function BootcampPage() {
     return (
-        <main className="mx-auto max-w-5xl px-6 py-16 text-white">
+        <main className="mx-auto max-w-5xl px-6 py-16 text-black">
             <h1 className="text-4xl font-bold mb-4">Bootcamp</h1>
-            <p className="text-lg text-white/70 mb-8">
+            <p className="text-lg text-black/70 mb-8">
                 Sumate al bootcamp y aprendé en un entorno colaborativo con proyectos
                 reales, mentores y desafíos semanales.
             </p>
@@ -10,7 +10,7 @@ export default function BootcampPage() {
             <section className="space-y-6">
                 <div>
                     <h2 className="text-2xl font-semibold mb-2">Metodología</h2>
-                    <p className="text-white/70">
+                    <p className="text-black/70">
                         Trabajamos con metodologías ágiles, sprints semanales y feedback
                         constante. Cada alumno desarrolla un proyecto que forma parte de su
                         portfolio profesional.
@@ -19,7 +19,7 @@ export default function BootcampPage() {
 
                 <div>
                     <h2 className="text-2xl font-semibold mb-2">Mentores</h2>
-                    <p className="text-white/70">
+                    <p className="text-black/70">
                         Nuestros mentores son profesionales activos en tecnología, diseño y
                         producto. Te acompañarán durante todo el proceso de aprendizaje.
                     </p>

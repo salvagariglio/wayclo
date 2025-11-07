@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { DialogTrigger } from "@/components/ui/dialog";
 import { Menu, X } from "lucide-react";
-import Logo from "../../public/logo.png";
+import Logo from "../../public/logo-wayclo.png";
 
 const LINKS = [
     { href: "/", label: "Inicio" },
@@ -39,27 +39,24 @@ export default function NavBar() {
 
     return (
         <header
-            className={[
-                "sticky top-0 backdrop-blur supports-[backdrop-filter]:bg-black/30",
-                "border-b border-white/10 transition-shadow",
-                scrolled ? "shadow-[0_4px_20px_rgba(0,0,0,0.35)]" : "shadow-none",
-                ,
-            ].join(" ")}
+        className={[
+            "fixed top-0 left-0 right-0 z-[9999] bg-white", // ← siempre arriba y con fondo
+            scrolled ? "shadow-[0_4px_20px_rgba(0,0,0,0.15)]" : "shadow-none",
+        ].join(" ")}
         >
             {/* Barra principal */}
-            <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-24 flex items-center justify-between">
                 {/* Brand */}
-                <div className="flex items-center gap-3 min-w-0">
+                <div className=" flex items-center gap-3 min-w-0">
                     <Link href="/" className="flex items-center gap-3 group">
                         <Image
                             src={Logo}
-                            width={32}
-                            height={32}
-                            alt="Aesthetic logo"
-                            className="h-8 w-8 object-contain"
+                            width={150}
+                            height={150}
+                            alt="Wayclo logo"
+                            className="object-contain"
                             priority
                         />
-                        <span className="font-semibold tracking-tight">Wayclo</span>
                     </Link>
                 </div>
 
@@ -71,7 +68,7 @@ export default function NavBar() {
                                 <Link
                                     href={l.href}
                                     className={[
-                                        "opacity-80 hover:opacity-100 transition-opacity relative after:absolute after:left-0 after:-bottom-1 after:h-[2px] after:w-0 after:bg-[var(--brand)] after:transition-[width] hover:after:w-full",
+                                        "text-black opacity-80 hover:opacity-100 transition-opacity relative after:absolute after:left-0 after:-bottom-1 after:h-[2px] after:w-0 after:bg-[var(--brand)] after:transition-[width] hover:after:w-full",
                                         isActive(l.href) ? "after:w-full opacity-100" : "",
                                     ].join(" ")}
                                 >
@@ -82,7 +79,7 @@ export default function NavBar() {
                     </ul>
 
                     <DialogTrigger asChild>
-                        <Button className="gap-2 bg-[var(--brand)] text-black hover:opacity-90">
+                        <Button className="gap-2 bg-[var(--brand)] text-white hover:opacity-90">
                             Inscripción
                         </Button>
                     </DialogTrigger>
@@ -94,7 +91,7 @@ export default function NavBar() {
                         aria-label={open ? "Cerrar menú" : "Abrir menú"}
                         aria-expanded={open}
                         onClick={() => setOpen((v) => !v)}
-                        className="inline-flex items-center justify-center rounded-md p-2 outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)]/70"
+                        className="text-black inline-flex items-center justify-center rounded-md p-2 outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)]/70"
                     >
                         {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
                     </button>
@@ -123,9 +120,9 @@ export default function NavBar() {
                                     aria-current={isActive(l.href) ? "page" : undefined}
                                     className={[
                                         "w-full rounded-md px-3 py-3 text-base text-center transition",
-                                        "text-white/90 hover:bg-white/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)]/60",
+                                        "text-black/90 hover:bg-white/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)]/60",
                                         // sin bordes para evitar el “rectángulo” raro
-                                        isActive(l.href) ? "bg-white/[0.08] text-white" : "",
+                                        isActive(l.href) ? "bg-white/[0.08] text-black" : "",
                                     ].join(" ")}
                                 >
                                     {l.label}
@@ -138,7 +135,7 @@ export default function NavBar() {
                         <DialogTrigger asChild>
                             <Button
                                 onClick={closeMenu}
-                                className="w-full max-w-xs gap-2 bg-[var(--brand)] text-black hover:opacity-90"
+                                className="w-full max-w-xs gap-2 bg-[var(--brand)] text-white hover:opacity-90"
                             >
                                 Inscripción
                             </Button>

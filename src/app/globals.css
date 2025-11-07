@@ -4,7 +4,7 @@
 
 /* Tipografías y tema */
 :root {
-  --brand: #FAA896;
+  --brand: #050057;
   --brand-10: color-mix(in oklab, var(--brand), white 10%);
   --brand-20: color-mix(in oklab, var(--brand), white 20%);
   --brand-40: color-mix(in oklab, var(--brand), white 40%);
@@ -28,7 +28,7 @@ body,
 }
 
 body {
-  background: #0b0b0c;
+  background: #ffffff;
   /* fondo sólido oscuro */
   color: #fff;
 }
@@ -49,7 +49,7 @@ body {
 }
 
 :root {
-  --brand: #FAA896;
+  --brand: #050057;
 }
 
 /* Scroll personalizado solo dentro del chat */

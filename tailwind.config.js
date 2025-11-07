@@ -8,7 +8,7 @@ module.exports = {
     theme: {
         extend: {
             colors: {
-                brand: "#FAA896"
+                brand: "#050057"
             },
             borderRadius: {
                 "2xl": "1rem",
