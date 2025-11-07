@@ -1,4 +1,5 @@
 import Empresas from "@/components/Empresas";
+import ExpoFeatures from "@/components/ExpoFeatures";
 import Hero from "@/components/Hero";
 
 export default function HomePage() {
@@ -8,6 +9,7 @@ export default function HomePage() {
       <main className="pt-24">
         <Hero />
         <Empresas />
+        <ExpoFeatures/>
       </main>
     </>
   );
