@@ -1,230 +1,265 @@
 "use client";
-import React, { useMemo, useState } from "react";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+
+import { useMemo, useState } from "react";
 
 export default function RegisterForm({ onSuccess, onClose }) {
-    const [form, setForm] = useState({
-        firstName: "",
-        lastName: "",
-        email: "",
-        phone: "",
-        company: "",
-        role: "",
-        diet: "Ninguna",
-        dietOther: "",
+  const [form, setForm] = useState({
+    name: "",
+    lastname: "",
+    email: "",
+    phone: "",
+    empresa: "",
+    puesto: "",
+    comentarios: "",
+  });
+  const [touched, setTouched] = useState({});
+  const [loading, setLoading] = useState(false);
+
+  // Validaciones (HTML5 + extra)
+  const errors = useMemo(() => {
+    const e = {};
+
+    // Nombre / Apellido: 2+ letras
+    if (!/^[A-Za-zÁÉÍÓÚÑáéíóúñ' -]{2,}$/.test(form.name || "")) e.name = "Ingresá un nombre válido (2+ letras).";
+    if (!/^[A-Za-zÁÉÍÓÚÑáéíóúñ' -]{2,}$/.test(form.lastname || "")) e.lastname = "Ingresá un apellido válido (2+ letras).";
+
+    // Email básico
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email || "")) e.email = "Ingresá un email válido.";
+
+    // Teléfono (7-20 dígitos aprox, permite +, espacios, guiones y paréntesis)
+    if (!/^[+()0-9\s-]{7,20}$/.test(form.phone || "")) e.phone = "Ingresá un teléfono válido.";
+
+    // Empresa / Puesto: requeridos
+    if (!form.empresa?.trim()) e.empresa = "Este campo es obligatorio.";
+    if (!form.puesto?.trim()) e.puesto = "Este campo es obligatorio.";
+
+    // Comentarios: opcional, máx 500
+    if ((form.comentarios || "").length > 500) e.comentarios = "Máximo 500 caracteres.";
+
+    return e;
+  }, [form]);
+
+  const hasErrors = Object.keys(errors).length > 0;
+
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleBlur = (e) => setTouched({ ...touched, [e.target.name]: true });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    // Marcar todos como tocados para mostrar errores si hay
+    setTouched({
+      name: true, lastname: true, email: true, phone: true, empresa: true, puesto: true, comentarios: true,
     });
-    const [loading, setLoading] = useState(false);
-    const [alreadyRegistered, setAlreadyRegistered] = useState(false);
 
-    const onlyLetters = (v) =>
-        /^[A-Za-zÁÉÍÓÚÑáéíóúñ\s'-]+$/.test(v.trim());
+    if (hasErrors) return;
 
-    const isValid = useMemo(() => {
-        const firstOk = form.firstName.trim().length >= 2 && onlyLetters(form.firstName);
-        const lastOk = form.lastName.trim().length >= 2 && onlyLetters(form.lastName);
-        const emailOk = /.+@.+\..+/.test(form.email);
-        const phoneOk = form.phone.replace(/\D/g, "").length >= 6;
-        const companyOk = form.company.trim().length >= 2; // obligatorio
-        const roleOk = form.role.trim().length >= 2;       // obligatorio
-        const dietOk = form.diet !== "Otro"
-            ? !!form.diet
-            : form.dietOther.trim().length >= 2;
+    setLoading(true);
+    // TODO: aquí enviar a backend o sheets
+    setTimeout(() => {
+      setLoading(false);
+      onSuccess?.();
+    }, 900);
+  };
 
-        return firstOk && lastOk && emailOk && phoneOk && companyOk && roleOk && dietOk;
-    }, [form]);
+  // Helper de clase input
+  const inputClass = (invalid) =>
+    [
+      "mt-1 w-full rounded-md border px-3 py-2",
+      "bg-white text-slate-900 placeholder:text-slate-400",
+      "focus-visible:ring-2 focus-visible:ring-[var(--brand,#050057)] focus-visible:border-[var(--brand,#050057)]",
+      invalid ? "border-rose-400" : "border-slate-300",
+    ].join(" ");
 
-    async function handleSubmit(e) {
-        e.preventDefault();
-        if (!isValid || loading) return;
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="
+        relative rounded-xl
+        bg-white text-slate-900
+        shadow-[0_10px_25px_rgba(0,0,0,0.12)]
+        border border-slate-200
+        p-4 sm:p-6
+      "
+      style={{ ["--brand"]: "#050057" }}
+      noValidate
+    >
+      {/* Título */}
+      <h3 className="mb-1 text-slate-900 font-semibold leading-tight">
+        Inscripción al evento
+      </h3>
+      <p className="mb-4 text-xs text-slate-500">
+        Todos los campos son obligatorios
+      </p>
 
-        setLoading(true);
-        setAlreadyRegistered(false);
+      {/* Campos */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* Nombre */}
+        <div>
+          <label className="text-sm">Nombre</label>
+          <input
+            name="name"
+            required
+            minLength={2}
+            pattern="^[A-Za-zÁÉÍÓÚÑáéíóúñ' -]{2,}$"
+            value={form.name}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            className={inputClass(touched.name && !!errors.name)}
+            aria-invalid={touched.name && !!errors.name}
+            aria-describedby="err-name"
+          />
+          {touched.name && errors.name && (
+            <p id="err-name" className="mt-1 text-xs text-rose-500">{errors.name}</p>
+          )}
+        </div>
 
-        try {
-            const res = await fetch("/api/registrations", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    first_name: form.firstName,
-                    last_name: form.lastName,
-                    email: form.email,
-                    phone: form.phone,
-                    company: form.company,
-                    role: form.role,
-                    diet: form.diet === "Otro" ? form.dietOther : form.diet,
-                }),
-            });
+        {/* Apellido */}
+        <div>
+          <label className="text-sm">Apellido</label>
+          <input
+            name="lastname"
+            required
+            minLength={2}
+            pattern="^[A-Za-zÁÉÍÓÚÑáéíóúñ' -]{2,}$"
+            value={form.lastname}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            className={inputClass(touched.lastname && !!errors.lastname)}
+            aria-invalid={touched.lastname && !!errors.lastname}
+            aria-describedby="err-lastname"
+          />
+          {touched.lastname && errors.lastname && (
+            <p id="err-lastname" className="mt-1 text-xs text-rose-500">{errors.lastname}</p>
+          )}
+        </div>
 
-            const json = await res.json().catch(() => null);
+        {/* Email */}
+        <div>
+          <label className="text-sm">Email</label>
+          <input
+            name="email"
+            type="email"
+            required
+            value={form.email}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            className={inputClass(touched.email && !!errors.email)}
+            aria-invalid={touched.email && !!errors.email}
+            aria-describedby="err-email"
+          />
+          {touched.email && errors.email && (
+            <p id="err-email" className="mt-1 text-xs text-rose-500">{errors.email}</p>
+          )}
+        </div>
 
-            // Duplicado -> mantener formulario abierto
-            if (res.status === 409 || json?.exists || /duplicate/i.test(json?.message || "")) {
-                setAlreadyRegistered(true);
-                return;
-            }
+        {/* Teléfono */}
+        <div>
+          <label className="text-sm">Teléfono</label>
+          <input
+            name="phone"
+            required
+            pattern="^[+()0-9\s-]{7,20}$"
+            value={form.phone}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            className={inputClass(touched.phone && !!errors.phone)}
+            aria-invalid={touched.phone && !!errors.phone}
+            aria-describedby="err-phone"
+            placeholder="+54 9 351 123 4567"
+          />
+          {touched.phone && errors.phone && (
+            <p id="err-phone" className="mt-1 text-xs text-rose-500">{errors.phone}</p>
+          )}
+        </div>
 
-            if (res.ok) {
-                // Éxito -> mostrar modal chico (SiteShell) y luego cerrar
-                onSuccess?.();
-                // limpiamos el form para la próxima vez
-                setForm({
-                    firstName: "",
-                    lastName: "",
-                    email: "",
-                    phone: "",
-                    company: "",
-                    role: "",
-                    diet: "Ninguna",
-                    dietOther: "",
-                });
-                return;
-            }
+        {/* Empresa */}
+        <div>
+          <label className="text-sm">Empresa</label>
+          <input
+            name="empresa"
+            required
+            value={form.empresa}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            className={inputClass(touched.empresa && !!errors.empresa)}
+            aria-invalid={touched.empresa && !!errors.empresa}
+            aria-describedby="err-empresa"
+          />
+          {touched.empresa && errors.empresa && (
+            <p id="err-empresa" className="mt-1 text-xs text-rose-500">{errors.empresa}</p>
+          )}
+        </div>
 
-            console.error("Server error:", json);
-            alert("No se pudo completar el registro. Intentalo de nuevo.");
-        } catch (err) {
-            console.error("Network error:", err);
-            alert("Error de conexión. Revisá tu red e intentá nuevamente.");
-        } finally {
-            setLoading(false);
-        }
-    }
+        {/* Puesto */}
+        <div>
+          <label className="text-sm">Puesto</label>
+          <input
+            name="puesto"
+            required
+            value={form.puesto}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            className={inputClass(touched.puesto && !!errors.puesto)}
+            aria-invalid={touched.puesto && !!errors.puesto}
+            aria-describedby="err-puesto"
+          />
+          {touched.puesto && errors.puesto && (
+            <p id="err-puesto" className="mt-1 text-xs text-rose-500">{errors.puesto}</p>
+          )}
+        </div>
+      </div>
 
-    return (
-        <form
-            onSubmit={handleSubmit}
-            className="relative rounded-2xl border border-white/10 bg-[rgba(15,15,16,0.6)] backdrop-blur-md shadow-[0_10px_30px_rgba(0,0,0,0.35)] p-5 md:p-6 text-white"
-            style={{ ["--brand"]: "#FAA896" }}
+      {/* Comentarios */}
+      <div className="mt-4">
+        <label className="text-sm">Comentarios (opcional)</label>
+        <textarea
+          name="comentarios"
+          maxLength={500}
+          value={form.comentarios}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          className={inputClass(touched.comentarios && !!errors.comentarios)}
+          aria-invalid={touched.comentarios && !!errors.comentarios}
+          aria-describedby="err-comentarios"
+          placeholder="Máximo 500 caracteres"
+          rows={4}
+        />
+        {touched.comentarios && errors.comentarios && (
+          <p id="err-comentarios" className="mt-1 text-xs text-rose-500">{errors.comentarios}</p>
+        )}
+      </div>
+
+      {/* Botones */}
+      <div className="mt-6 flex flex-col sm:flex-row gap-3">
+        <button
+          type="submit"
+          disabled={loading}
+          className="
+            flex-1 py-3 rounded-md
+            bg-[var(--brand,#050057)] text-white
+            font-semibold
+            hover:opacity-90
+            disabled:opacity-60
+            transition
+          "
         >
-            <h3 className="mb-1 text-white font-semibold leading-tight">Inscripción al evento</h3>
-            <p className="mb-4 text-xs text-white/60">Todos los campos son obligatorios</p>
+          {loading ? "Enviando..." : "Enviar registro"}
+        </button>
 
-            {alreadyRegistered && (
-                <div className="mb-4 rounded-md border border-amber-400/40 bg-amber-400/10 px-3 py-2 text-sm text-amber-200">
-                    Ya tenemos un registro con ese email o teléfono.
-                </div>
-            )}
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <Label className="text-white/90">Nombre *</Label>
-                    <Input
-                        required
-                        value={form.firstName}
-                        onChange={(e) => setForm({ ...form, firstName: e.target.value })}
-                        placeholder="Ej: Ana"
-                        className="mt-1 bg-[#121315] text-white placeholder:text-white/40 border-white/10 focus-visible:ring-2 focus-visible:ring-[var(--brand)]"
-                    />
-                </div>
-
-                <div>
-                    <Label className="text-white/90">Apellido *</Label>
-                    <Input
-                        required
-                        value={form.lastName}
-                        onChange={(e) => setForm({ ...form, lastName: e.target.value })}
-                        placeholder="Ej: Pérez"
-                        className="mt-1 bg-[#121315] text-white placeholder:text-white/40 border-white/10 focus-visible:ring-2 focus-visible:ring-[var(--brand)]"
-                    />
-                </div>
-
-                <div className="md:col-span-2">
-                    <Label className="text-white/90">Correo electrónico *</Label>
-                    <Input
-                        type="email"
-                        required
-                        value={form.email}
-                        onChange={(e) => setForm({ ...form, email: e.target.value })}
-                        placeholder="tu@email.com"
-                        className="mt-1 bg-[#121315] text-white placeholder:text-white/40 border-white/10 focus-visible:ring-2 focus-visible:ring-[var(--brand)]"
-                    />
-                </div>
-
-                <div className="md:col-span-2">
-                    <Label className="text-white/90">Teléfono *</Label>
-                    <Input
-                        required
-                        value={form.phone}
-                        onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                        placeholder="+54 9 351 123 4567"
-                        className="mt-1 bg-[#121315] text-white placeholder:text-white/40 border-white/10 focus-visible:ring-2 focus-visible:ring-[var(--brand)]"
-                    />
-                    <p className="mt-1 text-xs text-white/50">Incluí prefijo. Ej: +54 9 ...</p>
-                </div>
-
-                <div>
-                    <Label className="text-white/90">Empresa *</Label>
-                    <Input
-                        required
-                        value={form.company}
-                        onChange={(e) => setForm({ ...form, company: e.target.value })}
-                        placeholder="Nombre de la empresa"
-                        className="mt-1 bg-[#121315] text-white placeholder:text-white/40 border-white/10 focus-visible:ring-2 focus-visible:ring-[var(--brand)]"
-                    />
-                </div>
-
-                <div>
-                    <Label className="text-white/90">Puesto *</Label>
-                    <Input
-                        required
-                        value={form.role}
-                        onChange={(e) => setForm({ ...form, role: e.target.value })}
-                        placeholder="Ej: Gerente de Operaciones"
-                        className="mt-1 bg-[#121315] text-white placeholder:text-white/40 border-white/10 focus-visible:ring-2 focus-visible:ring-[var(--brand)]"
-                    />
-                </div>
-            </div>
-
-            <div className="mt-4">
-                <Label className="text-white/90 block mb-2">Restricciones alimentarias *</Label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {["Ninguna", "Vegetariano", "Vegano", "Libre de gluten", "Otro"].map((opt) => (
-                        <label
-                            key={opt}
-                            className={[
-                                "flex items-center gap-2 rounded-md border px-3 py-2 cursor-pointer",
-                                form.diet === opt ? "border-[var(--brand)] bg-white/5" : "border-white/10 hover:border-white/20",
-                            ].join(" ")}
-                        >
-                            <input
-                                type="radio"
-                                name="diet"
-                                value={opt}
-                                checked={form.diet === opt}
-                                onChange={() => setForm({ ...form, diet: opt })}
-                                className="accent-[var(--brand)]"
-                                required
-                            />
-                            <span className="text-sm">{opt}</span>
-                        </label>
-                    ))}
-                </div>
-
-                {form.diet === "Otro" && (
-                    <div className="mt-3">
-                        <Label className="text-white/90">Especificá *</Label>
-                        <Input
-                            required
-                            value={form.dietOther}
-                            onChange={(e) => setForm({ ...form, dietOther: e.target.value })}
-                            placeholder="Detalle de la restricción"
-                            className="mt-1 bg-[#121315] text-white placeholder:text-white/40 border-white/10 focus-visible:ring-2 focus-visible:ring-[var(--brand)]"
-                        />
-                    </div>
-                )}
-            </div>
-
-            <div className="mt-5 flex justify-end">
-                <Button
-                    type="submit"
-                    disabled={!isValid || loading}
-                    className="gap-2 bg-[var(--brand)] text-black hover:opacity-90 disabled:opacity-60"
-                >
-                    {loading ? "Enviando..." : "Inscribirme"}
-                </Button>
-            </div>
-        </form>
-    );
+        <button
+          type="button"
+          onClick={onClose}
+          className="
+            py-3 px-4 rounded-md
+            border border-slate-300
+            text-slate-700
+            hover:bg-slate-50
+            transition
+          "
+        >
+          Cancelar
+        </button>
+      </div>
+    </form>
+  );
 }

@@ -48,7 +48,7 @@ export const DialogContent = React.forwardRef(function DialogContent(
         {...props}
         className={cn(
           // centrado + tamaños responsive + scroll interno
-          "fixed z-[60] grid w-[92vw] max-w-[720px] sm:w-full",
+          "fixed z-[90] grid w-[92vw] max-w-[720px] sm:w-full",
           "left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2",
           "gap-4 rounded-lg border border-white/10 bg-[#101114] p-4 sm:p-6 text-white shadow-lg",
           // alto máximo y scroll en móviles

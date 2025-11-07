@@ -1,5 +1,7 @@
 // components/Hero.jsx
+"use client"
 import Image from "next/image";
+import { DialogTrigger } from "@/components/ui/dialog";
 
 // IMÁGENES (asegurate de tener estos nombres en /public)
 import WaycloLogo from "../../public/logo-wayclo.png";
@@ -61,25 +63,14 @@ export default function Hero() {
       </p>
 
       {/* CTA */}
-      <div className="mt-8 md:mt-10 flex justify-center">
-        <a
-          href="#registro"
-          className="
-            inline-flex items-center justify-center
-            rounded-full
-            px-6 md:px-8
-            h-11 md:h-12
-            text-sm md:text-base font-semibold
-            text-[#050057]                     /* ✅ Texto negro */
-            border-2 border-[#050057]
-            bg-transparent
-            hover:bg-[#050057] hover:text-white
-            transition-colors
-            shadow-[0_2px_0_0_#050057] md:shadow-[0_3px_0_0_#050057]
-          "
+      <div className="mt-8 md:mt-10 flex justify-center" id="registro">
+        <button
+          type="button"
+          onClick={() => document.dispatchEvent(new Event("open-register"))}
+          className="inline-flex items-center justify-center rounded-full px-6 md:px-8 h-11 md:h-12 text-sm md:text-base font-semibold text-[#050057] border-2 border-[#050057] bg-transparent hover:bg-[#050057] hover:text-white transition-colors shadow-[0_2px_0_0_#050057] md:shadow-[0_3px_0_0_#050057]"
         >
           REGÍSTRATE AHORA
-        </a>
+        </button>
       </div>
 
 
