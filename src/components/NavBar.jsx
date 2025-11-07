@@ -50,8 +50,8 @@ export default function NavBar({ dimmed = false }) {
           <Link href="/" className="flex items-center gap-3 group">
             <Image
               src={Logo}
-              width={150}
-              height={150}
+              width={180}
+              height={180}
               alt="Wayclo logo"
               className="object-contain"
               priority
@@ -70,7 +70,7 @@ export default function NavBar({ dimmed = false }) {
                     dimmed
                       ? "text-white/90 hover:text-white"
                       : "text-black/80 hover:text-black",
-                    "transition-opacity relative after:absolute after:left-0 after:-bottom-1 after:h-[2px] after:w-0",
+                    "text-lg transition-opacity relative after:absolute after:left-0 after:-bottom-1 after:h-[2px] after:w-0",
                     dimmed ? "after:bg-white/70" : "after:bg-[var(--brand,#050057)]",
                     "after:transition-[width] hover:after:w-full",
                     isActive(l.href) ? "after:w-full opacity-100" : "",
@@ -86,7 +86,7 @@ export default function NavBar({ dimmed = false }) {
           <Button
             onClick={() => document.dispatchEvent(new Event("open-register"))}
             className={[
-              "gap-2 hover:opacity-90",
+              "gap-2 hover:opacity-90 text-lg rounded-full p-5",
               dimmed ? "bg-white text-slate-900" : "bg-[var(--brand,#050057)] text-white",
             ].join(" ")}
           >

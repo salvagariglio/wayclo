@@ -1,11 +1,9 @@
 // components/Hero.jsx
 "use client"
 import Image from "next/image";
-import { DialogTrigger } from "@/components/ui/dialog";
 
 // IMÁGENES (asegurate de tener estos nombres en /public)
-import WaycloLogo from "../../public/logo-wayclo.png";
-import IntercityLogo from "../../public/intercity.png";
+
 import ShieldCheck from "../../public/shield-check.png";
 import LaptopShield from "../../public/laptop-shield.png";
 
@@ -17,8 +15,8 @@ export default function Hero() {
         relative
         mx-auto max-w-6xl
         px-4 sm:px-6 lg:px-8
-        pt-16 md:pt-20
         pb-40 md:pb-52
+        pt-8 md:pt-14
         text-center
       "
     >
@@ -27,7 +25,7 @@ export default function Hero() {
         className="
           text-black                      /* ✅ Título negro */
           font-extrabold leading-tight tracking-[-0.02em]
-          text-4xl sm:text-5xl md:text-6xl lg:text-[64px]
+          text-4xl sm:text-6xl md:text-6xl lg:text-[94px]
         "
       >
         La nueva era de
@@ -42,7 +40,7 @@ export default function Hero() {
         className="
           text-black                      /* ✅ Fecha negra */
           mt-6 md:mt-10
-          text-md sm:text-base md:text-2xl
+          text-lg  md:text-3xl
           uppercase tracking-[0.2em]
         "
       >
@@ -53,9 +51,9 @@ export default function Hero() {
       <p
         className="
           mx-auto mt-4 md:mt-5
-          max-w-lg
+          max-w-xl
           text-[#333]                    /* ✅ Gris oscuro como en la captura */
-          text-sm sm:text-base md:text-lg
+          text-lg md:text-2xl
         "
       >
         El evento donde líderes y creativos se reúnen
@@ -67,7 +65,7 @@ export default function Hero() {
         <button
           type="button"
           onClick={() => document.dispatchEvent(new Event("open-register"))}
-          className="inline-flex items-center justify-center rounded-full px-6 md:px-8 h-11 md:h-12 text-sm md:text-base font-semibold text-[#050057] border-2 border-[#050057] bg-transparent hover:bg-[#050057] hover:text-white transition-colors shadow-[0_2px_0_0_#050057] md:shadow-[0_3px_0_0_#050057]"
+          className="inline-flex items-center justify-center rounded-full px-10 md:px-12 h-14 md:h-16 text-md md:text-xl font-semibold text-[#050057] border-2 border-[#050057] bg-transparent hover:bg-[#050057] hover:text-white transition-colors shadow-[0_2px_0_0_#050057] md:shadow-[0_3px_0_0_#050057]"
         >
           REGÍSTRATE AHORA
         </button>
@@ -76,77 +74,54 @@ export default function Hero() {
 
       {/* ======= IMÁGENES DECORATIVAS ======= */}
       {/* Escudo con check (izquierda) */}
-<Image
-  src={ShieldCheck}
-  alt="Escudo con check"
-  priority
-  className="
-    /* ✅ visible en mobile */
-    block
-    absolute
-
-    /* ✅ posición y tamaño base (mobile first) */
-    left-4 top-40 w-16
-
-    /* ✅ overrides por breakpoint */
-    sm:left-5  sm:top-40  sm:w-28
-    md:left-[10px] md:top-48 md:w-40
-    lg:left-[80px] lg:top-60 lg:w-48
-    xl:left-[80px] xl:w-56
-
-    drop-shadow-[0_8px_24px_rgba(0,0,0,0.20)]
-    select-none pointer-events-none
-    z-[1]
-  "
-/>
-
-{/* Laptop con escudo (derecha) */}
-<Image
-  src={LaptopShield}
-  alt="Laptop con escudo"
-  priority
-  className="
-    /* ✅ visible en mobile */
-    block
-    absolute
-
-    /* ✅ posición y tamaño base (mobile first) */
-    right-1 top-[20rem] w-[120px]
-
-    /* ✅ overrides por breakpoint */
-    sm:right-[30px] sm:top-80   sm:w-[220px]
-    md:right-[20px] md:top-96   md:w-[300px]
-    lg:right-[40px] lg:top-[22rem] lg:w-[350px]
-    xl:right-[10px] xl:top-96   xl:w-[400px]
-
-    drop-shadow-[0_16px_40px_rgba(0,0,0,0.25)]
-    select-none pointer-events-none
-    z-[1]
-  "
-/>
-
-
-      {/* Logos inferiores (Wayclo + Intercity) */}
-      <div
+      <Image
+        src={ShieldCheck}
+        alt="Escudo con check"
+        priority
         className="
-          hidden sm:flex items-center gap-6
-          absolute left-4 md:left-8 bottom-6
+          /* ✅ visible en mobile */
+          block
+          absolute
+
+          /* ✅ posición y tamaño base (mobile first) */
+          left-4 top-32 w-16
+
+          /* ✅ overrides por breakpoint */
+          sm:left-5  sm:top-40  sm:w-28
+          md:left-[10px] md:top-48 md:w-40
+          lg:left-[20px] lg:top-60 lg:w-48
+          xl:left-[-80px] xl:w-56
+
+          drop-shadow-[0_8px_24px_rgba(0,0,0,0.20)]
+          select-none pointer-events-none
           z-[1]
         "
-      >
-        <Image
-          src={WaycloLogo}
-          alt="Wayclo"
-          className="h-8 w-auto opacity-90"
-          priority
-        />
-        <Image
-          src={IntercityLogo}
-          alt="Intercity"
-          className="h-9 w-auto opacity-90"
-          priority
-        />
-      </div>
+      />
+
+      {/* Laptop con escudo (derecha) */}
+      <Image
+        src={LaptopShield}
+        alt="Laptop con escudo"
+        priority
+        className="
+          /* ✅ visible en mobile */
+          block
+          absolute
+
+          /* ✅ posición y tamaño base (mobile first) */
+          right-1 top-[24rem] w-[100px]
+
+          /* ✅ overrides por breakpoint */
+          sm:right-[30px] sm:top-80   sm:w-[220px]
+          md:right-[20px] md:top-96   md:w-[300px]
+          lg:right-[40px] lg:top-[28rem] lg:w-[350px]
+          xl:right-[-80px] xl:top-96   xl:w-[400px]
+
+          drop-shadow-[0_16px_40px_rgba(0,0,0,0.25)]
+          select-none pointer-events-none
+          z-[1]
+        "
+      />
 
       {/* NOTA:
          - z-index de imágenes = 1 para quedar sobre el contenido del hero,
