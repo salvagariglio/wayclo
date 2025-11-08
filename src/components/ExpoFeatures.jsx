@@ -6,9 +6,18 @@ import ExpoImg from "../../public/polo.jpg";
 
 export default function ExpoFeaturesDarkCyber() {
   const features = [
-    { title: "Charlas Inspiradoras", text: "Escuchá a los pioneros de la industria mientras comparten sus conocimientos y experiencias sobre las últimas tendencias y avances tecnológicos." },
-    { title: "Paneles de Discusión", text: "Participá en debates dinámicos sobre temas cruciales como la sostenibilidad, la innovación y el impacto social de la tecnología." },
-    { title: "Demostraciones en Vivo", text: "Descubrí las últimas innovaciones tecnológicas a través de demostraciones en vivo que te permitirán ver y experimentar el futuro de primera mano." },
+    {
+      title: "TENDENCIAS",
+      text: "Analizá los desafíos emergentes en ciberseguridad, inteligencia artificial y transformación digital que marcarán el futuro de las empresas.",
+    },
+    {
+      title: "NETWORKING",
+      text: "Conectate con líderes de tecnología, responsables de seguridad y expertos del sector para compartir experiencias y construir alianzas estratégicas.",
+    },
+    {
+      title: "APRENDIZAJE",
+      text: "Accedé a perspectivas reales de quienes protegen, gestionan y optimizan los entornos tecnológicos más exigentes del mercado.",
+    },
   ];
 
   const [openIndex, setOpenIndex] = useState(0);
@@ -16,48 +25,45 @@ export default function ExpoFeaturesDarkCyber() {
 
   return (
     <section className="py-20 bg-white">
-      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center justify-items-center">
 
         {/* IZQUIERDA */}
-        <div className="lg:pr-12">
+        <div className="lg:pr-12 lg:text-left text-center">
           <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-6">
-            UNA EXPERIENCIA ÚNICA PARA LÍDERES Y EMPRESARIOS
+            UNA EXPERIENCIA ÚNICA PARA LÍDERES Y EXPERTOS EN TECNOLOGÍA
           </h2>
-          <p className="text-gray-600 text-lg leading-relaxed max-w-xl">
-            CyberCloudes un encuentro regional
-            que reúne a los principales referentes
-            del mundo digital, la tecnología y la
-            innovación empresarial.
+          <p className="text-gray-600 text-lg leading-relaxed max-w-xl mx-auto lg:mx-0">
+            CyberCloud reúne a los principales referentes del mundo digital y la
+            ciberseguridad para explorar cómo la innovación impulsa la
+            competitividad y la resiliencia empresarial.
           </p>
 
-          <div className="mt-10">
-            <div className="relative w-full max-w-xl">
+          <div className="mt-10 w-full">
+            <div className="relative w-full">
               <Image
                 src={ExpoImg}
                 alt="Vista previa de la expo"
-                className="rounded-2xl shadow-[0_12px_40px_rgba(0,0,0,0.10)]"
+                className="w-full h-auto rounded-2xl shadow-[0_12px_40px_rgba(0,0,0,0.10)] object-cover"
                 priority
               />
             </div>
           </div>
         </div>
 
-        {/* DERECHA (Dark Cyber suave) */}
-        <div className="flex flex-col gap-6">
+        {/* DERECHA */}
+        <div className="flex flex-col gap-6 w-full">
           {features.map((f, i) => {
             const isOpen = openIndex === i;
             return (
               <div
                 key={f.title}
                 className={[
-                  "rounded-3xl border p-0 transition-all duration-300 ease-out overflow-hidden",
+                  "rounded-3xl border p-0 transition-all duration-300 ease-out overflow-hidden w-full",
                   "bg-slate-900 border-slate-700",
-
-                  // ✅ Glow suave en hover
                   "hover:-translate-y-1 hover:shadow-[0_0_22px_rgba(56,189,248,0.35)] hover:border-cyan-400",
-
-                  // ✅ Glow suave cuando está abierto
-                  isOpen ? "border-cyan-400 shadow-[0_0_14px_rgba(56,189,248,0.28)]" : "",
+                  isOpen
+                    ? "border-cyan-400 shadow-[0_0_14px_rgba(56,189,248,0.28)]"
+                    : "",
                 ].join(" ")}
               >
                 <button
@@ -68,7 +74,7 @@ export default function ExpoFeaturesDarkCyber() {
                 >
                   <h3
                     className={[
-                      "text-lg md:text-xl font-bold transition-colors",
+                      "text-lg md:text-xl font-bold transition-colors tracking-wide",
                       isOpen ? "text-cyan-400" : "text-slate-100",
                     ].join(" ")}
                   >
@@ -78,7 +84,9 @@ export default function ExpoFeaturesDarkCyber() {
                   <svg
                     className={[
                       "h-5 w-5 flex-shrink-0 transition-transform",
-                      isOpen ? "rotate-180 text-cyan-400" : "rotate-0 text-slate-400",
+                      isOpen
+                        ? "rotate-180 text-cyan-400"
+                        : "rotate-0 text-slate-400",
                     ].join(" ")}
                     viewBox="0 0 20 20"
                     fill="currentColor"
@@ -95,7 +103,9 @@ export default function ExpoFeaturesDarkCyber() {
                 <div
                   className={[
                     "transition-all duration-300 ease-out px-6",
-                    isOpen ? "max-h-64 pb-6 opacity-100" : "max-h-0 pb-0 opacity-0",
+                    isOpen
+                      ? "max-h-64 pb-6 opacity-100"
+                      : "max-h-0 pb-0 opacity-0",
                     "overflow-hidden",
                   ].join(" ")}
                 >
@@ -105,7 +115,6 @@ export default function ExpoFeaturesDarkCyber() {
             );
           })}
         </div>
-
       </div>
     </section>
   );
