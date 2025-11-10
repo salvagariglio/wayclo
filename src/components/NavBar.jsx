@@ -32,9 +32,12 @@ export default function NavBar({ dimmed = false }) {
   }, []);
 
   const closeMenu = () => setOpen(false);
-  const isActive = (href) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
+  const isActive = (href) =>
+    href === "/" ? pathname === "/" : pathname.startsWith(href);
 
-  const baseBg = dimmed ? "bg-slate-900/90 text-white backdrop-blur" : "bg-white text-black";
+  const baseBg = dimmed
+    ? "bg-slate-900/90 text-white backdrop-blur"
+    : "bg-white text-black";
 
   return (
     <header
@@ -71,7 +74,9 @@ export default function NavBar({ dimmed = false }) {
                       ? "text-white/90 hover:text-white"
                       : "text-black/80 hover:text-black",
                     "text-lg transition-opacity relative after:absolute after:left-0 after:-bottom-1 after:h-[2px] after:w-0",
-                    dimmed ? "after:bg-white/70" : "after:bg-[var(--brand,#050057)]",
+                    dimmed
+                      ? "after:bg-white/70"
+                      : "after:bg-[var(--brand,#050057)]",
                     "after:transition-[width] hover:after:w-full",
                     isActive(l.href) ? "after:w-full opacity-100" : "",
                   ].join(" ")}
@@ -87,7 +92,9 @@ export default function NavBar({ dimmed = false }) {
             onClick={() => document.dispatchEvent(new Event("open-register"))}
             className={[
               "gap-2 hover:opacity-90 text-lg rounded-full p-5",
-              dimmed ? "bg-white text-slate-900" : "bg-[var(--brand,#050057)] text-white",
+              dimmed
+                ? "bg-white text-slate-900"
+                : "bg-[var(--brand,#050057)] text-white",
             ].join(" ")}
           >
             INSCRIBITE
@@ -102,7 +109,9 @@ export default function NavBar({ dimmed = false }) {
             onClick={() => setOpen((v) => !v)}
             className={[
               "inline-flex items-center justify-center rounded-md p-2 outline-none focus-visible:ring-2",
-              dimmed ? "text-white focus-visible:ring-white/70" : "text-black focus-visible:ring-[var(--brand,#050057)]/70",
+              dimmed
+                ? "text-white focus-visible:ring-white/70"
+                : "text-black focus-visible:ring-[var(--brand,#050057)]/70",
             ].join(" ")}
           >
             {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -134,7 +143,11 @@ export default function NavBar({ dimmed = false }) {
                     dimmed
                       ? "text-white/90 hover:bg-white/5 focus-visible:ring-white/60"
                       : "text-black/90 hover:bg-black/[0.04] focus-visible:ring-[var(--brand,#050057)]/60",
-                    isActive(l.href) ? (dimmed ? "bg-white/5 text-white" : "bg-black/[0.06] text-black") : "",
+                    isActive(l.href)
+                      ? dimmed
+                        ? "bg-white/5 text-white"
+                        : "bg-black/[0.06] text-black"
+                      : "",
                   ].join(" ")}
                 >
                   {l.label}
@@ -151,7 +164,9 @@ export default function NavBar({ dimmed = false }) {
               }}
               className={[
                 "w-full max-w-xs gap-2 hover:opacity-90",
-                dimmed ? "bg-white text-slate-900" : "bg-[var(--brand,#050057)] text-white",
+                dimmed
+                  ? "bg-white text-slate-900"
+                  : "bg-[var(--brand,#050057)] text-white",
               ].join(" ")}
             >
               INSCRIBITE

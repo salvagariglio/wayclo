@@ -4,39 +4,31 @@
 export default function Agenda() {
   const agenda = [
     {
-      time: "17:45 – 18:15",
-      title: "Recepción y acreditación",
-      description:
-        "Bienvenida a los participantes con café de recepción. Networking inicial entre decisores y asistentes técnicos.",
+      time: "18:00 – 18:30",
+      title: "Acreditación y bienvenida",
+      description: "Recepción de asistentes y apertura.",
     },
     {
-      time: "18:15 – 18:30",
-      title: "Introducción",
-      description:
-        "Palabras de apertura de Wayclo e Intercity. Mensaje clave: las soluciones de conectividad y ciberseguridad están en Río Cuarto.",
+      time: "18:30 – 19:15",
+      title: "Panel: Ciberseguridad hoy en las pymes",
+      description: "Desafíos actuales y aprendizajes locales.",
+      tag: "Panel",
     },
     {
-      time: "18:30 – 20:00",
-      title: "Panel de discusión: Desafíos reales y soluciones en IT en la región",
-      description:
-        "Participan Wayclo, Intercity y empresas invitadas. Casos de éxito, desafíos locales y debate sobre el futuro tecnológico de la región.",
-    },
-    {
-      time: "20:00 – 20:15",
+      time: "19:15 – 19:30",
       title: "Break",
-      description: "Coffee break y networking informal entre asistentes.",
+      description: "Café & networking rápido.",
     },
     {
-      time: "20:15 – 20:45",
-      title: "Charla especial: Ciberseguridad e Inteligencia Artificial",
-      description:
-        "Enfoque innovador sobre cómo la IA se integra como aliada en la seguridad y gestión IT empresarial.",
+      time: "19:30 – 20:15",
+      title: "Charla: IA y seguridad en la empresa",
+      description: "Riesgos, buenas prácticas y herramientas.",
+      tag: "Charla",
     },
     {
-      time: "20:45 – 21:15",
-      title: "Catering y networking final",
-      description:
-        "Cierre con cóctel distendido y conversaciones uno a uno entre líderes y decisores.",
+      time: "20:15 – 21:00",
+      title: "Networking & demos",
+      description: "Conexiones entre empresas y partners.",
     },
   ];
 
@@ -48,15 +40,20 @@ export default function Agenda() {
         </h2>
 
         <div className="flex flex-col gap-8">
-          {agenda.map((item) => (
+          {agenda.map((it, idx) => (
             <div
-              key={item.time}
+              key={idx}
               className="border-l-4 border-cyan-400 pl-6 hover:bg-gray-50 rounded-xl py-4 transition-all duration-300"
             >
               <h3 className="text-xl font-bold text-cyan-600 mb-1">
-                {item.time} | {item.title}
+                {it.time} | {it.title}
               </h3>
-              <p className="text-gray-700 leading-relaxed">{item.description}</p>
+              <p className="text-gray-700 leading-relaxed">{it.description}</p>
+              {it.tag && (
+                <span className="text-xs rounded-full bg-black text-white px-2 py-0.5">
+                  {it.tag}
+                </span>
+              )}
             </div>
           ))}
         </div>

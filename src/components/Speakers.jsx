@@ -11,20 +11,56 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 
+// 🔁 Reemplazá SOLO este bloque en tu Speakers.jsx
+// 🔁 Asegurate de tener este campo en cada speaker:
 const speakers = [
   {
+    name: "Cristian Mercado",
+    role: "Director",
+    company: "Wayclo",
+    linkedin: "https://www.linkedin.com/in/cristian--mercado/",
+    img: "/speakers/cristian.jpg",
+    session: "Panel 1",
+  },
+  {
     name: "Gustavo Matuk",
-    role: "Director Comercial",
+    role: "Cybersecurity Advisor",
     company: "Wayclo",
     linkedin: "https://www.linkedin.com/in/gustavo-matuk-66b96613/",
     img: "/speakers/gustavo.jpg",
+    session: "Panel 1",
   },
   {
-    name: "Cristian Mercado",
-    role: "Gerente de Tecnología",
-    company: "Intercity",
-    linkedin: "https://www.linkedin.com/in/cristian--mercado/",
-    img: "/speakers/cristian.jpg",
+    name: "Martín Lovera",
+    role: "Gerente de Auditorías",
+    company: "Sala Hnos.",
+    linkedin: "",
+    img: "/speakers/martin-lovera.jpg",
+    session: "Panel 1",
+  },
+  {
+    name: "Pablo Degiglio",
+    role: "Téc. Centro de Cómputos",
+    company: "Municipalidad de Río Cuarto",
+    linkedin: "",
+    img: "/speakers/pablo-degiglio.jpg",
+    session: "Panel 1",
+  },
+  {
+    name: "Iván Pecovich",
+    role: "Socio Gerente",
+    company: "Intercity Comunicaciones S.A.",
+    linkedin: "",
+    img: "/speakers/ivan-pecovich.jpg",
+    session: "Panel 2",
+  },
+  {
+    name: "Emmanuel Vilas",
+    role: "Cybercrime Researcher · Director de carrera",
+    company: "Universidad Siglo 21",
+    linkedin: "https://www.linkedin.com/in/emmanuelvilas/",
+    img: "/speakers/emmanuel.jpg",
+    session: "Charla",
   },
   {
     name: "Benjamín Gómez",
@@ -32,6 +68,7 @@ const speakers = [
     company: "Intercity",
     linkedin: "https://www.linkedin.com/in/benjamin--gomez/",
     img: "/speakers/benjamin.jpg",
+    session: "Panel 2",
   },
   {
     name: "Hernán Gariglio",
@@ -39,13 +76,7 @@ const speakers = [
     company: "Wayclo",
     linkedin: "https://www.linkedin.com/in/hernangariglio9/",
     img: "/speakers/hernan.jpg",
-  },
-  {
-    name: "Emmanuel Vilas",
-    role: "Especialista en Ciberseguridad",
-    company: "Consultor Independiente",
-    linkedin: "https://www.linkedin.com/in/emmanuelvilas/",
-    img: "/speakers/emmanuel.jpg",
+    session: "Panel 2",
   },
 ];
 
@@ -88,7 +119,6 @@ export default function SpeakersCarousel() {
         {/* Carrusel */}
         <Swiper
           modules={[Navigation, Pagination, A11y, Autoplay]}
-          // Navigation con refs (robusto)
           onBeforeInit={(sw) => {
             sw.params.navigation.prevEl = prevRef.current;
             sw.params.navigation.nextEl = nextRef.current;
@@ -112,11 +142,11 @@ export default function SpeakersCarousel() {
           grabCursor
           resistanceRatio={0.85}
           spaceBetween={28}
-          slidesPerView={1.3} // Muestra adyacentes en mobile
+          slidesPerView={1.3}
           breakpoints={{
             480: { slidesPerView: 1.3, spaceBetween: 28, centeredSlides: true },
             640: { slidesPerView: 1.4, spaceBetween: 32, centeredSlides: true },
-            768: { slidesPerView: 1.5, spaceBetween: 40, centeredSlides: true }, // 👈 centrado
+            768: { slidesPerView: 1.5, spaceBetween: 40, centeredSlides: true },
             1024: { slidesPerView: 3, spaceBetween: 64, centeredSlides: true },
             1440: { slidesPerView: 3, spaceBetween: 72, centeredSlides: true },
           }}
@@ -139,7 +169,7 @@ export default function SpeakersCarousel() {
 }
 
 function SpeakerCard({ data, featured = false }) {
-  const { name, role, company, linkedin, img } = data;
+  const { name, role, company, linkedin, img, session } = data; // ⬅️ sumo session
 
   return (
     <div
@@ -186,6 +216,17 @@ function SpeakerCard({ data, featured = false }) {
         />
       </div>
 
+      {/* ⬇️ Marcador chiquito (Panel 1 / Panel 2 / Charla). No altera tu diseño */}
+      {session && (
+        <span
+          className="absolute top-3 right-3 text-[10px] font-semibold tracking-wide uppercase
+                     bg-cyan-500/10 border border-cyan-400/30 text-cyan-300
+                     px-2 py-0.5 rounded-full pointer-events-none"
+        >
+          {session}
+        </span>
+      )}
+
       {/* Foto */}
       <div className="relative w-32 h-32 md:w-44 md:h-44 lg:w-52 lg:h-52 mb-8 md:mb-10 rounded-full overflow-hidden border border-slate-700 shadow-md">
         <Image
@@ -202,14 +243,17 @@ function SpeakerCard({ data, featured = false }) {
       <p className="text-sm md:text-base text-slate-300">{role}</p>
       <p className="text-sm md:text-base text-slate-400 mb-5">{company}</p>
 
-      <a
-        href={linkedin}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-flex items-center justify-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors mt-auto"
-      >
-        <Linkedin className="w-6 h-6" /> LinkedIn
-      </a>
+      {/* ⬇️ LinkedIn SOLO si existe */}
+      {linkedin && (
+        <a
+          href={linkedin}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center justify-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors mt-auto"
+        >
+          <Linkedin className="w-6 h-6" /> LinkedIn
+        </a>
+      )}
     </div>
   );
 }
