@@ -3,7 +3,8 @@
 import { useMemo, useState } from "react";
 
 export default function RegisterForm({ onSuccess, onClose }) {
-  const PHONE_PREFIX = "+54 ";
+  // Argentina E.164 típico: +54 9 + área + número
+  const PHONE_PREFIX = "+54 9 ";
 
   const [form, setForm] = useState({
     name: "",
@@ -17,24 +18,25 @@ export default function RegisterForm({ onSuccess, onClose }) {
   });
   const [touched, setTouched] = useState({});
   const [loading, setLoading] = useState(false);
+
   const DIET_BASE = [
-    { value: "vegetariano", label: "Vegetariano" },
-    { value: "vegano", label: "Vegano" },
     { value: "celiaco", label: "Celíaco" },
     { value: "diabetico", label: "Diabético" },
     { value: "ninguno", label: "Ninguno" },
-    { value: "otro", label: "Otro" },
+    { value: "vegano", label: "Vegano" },
+    { value: "vegetariano", label: "Vegetariano" },
+    { value: "otro", label: "Otro" }, // último siempre
   ];
   const DIET_OPTIONS = useMemo(() => {
     const other = DIET_BASE.find((d) => d.value === "otro");
-    const rest = DIET_BASE.filter((d) => d.value !== "otro");
-    rest.sort((a, b) =>
+    const rest = DIET_BASE.filter((d) => d.value !== "otro").sort((a, b) =>
       a.label.localeCompare(b.label, "es", { sensitivity: "base" })
     );
     return other ? [...rest, other] : rest;
   }, []);
 
   const onlyDigits = (s = "") => (s.match(/\d/g) || []).join("");
+
   const errors = useMemo(() => {
     const e = {};
     if (!/^[A-Za-zÁÉÍÓÚÑáéíóúñ' -]{2,}$/.test(form.name || ""))
@@ -59,8 +61,10 @@ export default function RegisterForm({ onSuccess, onClose }) {
   }, [form]);
 
   const hasErrors = Object.keys(errors).length > 0;
+
   const handleChange = (e) =>
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
+
   const handleBlur = (e) =>
     setTouched((t) => ({ ...t, [e.target.name]: true }));
 
@@ -90,7 +94,7 @@ export default function RegisterForm({ onSuccess, onClose }) {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setTouched({
       name: true,
@@ -105,15 +109,42 @@ export default function RegisterForm({ onSuccess, onClose }) {
     if (hasErrors) return;
 
     setLoading(true);
+
+    // Mapeo a columnas reales de la tabla
     const payload = {
-      ...form,
+      first_name: form.name.trim(),
+      last_name: form.lastname.trim(),
+      email: form.email.trim(),
       phone: `${PHONE_PREFIX}${form.phoneRest}`.trim(),
+      company: form.empresa.trim(),
+      role: form.puesto.trim(),
+      diet: form.dietas.join(","), // string
+      diet_other: form.dietas.includes("otro") ? form.dietaOtro.trim() : null,
+      status: "pending",
     };
-    setTimeout(() => {
+
+    try {
+      const res = await fetch("/api/registrations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const out = await res.json();
+      if (!res.ok) {
+        console.error("API error:", out);
+        alert(out?.detail || out?.error || "No se pudo registrar.");
+        setLoading(false);
+        return;
+      }
       setLoading(false);
-      onSuccess?.(payload);
-    }, 900);
+      onSuccess?.(out); // { ok: true, id }
+    } catch (err) {
+      console.error(err);
+      alert("Error inesperado. Intentá de nuevo.");
+      setLoading(false);
+    }
   };
+
   const inputClass = (invalid) =>
     [
       "mt-1 w-full rounded-md border px-3 py-2",
@@ -121,6 +152,7 @@ export default function RegisterForm({ onSuccess, onClose }) {
       "focus-visible:ring-2 focus-visible:ring-[var(--brand,#050057)] focus-visible:border-[var(--brand,#050057)]",
       invalid ? "border-rose-400" : "border-slate-300",
     ].join(" ");
+
   const pillClass = (active, invalid) =>
     [
       "block w-full h-10",
@@ -213,32 +245,26 @@ export default function RegisterForm({ onSuccess, onClose }) {
           )}
         </div>
 
-        {/* Teléfono con prefijo fijo */}
+        {/* Teléfono */}
         <div>
           <label className="text-sm">Teléfono*</label>
-          <div className="mt-1 flex">
-            <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-slate-300 bg-slate-50 text-slate-700 text-sm select-none">
-              {PHONE_PREFIX}
-            </span>
+          <div className="flex gap-2">
+            <input
+              value={PHONE_PREFIX}
+              readOnly
+              className="mt-1 w-24 rounded-md border px-3 py-2 bg-slate-100 text-slate-500 border-slate-300"
+              aria-label="Prefijo"
+            />
             <input
               name="phoneRest"
               required
-              inputMode="numeric"
-              pattern="^[0-9()\s-]{6,}$"
               value={form.phoneRest}
               onChange={handlePhoneChange}
               onBlur={handleBlur}
-              className={[
-                "flex-1 rounded-r-md border px-3 py-2",
-                "bg-white text-slate-900 placeholder:text-slate-400",
-                "focus-visible:ring-2 focus-visible:ring-[var(--brand,#050057)] focus-visible:border-[var(--brand,#050057)]",
-                touched.phoneRest && !!errors.phoneRest
-                  ? "border-rose-400"
-                  : "border-slate-300",
-              ].join(" ")}
+              placeholder="(351) 123-4567"
+              className={inputClass(touched.phoneRest && !!errors.phoneRest)}
               aria-invalid={touched.phoneRest && !!errors.phoneRest}
               aria-describedby="err-phone"
-              placeholder="351 123 4567"
             />
           </div>
           {touched.phoneRest && errors.phoneRest && (
@@ -258,13 +284,9 @@ export default function RegisterForm({ onSuccess, onClose }) {
             onChange={handleChange}
             onBlur={handleBlur}
             className={inputClass(touched.empresa && !!errors.empresa)}
-            aria-invalid={touched.empresa && !!errors.empresa}
-            aria-describedby="err-empresa"
           />
           {touched.empresa && errors.empresa && (
-            <p id="err-empresa" className="mt-1 text-xs text-rose-500">
-              {errors.empresa}
-            </p>
+            <p className="mt-1 text-xs text-rose-500">{errors.empresa}</p>
           )}
         </div>
 
@@ -278,82 +300,69 @@ export default function RegisterForm({ onSuccess, onClose }) {
             onChange={handleChange}
             onBlur={handleBlur}
             className={inputClass(touched.puesto && !!errors.puesto)}
-            aria-invalid={touched.puesto && !!errors.puesto}
-            aria-describedby="err-puesto"
           />
           {touched.puesto && errors.puesto && (
-            <p id="err-puesto" className="mt-1 text-xs text-rose-500">
-              {errors.puesto}
-            </p>
+            <p className="mt-1 text-xs text-rose-500">{errors.puesto}</p>
           )}
         </div>
-      </div>
 
-      {/* Dietas (multiselección con chips de tamaño uniforme) */}
-      <div className="mt-4">
-        <label className="text-sm block">Preferencias de dieta*</label>
-
-        <div
-          className={[
-            "mt-2 grid grid-cols-2 sm:grid-cols-3 gap-2",
-            touched.dietas && errors.dietas ? "pb-1" : "",
-          ].join(" ")}
-          role="group"
-          aria-label="Preferencias de dieta"
-        >
-          {DIET_OPTIONS.map((opt) => {
-            const active = form.dietas.includes(opt.value);
-            return (
-              <label key={opt.value} className="cursor-pointer w-full">
-                {/* Checkbox real (accesible) */}
-                <input
-                  type="checkbox"
-                  name="dietas"
-                  value={opt.value}
-                  checked={active}
-                  onChange={() => toggleDiet(opt.value)}
-                  onBlur={() => setTouched((t) => ({ ...t, dietas: true }))}
-                  className="sr-only peer"
-                />
-                <span
-                  role="button"
-                  aria-pressed={active}
-                  className={pillClass(
-                    active,
-                    touched.dietas && !!errors.dietas
-                  )}
-                >
-                  {opt.label}
-                </span>
-              </label>
-            );
-          })}
-        </div>
-
-        {touched.dietas && errors.dietas && (
-          <p className="mt-1 text-xs text-rose-500">{errors.dietas}</p>
-        )}
-
-        {/* Campo "Otro" */}
-        {form.dietas.includes("otro") && (
-          <div className="mt-2">
-            <input
-              name="dietaOtro"
-              placeholder="Especificá tu dieta"
-              value={form.dietaOtro}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              className={inputClass(touched.dietaOtro && !!errors.dietaOtro)}
-              aria-invalid={touched.dietaOtro && !!errors.dietaOtro}
-              aria-describedby="err-dietaOtro"
-            />
-            {touched.dietaOtro && errors.dietaOtro && (
-              <p id="err-dietaOtro" className="mt-1 text-xs text-rose-500">
-                {errors.dietaOtro}
-              </p>
-            )}
+        {/* Dietas (multi) */}
+        <div className="sm:col-span-2">
+          <label className="text-sm">Preferencias de dieta*</label>
+          <div className="mt-1 grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {DIET_OPTIONS.map((opt) => {
+              const active = form.dietas.includes(opt.value);
+              return (
+                <label key={opt.value} className="cursor-pointer w-full">
+                  <input
+                    type="checkbox"
+                    name="dietas"
+                    value={opt.value}
+                    checked={active}
+                    onChange={() => toggleDiet(opt.value)}
+                    onBlur={() => setTouched((t) => ({ ...t, dietas: true }))}
+                    className="sr-only peer"
+                  />
+                  <span
+                    role="button"
+                    aria-pressed={active}
+                    className={pillClass(
+                      active,
+                      touched.dietas && !!errors.dietas
+                    )}
+                  >
+                    {opt.label}
+                  </span>
+                </label>
+              );
+            })}
           </div>
-        )}
+
+          {touched.dietas && errors.dietas && (
+            <p className="mt-1 text-xs text-rose-500">{errors.dietas}</p>
+          )}
+
+          {/* Campo "Otro" */}
+          {form.dietas.includes("otro") && (
+            <div className="mt-2">
+              <input
+                name="dietaOtro"
+                placeholder="Especificá tu dieta"
+                value={form.dietaOtro}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                className={inputClass(touched.dietaOtro && !!errors.dietaOtro)}
+                aria-invalid={touched.dietaOtro && !!errors.dietaOtro}
+                aria-describedby="err-dietaOtro"
+              />
+              {touched.dietaOtro && errors.dietaOtro && (
+                <p id="err-dietaOtro" className="mt-1 text-xs text-rose-500">
+                  {errors.dietaOtro}
+                </p>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Botones */}
