@@ -1,4 +1,3 @@
-// components/SpeakersCarousel.jsx
 "use client";
 import { useRef, useState } from "react";
 import Image from "next/image";
@@ -6,13 +5,9 @@ import { Linkedin, ChevronLeft, ChevronRight } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, A11y, Autoplay } from "swiper/modules";
 
-// Swiper styles
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-
-// 🔁 Reemplazá SOLO este bloque en tu Speakers.jsx
-// 🔁 Asegurate de tener este campo en cada speaker:
 const speakers = [
   {
     name: "Cristian Mercado",
@@ -20,14 +15,6 @@ const speakers = [
     company: "Wayclo",
     linkedin: "https://www.linkedin.com/in/cristian--mercado/",
     img: "/speakers/cristian.jpg",
-    session: "Panel 1",
-  },
-  {
-    name: "Gustavo Matuk",
-    role: "Cybersecurity Advisor",
-    company: "Wayclo",
-    linkedin: "https://www.linkedin.com/in/gustavo-matuk-66b96613/",
-    img: "/speakers/gustavo.jpg",
     session: "Panel 1",
   },
   {
@@ -52,6 +39,30 @@ const speakers = [
     company: "Intercity Comunicaciones S.A.",
     linkedin: "",
     img: "/speakers/ivan-pecovich.jpg",
+    session: "Panel 1",
+  },
+  {
+    name: "Eduardo Ochoa",
+    role: "Director del centro de Cómputos de la Municipalidad de Río Cuarto",
+    company: "Municipalidad de Río Cuarto",
+    linkedin: "",
+    img: "/speakers/eduardo.jpg",
+    session: "Panel 1",
+  },
+  {
+    name: "Hernán Gariglio",
+    role: "CEO & Fundador",
+    company: "Wayclo",
+    linkedin: "https://www.linkedin.com/in/hernangariglio9/",
+    img: "/speakers/hernan.jpg",
+    session: "Panel 1",
+  },
+  {
+    name: "Gustavo Matuk",
+    role: "Cybersecurity Advisor",
+    company: "Wayclo",
+    linkedin: "https://www.linkedin.com/in/gustavo-matuk-66b96613/",
+    img: "/speakers/gustavo.jpg",
     session: "Panel 2",
   },
   {
@@ -60,22 +71,6 @@ const speakers = [
     company: "Universidad Siglo 21",
     linkedin: "https://www.linkedin.com/in/emmanuelvilas/",
     img: "/speakers/emmanuel.jpg",
-    session: "Charla",
-  },
-  {
-    name: "Benjamín Gómez",
-    role: "Consultor Senior en Infraestructura",
-    company: "Intercity",
-    linkedin: "https://www.linkedin.com/in/benjamin--gomez/",
-    img: "/speakers/benjamin.jpg",
-    session: "Panel 2",
-  },
-  {
-    name: "Hernán Gariglio",
-    role: "CEO & Fundador",
-    company: "Wayclo",
-    linkedin: "https://www.linkedin.com/in/hernangariglio9/",
-    img: "/speakers/hernan.jpg",
     session: "Panel 2",
   },
 ];

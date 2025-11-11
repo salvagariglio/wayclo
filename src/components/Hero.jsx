@@ -1,12 +1,7 @@
-// components/Hero.jsx
-"use client"
+"use client";
 import Image from "next/image";
-
-// IMÁGENES (asegurate de tener estos nombres en /public)
-
 import ShieldCheck from "../../public/shield-check.png";
 import LaptopShield from "../../public/laptop-shield.png";
-
 
 export default function Hero() {
   return (
@@ -29,9 +24,9 @@ export default function Hero() {
         "
       >
         La nueva era de
-        <br/>
+        <br />
         la ciberseguridad
-        <br/>
+        <br />
         empresarial
       </h1>
 
@@ -56,8 +51,8 @@ export default function Hero() {
           text-lg md:text-2xl
         "
       >
-        El evento donde líderes y creativos se reúnen
-        para construir el futuro de la innovación digital.
+        El evento donde líderes y creativos se reúnen para construir el futuro
+        de la innovación digital.
       </p>
 
       {/* CTA */}
@@ -70,7 +65,6 @@ export default function Hero() {
           REGÍSTRATE AHORA
         </button>
       </div>
-
 
       {/* ======= IMÁGENES DECORATIVAS ======= */}
       {/* Escudo con check (izquierda) */}

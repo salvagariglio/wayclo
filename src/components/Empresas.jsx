@@ -1,4 +1,3 @@
-// components/Empresas.jsx
 "use client";
 
 import Image from "next/image";
@@ -12,7 +11,8 @@ export default function Empresas() {
       className="
         w-full flex flex-col items-center justify-center
         gap-8 sm:gap-10
-        sm:mt-32 
+        sm:mt-32
+        mb-24 
       "
     >
       {/* Logo principal (Wayclo) */}

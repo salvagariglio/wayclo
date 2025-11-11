@@ -1,30 +1,112 @@
+import CompaniesSection from "@/components/CompaniesSection";
+
+const waycloTexto = `
+Soluciones integrales y ciberseguridad para el crecimiento empresarial
+En Wayclo acompañamos a las organizaciones en su evolución digital mediante soluciones tecnológicas integrales que combinan infraestructura, nube y ciberseguridad, impulsando operaciones más eficientes, seguras y confiables.
+Evaluamos cada entorno de forma personalizada para diseñar estrategias escalables y seguras, orientadas a la mejora continua, la reducción de riesgos y una transformación tecnológica alineada con los objetivos del negocio.
+Somos partners de las marcas más reconocidas a nivel mundial en infraestructura, virtualización, respaldo, networking y seguridad, lo que nos permite ofrecer soluciones robustas y de alto rendimiento adaptadas a cada necesidad.
+En Wayclo, la tecnología es el medio para un fin: impulsar el éxito empresarial, ayudando a las empresas a alcanzar nuevos niveles de rendimiento, resiliencia y protección.
+`;
+
+const intercityTexto = `
+Intercity Comunicaciones S.A. es un proveedor de conectividad por fibra óptica en Río Cuarto y zona. Ofrecen planes empresariales, despliegue FTTH, soporte local y TV digital (Oy!), con soluciones para hogares, empresas e instituciones.
+`;
+
 export default function EmpresasPage() {
-    return (
-        <main className="mx-auto max-w-5xl px-6 py-16 text-black">
-            <h1 className="text-4xl font-bold mb-4">Empresas</h1>
-            <p className="text-lg text-black/70 mb-8">
-                Conectamos talento con empresas que apuestan por la innovación y el
-                crecimiento tecnológico.
-            </p>
+  const companies = [
+    {
+      id: "wayclo",
+      name: "Wayclo",
+      logoSrc: "/logo-wayclo.png",
+      about: waycloTexto,
+      keyServices: [
+        {
+          icon: "ShieldCheck",
+          title: "Ciberseguridad y Protección",
+          description:
+            "Soluciones integrales contra amenazas y reducción de riesgos.",
+        },
+        {
+          icon: "Server",
+          title: "Infraestructura & Nube",
+          description:
+            "Datacenters, virtualización y soluciones cloud escalables.",
+        },
+        {
+          icon: "Database",
+          title: "Respaldo y Resiliencia",
+          description:
+            "Estrategias de networking y respaldo para la continuidad del negocio.",
+        },
+      ],
+      links: [
+        { label: "Sitio web", href: "https://wayclo.tech/", iconName: "Globe" },
+        {
+          label: "LinkedIn",
+          href: "https://www.linkedin.com/company/wayclo/posts/?feedView=all",
+          iconName: "Linkedin",
+        },
+        {
+          label: "Infra",
+          href: "https://wayclo.tech/infra/",
+          iconName: "Wrench",
+        },
+        {
+          label: "Security",
+          href: "https://wayclo.tech/security/",
+          iconName: "Lock",
+        },
+      ],
+      ctaHref: "https://wayclo.tech/#contacto",
+      ctaLabel: "Hablar con Wayclo",
+    },
+    {
+      id: "intercity",
+      name: "Intercity",
+      logoSrc: "/intercity.png",
+      about: intercityTexto,
+      keyServices: [
+        {
+          icon: "Zap",
+          title: "Conectividad Fibra Óptica (FTTH)",
+          description: "Planes de alta velocidad para hogares y empresas.",
+        },
+        {
+          icon: "Building",
+          title: "Soluciones Empresariales",
+          description: "Conectividad dedicada para empresas e instituciones.",
+        },
+        {
+          icon: "Tv",
+          title: "TV Digital (Oy!)",
+          description: "Servicio de televisión digital con contenido variado.",
+        },
+      ],
+      links: [
+        {
+          label: "Sitio web",
+          href: "https://www.intercity.net.ar/",
+          iconName: "Globe",
+        },
+        {
+          label: "LinkedIn",
+          href: "https://www.linkedin.com/company/intercityinternet/",
+          iconName: "Linkedin",
+        },
+        {
+          label: "Instagram",
+          href: "https://www.instagram.com/intercity.ar/",
+          iconName: "Instagram",
+        },
+      ],
+      ctaHref: "https://www.intercity.net.ar/#contact",
+      ctaLabel: "Hablar con Intercity",
+    },
+  ];
 
-            <section className="space-y-6">
-                <div>
-                    <h2 className="text-2xl font-semibold mb-2">Alianzas Corporativas</h2>
-                    <p className="text-black/70">
-                        Colaboramos con startups y compañías líderes que buscan nuevos
-                        perfiles técnicos. Ofrecemos programas de inserción laboral y
-                        prácticas profesionales.
-                    </p>
-                </div>
-
-                <div>
-                    <h2 className="text-2xl font-semibold mb-2">Contratación de Talento</h2>
-                    <p className="text-black/70">
-                        Si tu empresa busca incorporar desarrolladores formados en nuestro
-                        bootcamp, te ayudamos a conectar con el perfil ideal.
-                    </p>
-                </div>
-            </section>
-        </main>
-    );
+  return (
+    <main className="bg-slate-950">
+      <CompaniesSection data={companies} />
+    </main>
+  );
 }

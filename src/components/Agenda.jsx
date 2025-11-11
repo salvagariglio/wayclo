@@ -1,4 +1,3 @@
-// components/Agenda.jsx
 "use client";
 
 export default function Agenda() {

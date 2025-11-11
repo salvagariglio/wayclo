@@ -3,7 +3,12 @@
 import { useEffect, useState } from "react";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import RegisterForm from "@/components/RegisterForm";
 
 export default function SiteShell({ children }) {
@@ -14,12 +19,11 @@ export default function SiteShell({ children }) {
     setOpen(false);
     setTimeout(() => setMode("form"), 250);
   };
-
-  // Abrir desde botón (evento global) o hash #registro
   useEffect(() => {
     const openFromEvent = () => setOpen(true);
     document.addEventListener("open-register", openFromEvent);
-    if (typeof window !== "undefined" && window.location.hash === "#registro") setOpen(true);
+    if (typeof window !== "undefined" && window.location.hash === "#registro")
+      setOpen(true);
     return () => document.removeEventListener("open-register", openFromEvent);
   }, []);
 
@@ -46,7 +50,7 @@ export default function SiteShell({ children }) {
           {mode === "form" && (
             <>
               <DialogHeader className="px-6 pt-6">
-                <DialogTitle className="text-slate-900">Solicitud de registro</DialogTitle>
+                <DialogTitle className="text-slate-900"></DialogTitle>
               </DialogHeader>
 
               <div className="p-4 sm:p-6">
@@ -61,11 +65,15 @@ export default function SiteShell({ children }) {
           {mode === "success" && (
             <>
               <DialogHeader className="px-6 pt-6">
-                <DialogTitle className="text-slate-900">Registro enviado</DialogTitle>
+                <DialogTitle className="text-slate-900">
+                  Registro enviado
+                </DialogTitle>
               </DialogHeader>
 
               <div className="p-6 text-slate-800 text-center">
-                <p className="mb-4">¡Gracias! Tu inscripción fue enviada correctamente.</p>
+                <p className="mb-4">
+                  ¡Gracias! Tu inscripción fue enviada correctamente.
+                </p>
                 <button
                   onClick={handleClose}
                   className="

@@ -1,4 +1,3 @@
-// components/ExpoFeaturesDarkCyber.jsx
 "use client";
 import { useState } from "react";
 import Image from "next/image";
@@ -7,16 +6,12 @@ import ExpoImg from "../../public/polo.jpg";
 export default function ExpoFeaturesDarkCyber() {
   const features = [
     {
-      title: "TENDENCIAS",
-      text: "Analizá los desafíos emergentes en ciberseguridad, inteligencia artificial y transformación digital que marcarán el futuro de las empresas.",
+      title: "Networking Empresarial",
+      text: "Donde las conversaciones se transforman en alianzas y las conexiones en oportunidades reales para crecer juntos.",
     },
     {
-      title: "NETWORKING",
-      text: "Conectate con líderes de tecnología, responsables de seguridad y expertos del sector para compartir experiencias y construir alianzas estratégicas.",
-    },
-    {
-      title: "APRENDIZAJE",
-      text: "Accedé a perspectivas reales de quienes protegen, gestionan y optimizan los entornos tecnológicos más exigentes del mercado.",
+      title: "Networking & Alianzas Estratégicas",
+      text: "Un espacio para conocerse, compartir experiencias y construir nuevas oportunidades junto a referentes y empresas de la región.",
     },
   ];
 
@@ -26,16 +21,18 @@ export default function ExpoFeaturesDarkCyber() {
   return (
     <section className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center justify-items-center">
-
         {/* IZQUIERDA */}
         <div className="lg:pr-12 lg:text-left text-center">
           <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-6">
             UNA EXPERIENCIA ÚNICA PARA LÍDERES Y EXPERTOS EN TECNOLOGÍA
           </h2>
           <p className="text-gray-600 text-lg leading-relaxed max-w-xl mx-auto lg:mx-0">
-            CyberCloud reúne a los principales referentes del mundo digital y la
-            ciberseguridad para explorar cómo la innovación impulsa la
-            competitividad y la resiliencia empresarial.
+            CyberCloud es el evento que reúne a líderes, empresarios y tomadores
+            de decisión para hablar de lo que hoy mueve a las PYMES:
+            crecimiento, conectividad y ciberseguridad. Porque Río Cuarto no se
+            queda atrás: hoy cuenta con talento, infraestructura y servicios
+            tecnológicos de primer nivel, capaces de acompañar el desarrollo de
+            cualquier empresa sin depender de grandes proveedores externos.
           </p>
 
           <div className="mt-10 w-full">
@@ -52,6 +49,16 @@ export default function ExpoFeaturesDarkCyber() {
 
         {/* DERECHA */}
         <div className="flex flex-col gap-6 w-full">
+          <div className="lg:pr-12 lg:text-left text-center">
+            <p className="text-gray-600 text-lg leading-relaxed max-w-xl mx-auto lg:mx-0">
+              En esta edición, conocerás historias reales de empresas locales
+              que transformaron su forma de operar, invirtieron en tecnología y
+              entendieron que la seguridad y la conectividad son la base para
+              seguir creciendo. CyberCloud es un espacio para conectarte con la
+              innovación, descubrir nuevas oportunidades y ser parte del
+              crecimiento tecnológico del sur cordobés.
+            </p>
+          </div>
           {features.map((f, i) => {
             const isOpen = openIndex === i;
             return (
