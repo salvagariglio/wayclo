@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
+import { Resend } from "resend";
 import { getSupabaseServer } from "@/lib/supabaseServer";
 
 export async function POST(req) {
@@ -19,7 +20,6 @@ export async function POST(req) {
       diet_other,
     } = body || {};
 
-    // validaciones básicas
     if (!first_name || !last_name || !email || !phone) {
       return NextResponse.json(
         { error: "Missing required fields" },
@@ -27,8 +27,7 @@ export async function POST(req) {
       );
     }
 
-    const supabase = getSupabaseServer(); // usa SERVICE_ROLE en servidor (como en tu helper) :contentReference[oaicite:3]{index=3}
-
+    const supabase = getSupabaseServer(); // usa SERVICE_ROLE en server
     const { data, error } = await supabase
       .from("registrations")
       .insert({
@@ -47,12 +46,24 @@ export async function POST(req) {
 
     if (error) {
       console.error(error);
-      const status = error.code === "23505" ? 409 : 500; // por si tenés unique indexes
+      const status = error.code === "23505" ? 409 : 500;
       return NextResponse.json(
         { error: "DB error", detail: error.message },
         { status }
       );
     }
+
+    // ==== Email "registro recibido" con Resend ====
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    await resend.emails.send({
+      from: "Evento <noreply@tudominio.com>", // usa un remitente de tu dominio verificado en Resend
+      to: email,
+      subject: "Registro recibido — ¡Gracias!",
+      text: `Hola ${first_name},
+Recibimos tu registro y quedó pendiente de aprobación.
+Te avisamos por este mismo email cuando esté confirmado.
+— Equipo del evento`,
+    });
 
     return NextResponse.json({ ok: true, id: data.id });
   } catch (e) {
