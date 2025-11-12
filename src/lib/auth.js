@@ -1,3 +1,4 @@
+import "server-only";
 import { SignJWT, jwtVerify } from "jose";
 
 const encoder = () => new TextEncoder().encode(process.env.ADMIN_JWT_SECRET);

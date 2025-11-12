@@ -1,3 +1,4 @@
+import "server-only";
 import { NextResponse } from "next/server";
 import { getSupabaseServer } from "@/lib/supabaseServer";
 import { sendEmail } from "@/lib/sendEmail";

@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
+import Script from "next/script";
 
 export default function RegisterForm({ onSuccess, onClose }) {
   // Argentina E.164 típico: +54 9 + área + número
@@ -18,6 +19,24 @@ export default function RegisterForm({ onSuccess, onClose }) {
   });
   const [touched, setTouched] = useState({});
   const [loading, setLoading] = useState(false);
+
+  // --- NUEVO: estado captcha ---
+  const [captchaToken, setCaptchaToken] = useState("");
+  const [captchaError, setCaptchaError] = useState("");
+
+  // --- Turnstile callback global (recibe el token) ---
+  useEffect(() => {
+    // @ts-ignore
+    window.onTurnstileVerified = (token) => {
+      setCaptchaToken(token || "");
+      setCaptchaError("");
+    };
+    // opcional: limpieza
+    return () => {
+      // @ts-ignore
+      delete window.onTurnstileVerified;
+    };
+  }, []);
 
   const DIET_BASE = [
     { value: "celiaco", label: "Celíaco" },
@@ -106,6 +125,13 @@ export default function RegisterForm({ onSuccess, onClose }) {
       dietas: true,
       dietaOtro: true,
     });
+
+    // --- NUEVO: exigir token captcha ---
+    if (!captchaToken) {
+      setCaptchaError("Por favor resolvé el verificado de seguridad.");
+      return;
+    }
+
     if (hasErrors) return;
 
     setLoading(true);
@@ -121,6 +147,9 @@ export default function RegisterForm({ onSuccess, onClose }) {
       diet: form.dietas.join(","), // string
       diet_other: form.dietas.includes("otro") ? form.dietaOtro.trim() : null,
       status: "pending",
+
+      // --- NUEVO: enviar token ---
+      turnstileToken: captchaToken,
     };
 
     try {
@@ -172,6 +201,12 @@ export default function RegisterForm({ onSuccess, onClose }) {
       style={{ ["--brand"]: "#050057" }}
       noValidate
     >
+      {/* Script de Turnstile */}
+      <Script
+        src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+        strategy="afterInteractive"
+      />
+
       <h3 className="mb-1 text-slate-900 font-semibold leading-tight">
         Inscripción al evento
       </h3>
@@ -363,6 +398,19 @@ export default function RegisterForm({ onSuccess, onClose }) {
             </div>
           )}
         </div>
+      </div>
+
+      {/* --- NUEVO: Widget Turnstile --- */}
+      <div className="mt-4">
+        <div
+          className="cf-turnstile"
+          data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
+          data-callback="onTurnstileVerified"
+          data-theme="light"
+        />
+        {captchaError && (
+          <p className="mt-1 text-xs text-rose-500">{captchaError}</p>
+        )}
       </div>
 
       {/* Botones */}

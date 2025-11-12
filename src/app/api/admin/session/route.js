@@ -1,3 +1,4 @@
+import "server-only";
 import { NextResponse } from "next/server";
 import { createAdminJWT, verifyAdminJWT } from "@/lib/auth";
 

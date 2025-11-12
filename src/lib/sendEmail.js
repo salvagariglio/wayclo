@@ -1,3 +1,4 @@
+import "server-only";
 export async function sendEmail({ to, subject, html }) {
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.RESEND_FROM || "Evento <onboarding@resend.dev>";
