@@ -1,6 +1,9 @@
 export async function sendEmail({ to, subject, html }) {
-  if (!process.env.RESEND_API_KEY) {
-    console.log("⚠️ EMAIL DESHABILITADO (no hay API key)");
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = process.env.RESEND_FROM || "Evento <onboarding@resend.dev>";
+
+  if (!apiKey) {
+    console.warn("RESEND_API_KEY no configurada; no se envía email.");
     return;
   }
 
@@ -8,17 +11,13 @@ export async function sendEmail({ to, subject, html }) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+      Authorization: `Bearer ${apiKey}`,
     },
-    body: JSON.stringify({
-      from: "Evento <onboarding@resend.dev>",
-      to,
-      subject,
-      html,
-    }),
+    body: JSON.stringify({ from, to, subject, html }),
   });
 
   if (!res.ok) {
-    console.error("Error enviando email:", res.status, await res.text());
+    const t = await res.text();
+    console.error("Resend error:", res.status, t);
   }
 }
