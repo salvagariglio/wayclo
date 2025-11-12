@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import {
   ChevronDown,
   ArrowRight,
@@ -38,25 +38,11 @@ function Icon({ name, className = "w-5 h-5" }) {
 
 export default function CompaniesSection({ data = [] }) {
   const safeData = Array.isArray(data) ? data : [];
-  const firstId = safeData[0]?.id ?? "";
 
-  const [active, setActive] = useState(firstId);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const u = new URL(window.location.href);
-    const empresa = u.searchParams.get("empresa");
-    if (empresa && safeData.some((d) => d.id === empresa)) {
-      setActive(empresa);
-    }
-  }, [safeData]);
-
-  if (safeData.length === 0) {
-    return null;
-  }
+  if (safeData.length === 0) return null;
 
   return (
-    <section id="sponsors" className="bg-slate-950 text-white">
+    <section id="empresas" className="bg-slate-950 text-white">
       <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
         <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-center">
           Empresas organizadoras
@@ -65,29 +51,13 @@ export default function CompaniesSection({ data = [] }) {
           Conocé a los equipos detrás del evento.
         </p>
 
-        {/* Botones (Tabs responsivos, usando flex-wrap) */}
-        <div className="flex flex-wrap items-center justify-center gap-3 mt-8">
+        {/* Listado estático de panels, uno debajo del otro */}
+        <div className="mt-10 space-y-16 md:space-y-24">
           {safeData.map((c) => (
-            <button
-              key={c.id}
-              onClick={() => setActive(c.id)}
-              className={[
-                "px-4 py-2 rounded-xl border text-sm md:text-base transition",
-                active === c.id
-                  ? "border-cyan-400/40 bg-cyan-500/10 text-white"
-                  : "border-slate-800 bg-slate-900/40 text-slate-300 hover:text-slate-100 hover:border-cyan-400/20",
-              ].join(" ")}
-            >
-              {c.name}
-            </button>
+            <div key={c.id} id={c.id} className="scroll-mt-24">
+              <CompanyPanel {...c} />
+            </div>
           ))}
-        </div>
-
-        {/* Panel activo */}
-        <div className="block mt-10">
-          {safeData.map((c) =>
-            active === c.id ? <CompanyPanel key={c.id} {...c} /> : null
-          )}
         </div>
       </div>
     </section>
@@ -176,9 +146,9 @@ function CompanyPanel({
         </div>
       </div>
 
-      {/* DERECHA: Ahora solo tiene espacio, los fondos están en los hijos */}
+      {/* Derecha: tarjetas de áreas y enlaces */}
       <div className="space-y-5">
-        {/* Sección 1: Áreas Clave (con su propio background y borde) */}
+        {/* Sección 1: Áreas Clave */}
         <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-6 md:p-8">
           <h4 className="text-lg md:text-xl font-semibold text-white mb-4">
             Áreas Clave
@@ -206,7 +176,7 @@ function CompanyPanel({
           </ul>
         </div>
 
-        {/* Sección 2: Enlaces (con su propio background y borde) */}
+        {/* Sección 2: Enlaces */}
         {links.length > 0 && (
           <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-6 md:p-8">
             <h4 className="text-lg md:text-xl font-semibold text-white mb-4">

@@ -10,7 +10,7 @@ import Logo from "../../public/logo-wayclo.png";
 const LINKS = [
   { href: "/", label: "EVENTO" },
   { href: "/agenda", label: "AGENDA" },
-  { href: "/sponsors", label: "SPONSORS" },
+  { href: "/empresas", label: "EMPRESAS" },
 ];
 
 export default function NavBar({ dimmed = false }) {
@@ -69,19 +69,20 @@ export default function NavBar({ dimmed = false }) {
                 <Link
                   href={l.href}
                   className={[
-                    dimmed
-                      ? "text-white/90 hover:text-white"
-                      : "text-black/80 hover:text-black",
-                    "text-lg transition-opacity relative after:absolute after:left-0 after:-bottom-1 after:h-[2px] after:w-0",
-                    dimmed
-                      ? "after:bg-white/70"
-                      : "after:bg-[var(--brand,#050057)]",
-                    "after:transition-[width] hover:after:w-full",
-                    isActive(l.href) ? "after:w-full opacity-100" : "",
+                    // texto base en mayúsculas y espaciado tipo la captura
+                    "uppercase tracking-[0.18em] text-lg transition leading-none",
+
+                    // color general y hover
+                    " hover:text-black",
+
+                    // cuando está activo, lo hacemos bold
+                    isActive(l.href) ? "font-extrabold text-black" : "font-medium text-black/70",
+
                   ].join(" ")}
                 >
                   {l.label}
                 </Link>
+
               </li>
             ))}
           </ul>
@@ -90,10 +91,10 @@ export default function NavBar({ dimmed = false }) {
           <Button
             onClick={() => document.dispatchEvent(new Event("open-register"))}
             className={[
-              "gap-2 hover:opacity-90 text-lg rounded-full p-5",
+              "gap-2 hover:opacity-90 text-lg rounded-full p-3",
               dimmed
                 ? "bg-white text-slate-900"
-                : "bg-[var(--brand,#050057)] text-white",
+                : "bg-black text-white",
             ].join(" ")}
           >
             INSCRIBITE

@@ -12,7 +12,7 @@ export default function HomePage() {
         items={[
           { href: "#speakers", label: "Speakers" },
           { href: "#agenda", label: "Agenda" },
-          { href: "#sponsors", label: "Sponsors" },
+          { href: "#empresas", label: "Empresas" },
           { href: "#registro", label: "Inscribite" },
         ]}
       />
@@ -20,9 +20,6 @@ export default function HomePage() {
 
       <section id="empresas" className="scroll-mt-24">
         <Empresas />
-      </section>
-      <section id="speakers" className="scroll-mt-24">
-        <Speakers />
       </section>
       <ExpoFeatures />
       {/* ancla para que el botón de la navbar/hero enfoque el formulario/modal */}

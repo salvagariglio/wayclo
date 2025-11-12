@@ -2,6 +2,7 @@
 import Image from "next/image";
 import ShieldCheck from "../../public/shield-check.png";
 import LaptopShield from "../../public/laptop-shield.png";
+import WaycloLogo from "../../public/logo-wayclo.png";
 
 export default function Hero() {
   return (
@@ -15,6 +16,14 @@ export default function Hero() {
         text-center
       "
     >
+      <div className="mb-6 flex justify-center">
+        <Image
+          src={WaycloLogo}
+          alt="Wayclo"
+          className="h-12 sm:h-16 md:h-20 w-auto opacity-95"
+          priority
+        />
+      </div>
       {/* TITULAR */}
       <h1
         className="
@@ -78,12 +87,12 @@ export default function Hero() {
           absolute
 
           /* ✅ posición y tamaño base (mobile first) */
-          left-4 top-32 w-16
+          left-4 top-48 w-16
 
           /* ✅ overrides por breakpoint */
-          sm:left-5  sm:top-40  sm:w-28
-          md:left-[10px] md:top-48 md:w-40
-          lg:left-[20px] lg:top-60 lg:w-48
+          sm:left-5  sm:top-60  sm:w-28
+          md:left-[10px] md:top-72 md:w-40
+          lg:left-[20px] lg:top-96 lg:w-48
           xl:left-[-80px] xl:w-56
 
           drop-shadow-[0_8px_24px_rgba(0,0,0,0.20)]
@@ -103,13 +112,13 @@ export default function Hero() {
           absolute
 
           /* ✅ posición y tamaño base (mobile first) */
-          right-1 top-[24rem] w-[100px]
+          right-1 top-[28rem] w-[100px]
 
           /* ✅ overrides por breakpoint */
-          sm:right-[30px] sm:top-80   sm:w-[220px]
-          md:right-[20px] md:top-96   md:w-[300px]
-          lg:right-[40px] lg:top-[28rem] lg:w-[350px]
-          xl:right-[-80px] xl:top-96   xl:w-[400px]
+          sm:right-[30px] sm:top-98   sm:w-[220px]
+          md:right-[20px] md:top-[32rem]   md:w-[300px]
+          lg:right-[40px] lg:top-[36rem] lg:w-[350px]
+          xl:right-[-80px] xl:top-90   xl:w-[400px]
 
           drop-shadow-[0_16px_40px_rgba(0,0,0,0.25)]
           select-none pointer-events-none
