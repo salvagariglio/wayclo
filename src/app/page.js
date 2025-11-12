@@ -12,7 +12,7 @@ export default function HomePage() {
         items={[
           { href: "#speakers", label: "Speakers" },
           { href: "#agenda", label: "Agenda" },
-          { href: "#empresas", label: "Empresas" },
+          { href: "#sponsors", label: "Sponsors" },
           { href: "#registro", label: "Inscribite" },
         ]}
       />

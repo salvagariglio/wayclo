@@ -56,7 +56,7 @@ export default function CompaniesSection({ data = [] }) {
   }
 
   return (
-    <section id="empresas" className="bg-slate-950 text-white">
+    <section id="sponsors" className="bg-slate-950 text-white">
       <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
         <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-center">
           Empresas organizadoras

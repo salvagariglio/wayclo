@@ -8,9 +8,9 @@ import { Menu, X } from "lucide-react";
 import Logo from "../../public/logo-wayclo.png";
 
 const LINKS = [
-  { href: "/", label: "Inicio" },
-  { href: "/programa", label: "Programa" },
-  { href: "/empresas", label: "Empresas" },
+  { href: "/", label: "EVENTO" },
+  { href: "/agenda", label: "AGENDA" },
+  { href: "/sponsors", label: "SPONSORS" },
 ];
 
 export default function NavBar({ dimmed = false }) {
@@ -173,6 +173,6 @@ export default function NavBar({ dimmed = false }) {
           </div>
         </div>
       </div>
-    </header>
+    </header >
   );
 }
