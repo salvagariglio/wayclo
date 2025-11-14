@@ -22,18 +22,18 @@ export default function Agenda() {
   const agenda = [
     {
       time: "17:45 – 18:15",
-      title: "Recepción y acreditación",
+      title: "RECEPCIÓN Y ACREDITACIÓN",
       description:
         "Bienvenida a los participantes con café de recepción. Networking inicial entre decisores y asistentes técnicos.",
     },
     {
       time: "18:15 - 18:30",
-      title: "Introducción",
+      title: "INTRODUCCIÓN ",
       description: "Apertura y bienvenida, Wayclo e Intercity. ",
     },
     {
       time: "18:30 - 19.15",
-      title: " Panel de discusión: Desafíos reales y soluciones en IT en la región",
+      title: " PANEL DE DISCUSIÓN: Desafíos reales y soluciones en IT en la región",
       description:
         "Participan Wayclo, Intercity y empresas invitadas. Casos de éxito, desafíos locales y debate sobre el futuro tecnológico de la región.",
       tag: "Panel",
@@ -47,19 +47,19 @@ export default function Agenda() {
     },
     {
       time: "19:15 – 19:30",
-      title: "Break",
+      title: "BREAK",
       description: "Coffee break y networking informal entre asistentes.",
     },
     {
       time: "19:30 – 20:15",
-      title: "Charla: Ciberseguridad ",
+      title: "CHARLA: Ciberseguridad ",
       description: "Riesgos empresariales y legales.",
       tag: "Charla",
       speakersNames: ["Gustavo Matuk", "Emmanuel Villas"],
     },
     {
       time: "20:15 – 21:00",
-      title: "Catering y Networking final",
+      title: "CATERING Y NETWORKING FINAL",
       description: "Cierre con cóctel distendido y networking entre empresas.",
       tag: "Cóctel",
     },

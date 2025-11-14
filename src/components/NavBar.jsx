@@ -28,25 +28,40 @@ export default function NavBar({ dimmed = false }) {
 
   useEffect(() => {
     document.body.style.overflow = "";
-    return () => (document.body.style.overflow = "");
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, []);
 
   const closeMenu = () => setOpen(false);
+
   const isActive = (href) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 
-  const baseBg = dimmed
-    ? "bg-slate-900/90 text-white backdrop-blur"
-    : "bg-white text-black";
+  const isEmpresas = pathname.startsWith("/empresas");
+  const isDark = isEmpresas || dimmed;
+
+  const baseBg = isEmpresas
+    ? "bg-slate-950 text-white"
+    : dimmed
+      ? "bg-slate-900/90 text-white backdrop-blur"
+      : "bg-white text-black";
 
   return (
     <header
       className={[
         "fixed top-0 left-0 right-0 z-[50]",
         baseBg,
-        scrolled ? "shadow-[0_4px_20px_rgba(0,0,0,0.15)]" : "shadow-none",
+
+        // 🔥 sombra visible en modo EMPRESAS (fondo oscuro)
+        isEmpresas
+          ? "shadow-[0_6px_25px_rgba(255,255,255,0.18)] backdrop-blur-[2px]"
+          : scrolled
+            ? "shadow-[0_2px_10px_rgba(255,255,255,0.08)]"
+            : "shadow-none",
       ].join(" ")}
     >
+
       <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-24 flex items-center justify-between">
         {/* Brand */}
         <div className="flex items-center gap-3 min-w-0">
@@ -70,39 +85,40 @@ export default function NavBar({ dimmed = false }) {
                 <Link
                   href={l.href}
                   className={[
-                    // texto base en mayúsculas y espaciado tipo la captura
                     "uppercase tracking-[0.18em] text-lg transition leading-none",
-
-                    // color general y hover
-                    " hover:text-black",
-
-                    // cuando está activo, lo hacemos bold
-                    isActive(l.href) ? "font-extrabold text-black" : "font-medium text-black/70",
-
+                    isEmpresas
+                      ? "text-white/70 hover:text-white"
+                      : "text-black/70 hover:text-black",
+                    isActive(l.href)
+                      ? isEmpresas
+                        ? "font-extrabold text-white"
+                        : "font-extrabold text-black"
+                      : "",
                   ].join(" ")}
                 >
                   {l.label}
                 </Link>
-
               </li>
             ))}
           </ul>
 
-          {/* CTA → abre modal via evento */}
+          {/* CTA */}
           <Button
             onClick={() => document.dispatchEvent(new Event("open-register"))}
             className={[
               "gap-2 hover:opacity-90 text-lg rounded-full p-3",
-              dimmed
-                ? "bg-white text-slate-900"
-                : "bg-black text-white",
+              isEmpresas
+                ? "bg-white text-[#050057]"
+                : dimmed
+                  ? "bg-white text-slate-900"
+                  : "bg-black text-white",
             ].join(" ")}
           >
             INSCRIBITE
           </Button>
         </div>
 
-        {/* Botón hamburguesa (mobile) */}
+        {/* Mobile button */}
         <div className="md:hidden">
           <button
             aria-label={open ? "Cerrar menú" : "Abrir menú"}
@@ -110,7 +126,7 @@ export default function NavBar({ dimmed = false }) {
             onClick={() => setOpen((v) => !v)}
             className={[
               "inline-flex items-center justify-center rounded-md p-2 outline-none focus-visible:ring-2",
-              dimmed
+              isDark
                 ? "text-white focus-visible:ring-white/70"
                 : "text-black focus-visible:ring-[var(--brand,#050057)]/70",
             ].join(" ")}
@@ -120,12 +136,12 @@ export default function NavBar({ dimmed = false }) {
         </div>
       </nav>
 
-      {/* Panel mobile */}
+      {/* Mobile panel */}
       <div
         data-state={open ? "open" : "closed"}
         className={[
           "md:hidden overflow-hidden border-b",
-          dimmed ? "border-white/20" : "border-slate-200",
+          isDark ? "border-white/20" : "border-slate-200",
           "transition-[max-height,opacity] duration-700 ease-in-out",
           "max-h-0 opacity-0",
           "data-[state=open]:max-h-[80vh] data-[state=open]:opacity-100",
@@ -141,11 +157,11 @@ export default function NavBar({ dimmed = false }) {
                   aria-current={isActive(l.href) ? "page" : undefined}
                   className={[
                     "w-full rounded-md px-3 py-3 text-base text-center transition",
-                    dimmed
+                    isDark
                       ? "text-white/90 hover:bg-white/5 focus-visible:ring-white/60"
                       : "text-black/90 hover:bg-black/[0.04] focus-visible:ring-[var(--brand,#050057)]/60",
                     isActive(l.href)
-                      ? dimmed
+                      ? isDark
                         ? "bg-white/5 text-white"
                         : "bg-black/[0.06] text-black"
                       : "",
@@ -165,9 +181,11 @@ export default function NavBar({ dimmed = false }) {
               }}
               className={[
                 "w-full max-w-xs gap-2 hover:opacity-90",
-                dimmed
-                  ? "bg-white text-slate-900"
-                  : "bg-[var(--brand,#050057)] text-white",
+                isEmpresas
+                  ? "bg-white text-[#050057]"
+                  : isDark
+                    ? "bg-white text-slate-900"
+                    : "bg-[var(--brand,#050057)] text-white",
               ].join(" ")}
             >
               INSCRIBITE
@@ -175,6 +193,6 @@ export default function NavBar({ dimmed = false }) {
           </div>
         </div>
       </div>
-    </header >
+    </header>
   );
 }

@@ -18,7 +18,7 @@ export const speakers = [
     lastname: "Lovera",
     role: "Gerente de Auditorías",
     company: "Sala Hnos.",
-    companyLogo: "",
+    companyLogo: "/salahnos.png",
     linkedin: "",
     img: "/speakers/martin-lovera.jpg",
   },
@@ -133,48 +133,62 @@ export function SpeakerCard({ speaker, index }) {
 export function SpeakerInfoRow({ speaker, index }) {
   const isOdd = index % 2 !== 0;
 
-  const InfoBox = (
-    <div className="flex flex-col justify-center bg-white rounded-xl w-full max-w-md">
-      <Image
-        src={speaker.companyLogo}
-        alt={speaker.company}
-        width={80}
-        height={40}
-        className="object-contain mb-4"
-      />
-      <h3 className="text-xl font-bold text-gray-900 leading-tight">
-        {speaker.name} {speaker.lastname}
-      </h3>
-
-      <p className="text-gray-600 mt-1 text-sm">{speaker.role} {speaker.company}</p>
-
-      {speaker.linkedin && (
-        <a
-          href={speaker.linkedin}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-4 inline-flex items-center gap-2 text-cyan-700 hover:underline"
-        >
-          <Linkedin className="w-6 h-6" />
-        </a>
-      )}
-    </div>
-  );
-
   return (
     <div
       className={`
-        w-full flex flex-col lg:flex-row items-center gap-6
+        w-full flex flex-col lg:flex-row gap-6
+        items-start lg:items-end
         ${isOdd ? "lg:flex-row-reverse" : ""}
       `}
     >
-      {/* Card original */}
+      {/* Card azul original */}
       <div className="w-full lg:w-auto">
         <SpeakerCard speaker={speaker} index={index} />
       </div>
 
-      {/* Caja de información */}
-      {InfoBox}
+      {/* Contenedor lateral de la caja de info */}
+      <div
+        className={`w-full lg:w-[40%] flex ${isOdd ? "lg:justify-start" : "lg:justify-end"
+          }`}
+      >
+        {/* Caja blanca de info */}
+        <div className="flex flex-col bg-white rounded-xl w-full max-w-md p-6">
+          {/* Logo arriba (si existe) */}
+          {speaker.companyLogo && (
+            <Image
+              src={speaker.companyLogo}
+              alt={speaker.company}
+              width={80}
+              height={40}
+              className="object-contain mb-4 drop-shadow-sm"
+              style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.15))" }}
+            />
+
+          )}
+
+          {/* Contenido pegado ABAJO, alineado a la izquierda */}
+          <div className="mt-auto flex flex-col text-left">
+            <h3 className="text-xl font-bold text-gray-900 leading-tight">
+              {speaker.name} {speaker.lastname}
+            </h3>
+
+            <p className="text-gray-600 mt-1 text-sm">
+              {speaker.role} – {speaker.company}
+            </p>
+
+            {speaker.linkedin && (
+              <a
+                href={speaker.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 inline-flex items-center gap-2 text-cyan-700 hover:underline"
+              >
+                <Linkedin className="w-6 h-6" />
+              </a>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

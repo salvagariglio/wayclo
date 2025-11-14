@@ -71,7 +71,7 @@ export default function Hero() {
           onClick={() => document.dispatchEvent(new Event("open-register"))}
           className="inline-flex items-center justify-center rounded-full px-10 md:px-12 h-14 md:h-16 text-md md:text-xl font-semibold text-[#050057] border-2 border-[#050057] bg-transparent hover:bg-[#050057] hover:text-white transition-colors shadow-[0_2px_0_0_#050057] md:shadow-[0_3px_0_0_#050057]"
         >
-          REGÍSTRATE AHORA
+          INSCRIBITE AHORA
         </button>
       </div>
 
