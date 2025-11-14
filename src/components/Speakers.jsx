@@ -2,13 +2,14 @@
 import Image from "next/image";
 import { Linkedin } from "lucide-react";
 
-const speakers = [
+export const speakers = [
   // PANEL 1 — Wayclo
   {
     name: "Cristian",
     lastname: "Mercado",
     role: "Director",
     company: "Wayclo",
+    companyLogo: "/logo-wayclo.png",
     linkedin: "https://www.linkedin.com/in/cristian--mercado/",
     img: "/speakers/cristian.png",
   },
@@ -17,6 +18,7 @@ const speakers = [
     lastname: "Lovera",
     role: "Gerente de Auditorías",
     company: "Sala Hnos.",
+    companyLogo: "",
     linkedin: "",
     img: "/speakers/martin-lovera.jpg",
   },
@@ -25,26 +27,29 @@ const speakers = [
   {
     name: "Pablo",
     lastname: "Degiglio",
-    role: "Técnico Ctro. de Cómputos Municipalidad Río Cuarto",
+    role: "Técnico Centro de Cómputos",
     company: "Municipalidad de Río Cuarto",
+    companyLogo: "/universidad.png",
     linkedin: "",
     img: "/speakers/pablo-degiglio.jpg",
   },
   {
     name: "Eduardo",
     lastname: "Ochoa",
-    role: "Director del centro de Cómputos de la Municipalidad de Río Cuarto",
+    role: "Director del Centro de Cómputos",
     company: "Municipalidad de Río Cuarto",
+    companyLogo: "/universidad.png",
     linkedin: "",
-    img: "/speakers/eduardo-ochoa.jpg", // ajustá al archivo real
+    img: "/speakers/eduardo-ochoa.jpg",
   },
   {
     name: "Ivan",
     lastname: "Pecovich",
     role: "Socio Gerente",
     company: "Intercity Comunicaciones S.A.",
+    companyLogo: "/intercity.png",
     linkedin: "",
-    img: "/speakers/ivan-pecovich.jpg", // ajustá al archivo real
+    img: "/speakers/ivan-pecovich.jpg",
   },
 
   // PANEL 2
@@ -53,6 +58,7 @@ const speakers = [
     lastname: "Matuk",
     role: "Cybersecurity Advisor",
     company: "Wayclo",
+    companyLogo: "/logo-wayclo.png",
     linkedin: "https://www.linkedin.com/in/gustavo-matuk-66b96613/",
     img: "/speakers/martin.png",
   },
@@ -61,14 +67,14 @@ const speakers = [
     lastname: "Villas",
     role: "Cybercrime Researcher - Director de carrera",
     company: "Universidad Siglo 21",
+    companyLogo: "/universidadd.png",
     linkedin: "https://www.linkedin.com/in/emmanuelvilas/",
-    img: "/speakers/emmanuel-villas.jpg", // ajustá al archivo real
+    img: "/speakers/emmanuel-villas.jpg",
   },
 ];
 
-
 /** 🔹 CARD INDIVIDUAL – MISMO DISEÑO QUE VENÍAS HACIENDO */
-function SpeakerCard({ speaker, index }) {
+export function SpeakerCard({ speaker, index }) {
   const { name, lastname, img } = speaker;
 
   const isOdd = index % 2 !== 0;
@@ -124,13 +130,61 @@ function SpeakerCard({ speaker, index }) {
 }
 
 
+export function SpeakerInfoRow({ speaker, index }) {
+  const isOdd = index % 2 !== 0;
+
+  const InfoBox = (
+    <div className="flex flex-col justify-center bg-white rounded-xl w-full max-w-md">
+      <Image
+        src={speaker.companyLogo}
+        alt={speaker.company}
+        width={80}
+        height={40}
+        className="object-contain mb-4"
+      />
+      <h3 className="text-xl font-bold text-gray-900 leading-tight">
+        {speaker.name} {speaker.lastname}
+      </h3>
+
+      <p className="text-gray-600 mt-1 text-sm">{speaker.role} {speaker.company}</p>
+
+      {speaker.linkedin && (
+        <a
+          href={speaker.linkedin}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-4 inline-flex items-center gap-2 text-cyan-700 hover:underline"
+        >
+          <Linkedin className="w-6 h-6" />
+        </a>
+      )}
+    </div>
+  );
+
+  return (
+    <div
+      className={`
+        w-full flex flex-col lg:flex-row items-center gap-6
+        ${isOdd ? "lg:flex-row-reverse" : ""}
+      `}
+    >
+      {/* Card original */}
+      <div className="w-full lg:w-auto">
+        <SpeakerCard speaker={speaker} index={index} />
+      </div>
+
+      {/* Caja de información */}
+      {InfoBox}
+    </div>
+  );
+}
 
 /** 🔹 LISTA DE SPEAKERS – SOLO LOS RENDERIZA, SIN CAMBIAR DISEÑO */
 export default function SpeakersSection() {
   return (
-    <div className="flex flex-col gap-6">
-      {speakers.map((speaker, index) => (
-        <SpeakerCard key={speaker.name} speaker={speaker} index={index} />
+    <div className="flex flex-col gap-12">
+      {speakers.map((sp, i) => (
+        <SpeakerInfoRow key={i} speaker={sp} index={i} />
       ))}
     </div>
   );
