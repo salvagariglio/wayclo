@@ -40,21 +40,20 @@ export default function EmpresasPage() {
         },
       ],
       links: [
-        { label: "Sitio web", href: "https://wayclo.tech/", iconName: "Globe" },
         {
-          label: "LinkedIn",
-          href: "https://www.linkedin.com/company/wayclo/posts/?feedView=all",
+          href: "https://wayclo.com",
+          iconName: "Globe",
+          label: "Sitio web",
+        },
+        {
+          href: "https://www.linkedin.com/company/wayclo", // si cambia, lo ajustás
           iconName: "Linkedin",
+          label: "LinkedIn",
         },
         {
-          label: "Infra",
-          href: "https://wayclo.tech/infra/",
-          iconName: "Wrench",
-        },
-        {
-          label: "Security",
-          href: "https://wayclo.tech/security/",
-          iconName: "Lock",
+          href: "https://www.instagram.com/waycloar?igsh=dmp2N2RxMzdva2py",
+          iconName: "Instagram",
+          label: "Instagram",
         },
       ],
       ctaHref: "https://wayclo.tech/#contacto",

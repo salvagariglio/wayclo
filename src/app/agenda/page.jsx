@@ -1,4 +1,5 @@
 import Agenda from "@/components/Agenda";
+import Speakers from "@/components/Speakers";
 
 export default function AgendaPage() {
   return (

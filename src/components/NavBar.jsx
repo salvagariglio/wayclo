@@ -10,6 +10,7 @@ import Logo from "../../public/logo-wayclo.png";
 const LINKS = [
   { href: "/", label: "EVENTO" },
   { href: "/agenda", label: "AGENDA" },
+  { href: "/speakers", label: "SPEAKERS" },
   { href: "/empresas", label: "EMPRESAS" },
 ];
 

@@ -30,6 +30,7 @@ const iconMap = {
   Lock,
   Instagram,
 };
+
 function Icon({ name, className = "w-5 h-5" }) {
   const LucideIcon = iconMap[name];
   if (!LucideIcon) return null;
@@ -84,6 +85,27 @@ function CompanyPanel({
 
   const [expanded, setExpanded] = useState(false);
 
+  // Frase a resaltar
+  const highlightText =
+    "Soluciones integrales y ciberseguridad para el crecimiento empresarial";
+
+  // Render de párrafo con highlight si corresponde
+  function renderParagraph(p) {
+    if (!p.includes(highlightText)) return p;
+
+    const [before, after] = p.split(highlightText);
+
+    return (
+      <>
+        {before}
+        <span className="inline-block font-semibold text-lg md:text-xl bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+          {highlightText}
+        </span>
+        {after}
+      </>
+    );
+  }
+
   return (
     <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-start">
       {/* Izquierda: texto + CTA principal */}
@@ -110,9 +132,10 @@ function CompanyPanel({
               key={idx}
               className="text-base md:text-lg text-slate-300/90 leading-relaxed"
             >
-              {p}
+              {renderParagraph(p)}
             </p>
           ))}
+
           {/* Efecto "fade-out" */}
           {!expanded && paragraphs.length > 2 && (
             <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-slate-950 to-transparent" />
@@ -176,14 +199,14 @@ function CompanyPanel({
           </ul>
         </div>
 
-        {/* Sección 2: Enlaces */}
-        {links.length > 0 && (
+        {/* Sección 2: Enlaces (Web, LinkedIn, Instagram) */}
+        {Array.isArray(links) && links.length > 0 && (
           <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-6 md:p-8">
             <h4 className="text-lg md:text-xl font-semibold text-white mb-4">
               Enlaces
             </h4>
             <div className="flex flex-wrap items-center gap-3">
-              {(Array.isArray(links) ? links : []).map((l) => (
+              {links.map((l) => (
                 <a
                   key={l.href}
                   href={l.href}
