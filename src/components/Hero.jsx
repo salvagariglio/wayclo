@@ -69,10 +69,25 @@ export default function Hero() {
         <button
           type="button"
           onClick={() => document.dispatchEvent(new Event("open-register"))}
-          className="inline-flex items-center justify-center rounded-full px-10 md:px-12 h-14 md:h-16 text-md md:text-xl font-semibold text-[#050057] border-2 border-[#050057] bg-transparent hover:bg-[#050057] hover:text-white transition-colors shadow-[0_2px_0_0_#050057] md:shadow-[0_3px_0_0_#050057]"
+          className="
+    inline-flex items-center justify-center
+    rounded-full
+    px-10 md:px-12
+    h-14 md:h-16
+    text-md md:text-xl
+    font-semibold
+    text-cyan-600
+    border-2 border-cyan-600
+    bg-transparent
+    hover:bg-cyan-600 hover:text-white
+    transition-colors
+    shadow-[0_2px_0_0_#0891b2]
+    md:shadow-[0_3px_0_0_#0891b2]
+  "
         >
           INSCRIBITE AHORA
         </button>
+
       </div>
 
       {/* ======= IMÁGENES DECORATIVAS ======= */}
@@ -87,7 +102,7 @@ export default function Hero() {
           absolute
 
           /* ✅ posición y tamaño base (mobile first) */
-          left-4 top-48 w-16
+          left-4 top-48 w-20
 
           /* ✅ overrides por breakpoint */
           sm:left-5  sm:top-60  sm:w-28
@@ -112,7 +127,7 @@ export default function Hero() {
           absolute
 
           /* ✅ posición y tamaño base (mobile first) */
-          right-1 top-[28rem] w-[100px]
+          right-1 top-[28rem] w-[130px]
 
           /* ✅ overrides por breakpoint */
           sm:right-[30px] sm:top-98   sm:w-[220px]

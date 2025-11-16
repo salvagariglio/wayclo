@@ -43,12 +43,12 @@ export default function CompaniesSection({ data = [] }) {
   if (safeData.length === 0) return null;
 
   return (
-    <section id="empresas" className="bg-slate-950 text-white">
+    <section id="empresas" className="bg-white">
       <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
-        <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-center">
+        <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-center text-slate-900">
           Empresas organizadoras
         </h2>
-        <p className="text-base md:text-lg text-slate-300/90 text-center mt-2">
+        <p className="text-base md:text-lg text-slate-700 text-center mt-2">
           Conocé a los equipos detrás del evento.
         </p>
 
@@ -60,6 +60,29 @@ export default function CompaniesSection({ data = [] }) {
             </div>
           ))}
         </div>
+      </div>
+      <div className="flex pb-20 justify-center mt-16">
+        <button
+          type="button"
+          onClick={() => document.dispatchEvent(new Event("open-register"))}
+          className="
+    inline-flex items-center justify-center
+    rounded-full
+    px-10 md:px-12
+    h-14 md:h-16
+    text-md md:text-xl
+    font-semibold
+    text-cyan-600
+    border-2 border-cyan-600
+    bg-transparent
+    hover:bg-cyan-600 hover:text-white
+    transition-colors
+    shadow-[0_2px_0_0_#0891b2]
+    md:shadow-[0_3px_0_0_#0891b2]
+  "
+        >
+          INSCRIBITE AHORA
+        </button>
       </div>
     </section>
   );
@@ -98,7 +121,7 @@ function CompanyPanel({
     return (
       <>
         {before}
-        <span className="inline-block font-semibold text-lg md:text-xl bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+        <span className="inline-block font-semibold text-lg md:text-xl bg-gradient-to-r from-cyan-500 to-cyan-700 bg-clip-text text-transparent">
           {highlightText}
         </span>
         {after}
@@ -115,7 +138,7 @@ function CompanyPanel({
             <img
               src={logoSrc}
               alt={`${name} logo`}
-              className="h-16 md:h-22 w-auto"
+              className="h-16 md:h-20 w-auto"
             />
           ) : null}
         </div>
@@ -130,15 +153,15 @@ function CompanyPanel({
           {paragraphs.map((p, idx) => (
             <p
               key={idx}
-              className="text-base md:text-lg text-slate-300/90 leading-relaxed"
+              className="text-base md:text-lg text-slate-700/90 leading-relaxed"
             >
               {renderParagraph(p)}
             </p>
           ))}
 
-          {/* Efecto "fade-out" */}
+          {/* Fade suave en blanco */}
           {!expanded && paragraphs.length > 2 && (
-            <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-slate-950 to-transparent" />
+            <div className="absolute bottom-0 left-0 w-full h-20 bg-gradient-to-t from-white to-transparent" />
           )}
         </div>
 
@@ -146,7 +169,7 @@ function CompanyPanel({
         {paragraphs.length > 2 && (
           <button
             onClick={() => setExpanded((s) => !s)}
-            className="mt-4 inline-flex items-center gap-2 text-cyan-300 hover:text-cyan-200 text-sm md:text-base"
+            className="mt-4 inline-flex items-center gap-2 text-cyan-600 hover:text-cyan-500 text-sm md:text-base"
           >
             {expanded ? "Ver menos" : "Leer más"}
             <ChevronDown
@@ -162,9 +185,10 @@ function CompanyPanel({
         <div className="mt-6 pt-2">
           <a
             href={ctaHref}
-            className="inline-flex items-center gap-2 rounded-xl bg-cyan-500 text-cyan-950 px-5 py-2.5 text-sm md:text-base font-semibold hover:bg-cyan-400 transition"
+            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-cyan-700 text-white px-5 py-2.5 text-sm md:text-base font-semibold hover:from-cyan-400 hover:to-cyan-600 transition"
           >
-            {ctaLabel} <ArrowRight className="w-4 h-4" />
+            {ctaLabel}
+            <ArrowRight className="w-4 h-4 text-white" />
           </a>
         </div>
       </div>
@@ -172,25 +196,25 @@ function CompanyPanel({
       {/* Derecha: tarjetas de áreas y enlaces */}
       <div className="space-y-5">
         {/* Sección 1: Áreas Clave */}
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-6 md:p-8">
-          <h4 className="text-lg md:text-xl font-semibold text-white mb-4">
+        <div className="rounded-2xl border border-slate-300 bg-white/80 backdrop-blur-sm p-6 md:p-8 shadow-lg">
+          <h4 className="text-lg md:text-xl font-semibold text-slate-900 mb-4">
             Áreas Clave
           </h4>
           <ul className="space-y-3">
             {(Array.isArray(keyServices) ? keyServices : []).map((s) => (
               <li
                 key={s.title}
-                className="flex items-start gap-3 p-3 rounded-lg bg-slate-800/40"
+                className="flex items-start gap-3 p-3 rounded-lg bg-slate-100"
               >
                 <Icon
                   name={s.icon}
-                  className="w-5 h-5 text-cyan-400 mt-1 flex-shrink-0"
+                  className="w-5 h-5 text-cyan-500 mt-1 flex-shrink-0"
                 />
                 <div>
-                  <h5 className="text-base md:text-lg font-semibold text-white">
+                  <h5 className="text-base md:text-lg font-semibold text-slate-900">
                     {s.title}
                   </h5>
-                  <p className="text-sm md:text-base text-slate-300/90">
+                  <p className="text-sm md:text-base text-slate-700">
                     {s.description}
                   </p>
                 </div>
@@ -201,8 +225,8 @@ function CompanyPanel({
 
         {/* Sección 2: Enlaces (Web, LinkedIn, Instagram) */}
         {Array.isArray(links) && links.length > 0 && (
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-6 md:p-8">
-            <h4 className="text-lg md:text-xl font-semibold text-white mb-4">
+          <div className="rounded-2xl border border-slate-300 bg-white/80 backdrop-blur-sm p-6 md:p-8 shadow-lg">
+            <h4 className="text-lg md:text-xl font-semibold text-slate-900 mb-4">
               Enlaces
             </h4>
             <div className="flex flex-wrap items-center gap-3">
@@ -212,12 +236,12 @@ function CompanyPanel({
                   href={l.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-3 rounded-xl border border-slate-800 bg-slate-900/40 text-slate-200 hover:border-cyan-400/30 hover:text-cyan-200 transition group"
+                  className="p-3 rounded-xl border border-slate-300 bg-slate-100 text-slate-700 hover:border-cyan-400/60 hover:text-cyan-600 transition group"
                   aria-label={`Ir a ${l.label}`}
                 >
                   <Icon
                     name={l.iconName}
-                    className="w-5 h-5 text-cyan-300 group-hover:text-cyan-200 transition"
+                    className="w-5 h-5 text-cyan-500 group-hover:text-cyan-400 transition"
                   />
                 </a>
               ))}

@@ -7,7 +7,7 @@ import LenovoLogo from "../../public/lenovo.png";
 
 export default function Empresas() {
   return (
-    <div className="my-10 flex items-center justify-center gap-10 sm:gap-12">
+    <div className=" flex items-center justify-center gap-10 sm:gap-12">
       <Image
         src={WaycloLogo}
         alt="Wayclo"

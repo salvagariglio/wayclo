@@ -66,11 +66,15 @@ export default function Agenda() {
   ];
 
   return (
-    <section className="py-20 bg-white text-gray-900">
+    <section className="bg-white text-gray-900">
       <div className="max-w-7xl mx-auto px-6">
-        <h2 className="text-3xl md:text-4xl font-extrabold mb-10 text-center">
-          AGENDA DEL EVENTO
+        <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-center text-slate-900">
+          Agenda
         </h2>
+        <p className="text-base md:text-lg text-slate-700 text-center mt-2 mb-10">
+          Mirá el recorrido completo del evento y organizá tu día.
+        </p>
+
 
         <div className="flex flex-col gap-12">
           {agenda.map((it, idx) => {
@@ -159,6 +163,30 @@ export default function Agenda() {
           })}
         </div>
       </div>
+      <div className="flex justify-center mt-16">
+        <button
+          type="button"
+          onClick={() => document.dispatchEvent(new Event("open-register"))}
+          className="
+    inline-flex items-center justify-center
+    rounded-full
+    px-10 md:px-12
+    h-14 md:h-16
+    text-md md:text-xl
+    font-semibold
+    text-cyan-600
+    border-2 border-cyan-600
+    bg-transparent
+    hover:bg-cyan-600 hover:text-white
+    transition-colors
+    shadow-[0_2px_0_0_#0891b2]
+    md:shadow-[0_3px_0_0_#0891b2]
+  "
+        >
+          INSCRIBITE AHORA
+        </button>
+      </div>
+
 
       {/* MODAL – CARD GRANDE, CENTRADA, MISMO DISEÑO */}
       {selectedSpeaker && (
@@ -180,10 +208,10 @@ export default function Agenda() {
   );
 }
 
-/**
+/*
  * 🔹 CARD PARA EL MODAL
  * Replica tu SpeakerCard en grande y centrada.
- */
+*/
 function SpeakerModalCard({ speaker }) {
   if (!speaker) return null;
 
@@ -195,8 +223,8 @@ function SpeakerModalCard({ speaker }) {
   const isOdd = index % 2 !== 0;
 
   const gradientClass = isOdd
-    ? "bg-gradient-to-r from-[#021728] to-[#006AAE]"
-    : "bg-gradient-to-r from-[#006AAE] to-[#021728]";
+    ? "bg-gradient-to-r from-[#021728] to-cyan-600"
+    : "bg-gradient-to-r from-cyan-600 to-[#021728]";
 
   const hasImage = typeof img === "string" && img.trim() !== "";
 
@@ -216,6 +244,7 @@ function SpeakerModalCard({ speaker }) {
         ${gradientClass}
       `}
     >
+
       {/* ⬇️ MISMO FIX: max-w y pr */}
       <div className="absolute bottom-10 left-5 flex flex-col gap-2 z-10 max-w-[55%] pr-3 break-words">
         <p className="text-2xl sm:text-3xl lg:text-4xl font-semibold leading-tight">

@@ -54,7 +54,7 @@ function CyberCloudButtons({ items = [] }) {
             href={`${f.title.toLowerCase()}`} // agenda → #agenda
             className={[
               "flex-1 min-w-0 rounded-3xl border p-6 transition-all duration-300 ease-out",
-              "bg-slate-900 border-slate-700",
+              "bg-[#021728] border-slate-700",
               "hover:-translate-y-1 hover:shadow-[0_0_22px_rgba(56,189,248,0.35)] hover:border-cyan-400",
               "group block"
             ].join(" ")}

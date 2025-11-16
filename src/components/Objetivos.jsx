@@ -1,28 +1,26 @@
 "use client";
 import Image from "next/image";
-import { Linkedin } from "lucide-react";
 
 export const speakers = [
-    // PANEL 1 — Wayclo
     {
         name: "Networking",
         lastname: "Empresarial",
-        role: "Donde las conversaciones se transforman en alianzas y las conexiones en oportunidades reales para crecer CyberCloud juntos.",
-        img: "/speakers/cristian.png",
+        role: "Donde las conversaciones se transforman en alianzas y las conexiones en oportunidades reales para crecer juntos.",
+        img: "/networking1.png",
     },
     {
-        name: "Networking",
+        name: "Networking &",
         lastname: "Alianzas Estratégicas",
-        role: "Un espacio para conocerse, compartir experiencias y construir nuevas oportunidades junto a referentes y empresas de la región. ",
-        img: "/speakers/cristian.png",
+        role: "Un espacio para conocerse, compartir experiencias y construir nuevas oportunidades junto a referentes y empresas de la región.",
+        img: "/networking2.png",
     },
 ];
 
-/** 🔹 CARD INDIVIDUAL – MISMO DISEÑO QUE VENÍAS HACIENDO */
 export function SpeakerCard({ speaker, index }) {
     const { name, lastname, img } = speaker;
 
     const isOdd = index % 2 !== 0;
+    const isSecond = index === 1;
 
     const gradientClass = isOdd
         ? "bg-gradient-to-r from-[#021728] to-[#006AAE]"
@@ -30,15 +28,24 @@ export function SpeakerCard({ speaker, index }) {
 
     const alignmentClass = isOdd ? "ml-auto" : "";
 
+    // ⚠️ La clave está acá
+    const imageWrapperClass = isSecond
+        ? "absolute bottom-0 right-0 h-full w-[50%] flex items-end justify-center" // SIEMPRE pega abajo
+        : "absolute right-0 h-full w-[60%] flex items-center justify-center";      // centrada
+
+    const imageClass = isSecond
+        ? "object-contain object-bottom" // pega SIEMPRE al borde inferior
+        : "object-contain object-center scale-110"; // más grande y centrada
+
     return (
         <div
             className={`
         relative
-        w-full                  /* mobile */
-        h-[26vh]                /* mobile base height */
-        sm:w-[45vh] sm:h-[24vh] /* pantallas medianas */
-        lg:w-[55vh] lg:h-[28vh] /* pantallas grandes */
-        xl:w-[65vh] xl:h-[32vh] /* pantallas muy grandes */
+        w-full
+        h-[26vh]
+        sm:w-[45vh] sm:h-[24vh]
+        lg:w-[55vh] lg:h-[28vh]
+        xl:w-[65vh] xl:h-[32vh]
         flex
         rounded-2xl
         px-5 sm:px-7 lg:px-8
@@ -48,7 +55,7 @@ export function SpeakerCard({ speaker, index }) {
         ${alignmentClass}
       `}
         >
-            {/* Texto abajo izquierda */}
+            {/* TEXTO */}
             <div className="absolute bottom-10 left-5 flex flex-col gap-1 z-10">
                 <p className="text-lg sm:text-xl lg:text-2xl font-semibold leading-tight">
                     {name}
@@ -57,22 +64,25 @@ export function SpeakerCard({ speaker, index }) {
                     {lastname}
                 </p>
                 <p className="text-sm sm:text-base lg:text-lg opacity-90">
-                    Cyber Cloud
+                    CyberCloud
                 </p>
             </div>
 
-            {/* Imagen pegada abajo derecha */}
-            <div className="absolute bottom-0 right-0 h-full w-[50%]">
+            {/* IMAGEN */}
+            <div className={imageWrapperClass}>
                 <Image
                     src={img}
                     alt={name}
                     fill
-                    className="object-cover object-bottom"
+                    className={imageClass}
                 />
             </div>
         </div>
     );
 }
+
+
+
 
 
 export function SpeakerInfoRow({ speaker, index }) {
@@ -81,62 +91,39 @@ export function SpeakerInfoRow({ speaker, index }) {
     return (
         <div
             className={`
-        w-full flex flex-col lg:flex-row gap-6
-        items-start lg:items-end
-        ${isOdd ? "lg:flex-row-reverse" : ""}
+        w-full 
+        flex flex-col md:flex-row gap-6
+        items-start md:items-end
+        ${isOdd ? "md:flex-row-reverse" : ""}
       `}
         >
-            {/* Card azul original */}
-            <div className="w-full lg:w-auto">
+            {/* Card azul: prioridad de espacio (no se achica) */}
+            <div className="w-full md:w-auto shrink-0">
                 <SpeakerCard speaker={speaker} index={index} />
             </div>
 
             {/* Contenedor lateral de la caja de info */}
             <div
-                className={`w-full lg:w-[40%] flex ${isOdd ? "lg:justify-start" : "lg:justify-end"
-                    }`}
+                className={`
+          w-full 
+          md:flex-1 min-w-0 
+          flex
+          ${isOdd ? "md:justify-start" : "md:justify-end"}
+        `}
             >
                 {/* Caja blanca de info */}
-                <div className="flex flex-col bg-white rounded-xl w-full max-w-md p-6">
-                    {/* Logo arriba (si existe) */}
-                    {speaker.companyLogo && (
-                        <Image
-                            src={speaker.companyLogo}
-                            alt={speaker.company}
-                            width={80}
-                            height={40}
-                            className="object-contain mb-4 drop-shadow-sm"
-                            style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.15))" }}
-                        />
-
-                    )}
-
-                    {/* Contenido pegado ABAJO, alineado a la izquierda */}
+                <div className="flex flex-col bg-white rounded-xl w-full max-w-md pb-4 px-2">
                     <div className="mt-auto flex flex-col text-left">
-                        <h3 className="text-xl font-bold text-gray-900 leading-tight">
-                            {speaker.name} {speaker.lastname}
+                        <h3 className="text-lg  text-gray-600 leading-tight">
+                            {speaker.role}
                         </h3>
-
-                        <p className="text-gray-600 mt-1 text-sm">
-                            {speaker.role} – {speaker.company}
-                        </p>
-
-                        {speaker.linkedin && (
-                            <a
-                                href={speaker.linkedin}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="mt-4 inline-flex items-center gap-2 text-cyan-700 hover:underline"
-                            >
-                                <Linkedin className="w-6 h-6" />
-                            </a>
-                        )}
                     </div>
                 </div>
             </div>
         </div>
     );
 }
+
 
 /** 🔹 LISTA DE SPEAKERS – SOLO LOS RENDERIZA, SIN CAMBIAR DISEÑO */
 export default function SpeakersSection() {

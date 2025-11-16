@@ -80,8 +80,8 @@ export function SpeakerCard({ speaker, index }) {
   const isOdd = index % 2 !== 0;
 
   const gradientClass = isOdd
-    ? "bg-gradient-to-r from-[#021728] to-[#006AAE]"
-    : "bg-gradient-to-r from-[#006AAE] to-[#021728]";
+    ? "bg-gradient-to-r from-[#021728] to-cyan-600"
+    : "bg-gradient-to-r from-cyan-600 to-[#021728]";
 
   const alignmentClass = isOdd ? "ml-auto" : "";
 
@@ -136,20 +136,25 @@ export function SpeakerInfoRow({ speaker, index }) {
   return (
     <div
       className={`
-        w-full flex flex-col lg:flex-row gap-6
-        items-start lg:items-end
-        ${isOdd ? "lg:flex-row-reverse" : ""}
+        w-full py-10
+        flex flex-col md:flex-row gap-6
+        items-start md:items-end
+        ${isOdd ? "md:flex-row-reverse" : ""}
       `}
     >
-      {/* Card azul original */}
-      <div className="w-full lg:w-auto">
+      {/* Card azul: prioridad de espacio (no se achica) */}
+      <div className="w-full md:w-auto shrink-0">
         <SpeakerCard speaker={speaker} index={index} />
       </div>
 
       {/* Contenedor lateral de la caja de info */}
       <div
-        className={`w-full lg:w-[40%] flex ${isOdd ? "lg:justify-start" : "lg:justify-end"
-          }`}
+        className={`
+          w-full 
+          md:flex-1 min-w-0
+          flex
+          ${isOdd ? "md:justify-start" : "md:justify-end"}
+        `}
       >
         {/* Caja blanca de info */}
         <div className="flex flex-col bg-white rounded-xl w-full max-w-md p-6">
@@ -163,7 +168,6 @@ export function SpeakerInfoRow({ speaker, index }) {
               className="object-contain mb-4 drop-shadow-sm"
               style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.15))" }}
             />
-
           )}
 
           {/* Contenido pegado ABAJO, alineado a la izquierda */}
@@ -193,13 +197,43 @@ export function SpeakerInfoRow({ speaker, index }) {
   );
 }
 
+
 /** 🔹 LISTA DE SPEAKERS – SOLO LOS RENDERIZA, SIN CAMBIAR DISEÑO */
 export default function SpeakersSection() {
   return (
-    <div className="flex flex-col gap-12">
+    <div className="flex flex-col ">
+      <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-center text-slate-900">
+        Quiénes nos inspiran
+      </h2>
+      <p className="text-base md:text-lg text-slate-700 text-center mt-2">
+        Especialistas con trayectoria que potencian la visión de CyberCloud.
+      </p>
       {speakers.map((sp, i) => (
         <SpeakerInfoRow key={i} speaker={sp} index={i} />
       ))}
+      <div className="flex justify-center mt-16">
+        <button
+          type="button"
+          onClick={() => document.dispatchEvent(new Event("open-register"))}
+          className="
+    inline-flex items-center justify-center
+    rounded-full
+    px-10 md:px-12
+    h-14 md:h-16
+    text-md md:text-xl
+    font-semibold
+    text-cyan-600
+    border-2 border-cyan-600
+    bg-transparent
+    hover:bg-cyan-600 hover:text-white
+    transition-colors
+    shadow-[0_2px_0_0_#0891b2]
+    md:shadow-[0_3px_0_0_#0891b2]
+  "
+        >
+          INSCRIBITE AHORA
+        </button>
+      </div>
     </div>
   );
 }

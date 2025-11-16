@@ -12,7 +12,7 @@ export default function Footer() {
         pathname === "/" || pathname.startsWith("/agenda");
 
     const baseBg = isEmpresas
-        ? "bg-[#050057] text-white"      // Footer en EMPRESAS
+        ? "bg-slate-950 text-white"      // Footer en EMPRESAS
         : "bg-[#1a1a1a] text-white";     // Footer default
 
     return (
