@@ -5,23 +5,30 @@ import { usePathname } from "next/navigation";
 export default function Footer() {
     const pathname = usePathname();
 
+    // ✔ cualquier página dentro de /admin activa modo admin
     const isAdmin = pathname.startsWith("/admin");
     const isEmpresas = pathname.startsWith("/empresas");
 
-    // Mostrar info solo en Home y Agenda, y nunca en admin
+    // Se muestra solo en Home y Agenda, nunca en admin
     const showEventInfo =
         (pathname === "/" || pathname.startsWith("/agenda")) && !isAdmin;
 
+    // ✔ Fondo según página
     const baseBg = isAdmin
-        ? "bg-[#021728] text-white border-[#021728]" // Footer en ADMIN (login + registros)
+        ? "bg-[#021728] text-white" // color admin
         : isEmpresas
-            ? "bg-[#1a1a1a] text-white border-white/10" // Footer en EMPRESAS
-            : "bg-[#1a1a1a] text-white border-white/10"; // Footer default
+            ? "bg-[#1a1a1a] text-white"
+            : "bg-[#1a1a1a] text-white";
+
+    // ✔ Border según página
+    const borderClass = isAdmin
+        ? "border-t border-slate-200" // ← lo que pediste
+        : "border-t border-white/10"; // normal
 
     return (
-        <footer className={["py-12 border-t", baseBg].join(" ")}>
+        <footer className={["py-12", baseBg, borderClass].join(" ")}>
 
-            {/* INFO EXTRA SOLO PARA HOME / AGENDA */}
+            {/* BLOQUE INFO (solo home/agenda) */}
             {showEventInfo && (
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mb-16">
                     <h2 className="text-2xl font-bold text-center mb-10 tracking-tight">

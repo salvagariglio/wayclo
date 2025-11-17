@@ -71,7 +71,7 @@ export default function AdminRegistrations() {
       <div className="max-w-6xl mx-auto">
         {/* HEADER + CONTROLES EN CARD TRANSLÚCIDA */}
         <section className="mb-8">
-          <div className="bg-white/5 border border-white/10 rounded-2xl px-5 py-4 md:px-6 md:py-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4 shadow-[0_0_22px_rgba(255,255,255,0.12)]">
+          <div className="bg-white/5 border border-white/10 rounded-2xl px-5 py-4 md:px-6 md:py-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div className="flex items-center gap-2">
               <LockKeyhole size={22} className="text-cyan-400" />
               <div>
