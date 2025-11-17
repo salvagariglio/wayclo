@@ -22,7 +22,7 @@ export default function Footer() {
 
     // ✔ Border según página
     const borderClass = isAdmin
-        ? "border-t border-slate-200" // ← lo que pediste
+        ? "border-t  border-white/20" // ← lo que pediste
         : "border-t border-white/10"; // normal
 
     return (
