@@ -24,7 +24,9 @@ export default function AdminRegistrations() {
 
   const load = async () => {
     setLoading(true);
-    const res = await fetch(`/api/admin/registrations?status=${status}`, { cache: "no-store" });
+    const res = await fetch(`/api/admin/registrations?status=${status}`, {
+      cache: "no-store",
+    });
     const out = await res.json();
     setItems(out.items || []);
     setLoading(false);
@@ -35,7 +37,9 @@ export default function AdminRegistrations() {
   }, [status, auth]);
 
   const act = async (id, action) => {
-    const res = await fetch(`/api/admin/registrations/${id}/${action}`, { method: "POST" });
+    const res = await fetch(`/api/admin/registrations/${id}/${action}`, {
+      method: "POST",
+    });
     if (!res.ok) {
       const out = await res.json();
       alert(out.error || "Error");
@@ -47,7 +51,7 @@ export default function AdminRegistrations() {
   // 🌀 Pantalla mientras valida auth
   if (auth === "checking") {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-slate-50 text-slate-500">
+      <main className="min-h-screen flex items-center justify-center bg-[#021728] text-white/80">
         <div className="flex items-center gap-2">
           <RotateCcw className="animate-spin" size={18} />
           <p>Verificando acceso...</p>
@@ -63,52 +67,89 @@ export default function AdminRegistrations() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-800 p-6">
+    <main className="min-h-screen bg-[#021728] text-white px-4 py-8 md:px-8">
       <div className="max-w-6xl mx-auto">
-        <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
-          <div className="flex items-center gap-2">
-            <LockKeyhole size={22} className="text-indigo-600" />
-            <h1 className="text-2xl font-semibold">Gestión de Invitados</h1>
-          </div>
+        {/* HEADER + CONTROLES EN CARD TRANSLÚCIDA */}
+        <section className="mb-8">
+          <div className="bg-white/5 border border-white/10 rounded-2xl px-5 py-4 md:px-6 md:py-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4 shadow-[0_0_22px_rgba(255,255,255,0.12)]">
+            <div className="flex items-center gap-2">
+              <LockKeyhole size={22} className="text-cyan-400" />
+              <div>
+                <h1 className="text-xl md:text-2xl font-semibold">
+                  Gestión de Invitados
+                </h1>
+                <p className="text-xs md:text-sm text-white/60">
+                  Revisá, aprobá o rechazá las solicitudes al evento.
+                </p>
+              </div>
+            </div>
 
-          <div className="mt-3 sm:mt-0 flex gap-2">
-            {["pending", "approved", "rejected"].map(s => (
+            <div className="flex flex-wrap gap-2 justify-start md:justify-end">
+              {["pending", "approved", "rejected"].map((s) => (
+                <button
+                  key={s}
+                  onClick={() => setStatus(s)}
+                  className={`capitalize px-4 py-2 rounded-full border text-xs md:text-sm font-medium transition
+                  ${status === s
+                      ? "bg-white text-[#021728] border-white shadow-sm"
+                      : "bg-transparent text-white border-white/40 hover:bg-white/10"
+                    }`}
+                >
+                  {s === "pending"
+                    ? "Pendientes"
+                    : s === "approved"
+                      ? "Aprobados"
+                      : "Rechazados"}
+                </button>
+              ))}
               <button
-                key={s}
-                onClick={() => setStatus(s)}
-                className={`capitalize px-4 py-2 rounded-lg border text-sm font-medium transition
-                ${status === s
-                    ? "bg-indigo-600 text-white border-indigo-600"
-                    : "bg-white border-slate-300 hover:bg-slate-100"
-                  }`}
+                onClick={load}
+                className="px-4 py-2 rounded-full border text-xs md:text-sm font-medium bg-transparent text-white border-white/40 hover:bg-white/10 flex items-center justify-center gap-2"
               >
-                {s}
+                <RotateCcw
+                  size={18}
+                  className={`transition-transform ${loading ? "animate-spin" : ""
+                    }`}
+                />
+                {!loading && <span>Refrescar</span>}
               </button>
-            ))}
-            <button
-              onClick={load}
-              className="px-4 py-2 rounded-lg border text-sm font-medium bg-white border-slate-300 hover:bg-slate-100 flex items-center justify-center gap-2"
-            >
-              <RotateCcw size={18} className={`transition-transform ${loading ? "animate-spin" : ""}`} />
-              {!loading && <span>Refrescar</span>}
-            </button>
+            </div>
           </div>
-        </header>
+        </section>
 
-        {loading && <p className="text-center py-10 text-slate-500">Cargando…</p>}
+        {/* ESTADO LISTA */}
+        {loading && (
+          <p className="text-center py-10 text-white/70">Cargando…</p>
+        )}
         {!loading && items.length === 0 && (
-          <p className="text-center py-10 text-slate-400">No hay registros en esta categoría.</p>
+          <p className="text-center py-10 text-white/50">
+            No hay registros en esta categoría.
+          </p>
         )}
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map(r => (
-            <div key={r.id} className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-col justify-between">
+        {/* GRID DE TARJETAS BLANCAS, COMO EL LOGIN */}
+        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {items.map((r) => (
+            <div
+              key={r.id}
+              className="bg-white rounded-2xl shadow-lg border border-slate-200 p-4 flex flex-col justify-between"
+            >
               <div>
-                <p className="text-sm text-slate-400">{new Date(r.created_at).toLocaleString()}</p>
-                <h2 className="text-lg font-semibold mt-1">{r.first_name} {r.last_name}</h2>
-                <p className="text-sm text-slate-600 mt-1">{r.email}</p>
-                <p className="text-sm text-slate-600">{r.company} — {r.role}</p>
-                {r.diet && <p className="text-xs text-slate-500 mt-1">Dieta: {r.diet}</p>}
+                <p className="text-xs text-slate-400">
+                  {new Date(r.created_at).toLocaleString()}
+                </p>
+                <h2 className="text-lg font-semibold mt-1 text-slate-900">
+                  {r.first_name} {r.last_name}
+                </h2>
+                <p className="text-sm text-slate-700 mt-1">{r.email}</p>
+                <p className="text-sm text-slate-700">
+                  {r.company} — {r.role}
+                </p>
+                {r.diet && (
+                  <p className="text-xs text-slate-500 mt-1">
+                    Dieta: {r.diet}
+                  </p>
+                )}
               </div>
 
               <div className="mt-4 flex gap-2">
@@ -131,7 +172,7 @@ export default function AdminRegistrations() {
               </div>
             </div>
           ))}
-        </div>
+        </section>
       </div>
     </main>
   );
