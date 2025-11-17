@@ -14,15 +14,13 @@ const LINKS = [
   { href: "/empresas", label: "EMPRESAS" },
 ];
 
-// safelist para que Tailwind no purgue la sombra custom
+// safelist tailwind
 const _safeAdminShadow = "shadow-[0_0_22px_rgba(255,255,255,0.22)]";
 
 export default function NavBar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
-
-  // 👇 cualquier ruta que empiece con /admin usa el estilo admin
   const isAdmin = pathname.startsWith("/admin");
 
   useEffect(() => {
@@ -32,17 +30,19 @@ export default function NavBar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  useEffect(() => {
-    document.body.style.overflow = "";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, []);
-
   const closeMenu = () => setOpen(false);
 
   const isActive = (href) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
+
+  // 👉 sombra de la navbar: se desactiva cuando el menú mobile está abierto
+  const shadowClass = isAdmin
+    ? open
+      ? "shadow-none"
+      : "shadow-[0_0_22px_rgba(255,255,255,0.22)]"
+    : scrolled && !open
+      ? "shadow-[0_2px_10px_rgba(15,23,42,0.12)]"
+      : "shadow-none";
 
   return (
     <header
@@ -50,11 +50,7 @@ export default function NavBar() {
         "fixed top-0 left-0 right-0 z-[50]",
         isAdmin ? "bg-[#021728] text-white" : "bg-white text-slate-900",
         "transition-shadow",
-        isAdmin
-          ? "shadow-[0_0_22px_rgba(255,255,255,0.22)]"
-          : scrolled
-            ? "shadow-[0_2px_10px_rgba(15,23,42,0.12)]"
-            : "shadow-none",
+        shadowClass,
       ].join(" ")}
     >
       <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-24 flex items-center justify-between">
@@ -91,25 +87,20 @@ export default function NavBar() {
             ))}
           </ul>
 
-          {/* CTA (botón blanco en admin) */}
-          <Button
-            onClick={() => document.dispatchEvent(new Event("open-register"))}
-            className={[
-              "gap-2 text-lg rounded-full px-5 py-3 transition",
-              isAdmin
-                ? "bg-white text-[#021728] hover:bg-white/90"
-                : "bg-black text-white hover:opacity-90",
-            ].join(" ")}
-          >
-            INSCRIBITE
-          </Button>
+          {/* CTA desktop — no aparece en admin */}
+          {!isAdmin && (
+            <Button
+              onClick={() => document.dispatchEvent(new Event("open-register"))}
+              className="gap-2 text-lg rounded-full px-5 py-3 transition bg-black font-bold text-white hover:opacity-90"
+            >
+              INSCRIBITE
+            </Button>
+          )}
         </div>
 
         {/* BOTÓN MOBILE */}
         <div className="md:hidden">
           <button
-            aria-label={open ? "Cerrar menú" : "Abrir menú"}
-            aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
             className={[
               "p-2 rounded-md outline-none focus-visible:ring-2",
@@ -123,6 +114,22 @@ export default function NavBar() {
         </div>
       </nav>
 
+      {/* OVERLAY (fondo ligeramente oscuro y casi sin blur, debajo de la navbar) */}
+      {open && (
+        <div
+          onClick={() => setOpen(false)}
+          className="
+            fixed left-0 right-0 bottom-0
+            top-24
+            bg-black/10
+            backdrop-blur-[1px]
+            transition-opacity
+            md:hidden
+            z-[40]
+          "
+        />
+      )}
+
       {/* PANEL MOBILE */}
       <div
         data-state={open ? "open" : "closed"}
@@ -131,27 +138,29 @@ export default function NavBar() {
           "max-h-0 opacity-0",
           "data-[state=open]:max-h-[80vh] data-[state=open]:opacity-100",
           isAdmin
-            ? "bg-[#021728] border-b border-[#021728]"
-            : "bg-white border-b border-slate-200",
+            ? "bg-[#021728] shadow-none border-none"
+            : "bg-white shadow-none border-none",
+          "relative z-[50]",
         ].join(" ")}
       >
-        <div className="px-4 sm:px-6 pb-6">
-          <ul className="flex flex-col gap-1">
+        <div className="px-6 pb-8 pt-4 flex flex-col items-center gap-3">
+          {/* LINKS MOBILE — CENTRADOS */}
+          <ul className="flex flex-col items-center gap-3 w-full">
             {LINKS.map((l) => (
-              <li key={l.href}>
+              <li key={l.href} className="w-full flex justify-center">
                 <Link
                   href={l.href}
                   onClick={closeMenu}
                   className={[
-                    "w-full rounded-md px-3 py-3 text-base text-center transition",
+                    "w-full max-w-xs text-center rounded-full px-5 py-3 text-base font-medium transition",
                     isAdmin
                       ? "text-white hover:bg-white/10"
                       : "text-slate-900 hover:bg-black/[0.04]",
                     isActive(l.href)
                       ? isAdmin
-                        ? "bg-white/10 font-semibold"
-                        : "bg-black/[0.06] font-semibold"
-                      : "",
+                        ? "bg-white/10 border border-white/20"
+                        : "bg-black/[0.06] border border-slate-200"
+                      : "border border-transparent",
                   ].join(" ")}
                 >
                   {l.label}
@@ -160,21 +169,18 @@ export default function NavBar() {
             ))}
           </ul>
 
-          {/* CTA MOBILE */}
-          <Button
-            onClick={() => {
-              closeMenu();
-              document.dispatchEvent(new Event("open-register"));
-            }}
-            className={[
-              "w-full max-w-xs mx-auto mt-4",
-              isAdmin
-                ? "bg-white text-[#021728] hover:bg-white/90"
-                : "bg-[var(--brand,#050057)] text-white",
-            ].join(" ")}
-          >
-            INSCRIBITE
-          </Button>
+          {/* CTA MOBILE — NO aparece en admin */}
+          {!isAdmin && (
+            <Button
+              onClick={() => {
+                closeMenu();
+                document.dispatchEvent(new Event("open-register"));
+              }}
+              className="w-full max-w-xs mt-2 rounded-full bg-black font-bold text-white"
+            >
+              INSCRIBITE
+            </Button>
+          )}
         </div>
       </div>
     </header>

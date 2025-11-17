@@ -1,4 +1,5 @@
 import CompaniesSection from "@/components/CompaniesSection";
+import Sponsor from "@/components/Sponsor";
 
 const waycloTexto = `
 Soluciones integrales y ciberseguridad para el crecimiento empresarial
@@ -104,8 +105,11 @@ export default function EmpresasPage() {
   ];
 
   return (
-    <main className="bg-slate-950">
+    <main>
       <CompaniesSection data={companies} />
+      <div className="my-10 ">
+        <Sponsor />
+      </div>
     </main>
   );
 }
