@@ -40,7 +40,7 @@ export const speakers = [
     company: "Municipalidad de Río Cuarto",
     companyLogo: "/universidad.png",
     linkedin: "",
-    img: "/speakers/eduardo-ochoa.jpg",
+    img: "/speakers/eduardo.png",
   },
   {
     name: "Ivan",

@@ -19,6 +19,9 @@ export default function NavBar() {
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
 
+  // Detect page admin
+  const isAdminLogin = pathname === "/admin/login";
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 6);
     onScroll();
@@ -27,7 +30,6 @@ export default function NavBar() {
   }, []);
 
   useEffect(() => {
-    // aseguro que no quede bloqueado el scroll en cambios de ruta
     document.body.style.overflow = "";
     return () => {
       document.body.style.overflow = "";
@@ -43,29 +45,33 @@ export default function NavBar() {
     <header
       className={[
         "fixed top-0 left-0 right-0 z-[50]",
-        "bg-white text-slate-900",
+        isAdminLogin ? "bg-[#021728] text-white" : "bg-white text-slate-900",
         "transition-shadow",
-        scrolled
-          ? "shadow-[0_2px_10px_rgba(15,23,42,0.12)]"
-          : "shadow-none",
+
+        // SOMBRA MÁS GRANDE SOLO EN ADMIN
+        isAdminLogin
+          ? "shadow-[0_0_22px_rgba(255,255,255,0.22)]"
+          : scrolled
+            ? "shadow-[0_2px_10px_rgba(15,23,42,0.12)]"
+            : "shadow-none",
       ].join(" ")}
     >
-      <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-24 flex items-center justify-between">
-        {/* Brand */}
-        <div className="flex items-center gap-3 min-w-0">
-          <Link href="/" className="flex items-center gap-3 group">
-            <Image
-              src={Logo}
-              width={180}
-              height={180}
-              alt="Wayclo logo"
-              className="object-contain"
-              priority
-            />
-          </Link>
-        </div>
 
-        {/* Links + CTA desktop */}
+      <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-24 flex items-center justify-between">
+
+        {/* LOGO */}
+        <Link href="/" className="flex items-center gap-3">
+          <Image
+            src={Logo}
+            width={180}
+            height={180}
+            alt="Wayclo logo"
+            priority
+            className="object-contain"
+          />
+        </Link>
+
+        {/* LINKS DESKTOP */}
         <div className="hidden md:flex items-center gap-6">
           <ul className="hidden md:flex items-center gap-6 text-sm">
             {LINKS.map((l) => (
@@ -74,9 +80,11 @@ export default function NavBar() {
                   href={l.href}
                   className={[
                     "uppercase tracking-[0.18em] text-lg transition leading-none",
-                    "text-slate-700 hover:text-slate-900",
+                    isAdminLogin
+                      ? "text-white hover:text-white/90"
+                      : "text-slate-700 hover:text-slate-900",
                     isActive(l.href)
-                      ? "font-extrabold text-slate-900"
+                      ? "font-extrabold"
                       : "",
                   ].join(" ")}
                 >
@@ -86,57 +94,66 @@ export default function NavBar() {
             ))}
           </ul>
 
-          {/* CTA */}
+          {/* CTA (botón blanco en admin) */}
           <Button
             onClick={() => document.dispatchEvent(new Event("open-register"))}
             className={[
-              "gap-2 hover:opacity-90 text-lg rounded-full px-5 py-3",
-              "bg-black text-white",
+              "gap-2 text-lg rounded-full px-5 py-3 transition",
+              isAdminLogin
+                ? "bg-white text-[#021728] hover:bg-white/90"
+                : "bg-black text-white hover:opacity-90",
             ].join(" ")}
           >
             INSCRIBITE
           </Button>
         </div>
 
-        {/* Mobile button */}
+        {/* BOTÓN MOBILE */}
         <div className="md:hidden">
           <button
             aria-label={open ? "Cerrar menú" : "Abrir menú"}
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
             className={[
-              "inline-flex items-center justify-center rounded-md p-2 outline-none focus-visible:ring-2",
-              "text-slate-900 focus-visible:ring-[var(--brand,#050057)]/70",
+              "p-2 rounded-md outline-none focus-visible:ring-2",
+              isAdminLogin
+                ? "text-white focus-visible:ring-white/70"
+                : "text-slate-900 focus-visible:ring-[var(--brand,#050057)]/70",
             ].join(" ")}
           >
-            {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            {open ? <X size={26} /> : <Menu size={26} />}
           </button>
         </div>
       </nav>
 
-      {/* Mobile panel */}
+      {/* PANEL MOBILE */}
       <div
         data-state={open ? "open" : "closed"}
         className={[
-          "md:hidden overflow-hidden border-b border-slate-200",
-          "transition-[max-height,opacity] duration-700 ease-in-out",
+          "md:hidden overflow-hidden transition-[max-height,opacity] duration-700 ease-in-out",
           "max-h-0 opacity-0",
           "data-[state=open]:max-h-[80vh] data-[state=open]:opacity-100",
+          isAdminLogin
+            ? "bg-[#021728] border-b border-[#021728]"
+            : "bg-white border-b border-slate-200",
         ].join(" ")}
       >
         <div className="px-4 sm:px-6 pb-6">
           <ul className="flex flex-col gap-1">
             {LINKS.map((l) => (
-              <li key={l.href} className="flex">
+              <li key={l.href}>
                 <Link
                   href={l.href}
                   onClick={closeMenu}
-                  aria-current={isActive(l.href) ? "page" : undefined}
                   className={[
                     "w-full rounded-md px-3 py-3 text-base text-center transition",
-                    "text-slate-900 hover:bg-black/[0.04] focus-visible:ring-[var(--brand,#050057)]/60",
+                    isAdminLogin
+                      ? "text-white hover:bg-white/10"
+                      : "text-slate-900 hover:bg-black/[0.04]",
                     isActive(l.href)
-                      ? "bg-black/[0.06] font-semibold"
+                      ? isAdminLogin
+                        ? "bg-white/10 font-semibold"
+                        : "bg-black/[0.06] font-semibold"
                       : "",
                   ].join(" ")}
                 >
@@ -146,20 +163,21 @@ export default function NavBar() {
             ))}
           </ul>
 
-          <div className="mt-4 flex justify-center">
-            <Button
-              onClick={() => {
-                closeMenu();
-                document.dispatchEvent(new Event("open-register"));
-              }}
-              className={[
-                "w-full max-w-xs gap-2 hover:opacity-90",
-                "bg-[var(--brand,#050057)] text-white",
-              ].join(" ")}
-            >
-              INSCRIBITE
-            </Button>
-          </div>
+          {/* CTA MOBILE */}
+          <Button
+            onClick={() => {
+              closeMenu();
+              document.dispatchEvent(new Event("open-register"));
+            }}
+            className={[
+              "w-full max-w-xs mx-auto mt-4",
+              isAdminLogin
+                ? "bg-white text-[#021728] hover:bg-white/90"
+                : "bg-[var(--brand,#050057)] text-white",
+            ].join(" ")}
+          >
+            INSCRIBITE
+          </Button>
         </div>
       </div>
     </header>

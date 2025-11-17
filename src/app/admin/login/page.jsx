@@ -25,14 +25,14 @@ export default function AdminLogin() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-slate-100 p-6">
+    <main className="h-[75vh] flex items-center justify-center bg-[#021728] p-6">
       <form
         onSubmit={login}
         className="bg-white shadow-xl border border-slate-200 rounded-2xl p-8 w-full max-w-sm flex flex-col items-center"
       >
         <div className="flex items-center gap-2 mb-4">
-          <LockKeyhole size={26} className="text-indigo-600" />
-          <h1 className="text-xl font-semibold text-slate-700">Panel Admin</h1>
+          <LockKeyhole size={26} className="text-cyan-600" />
+          <h1 className="text-xl font-semibold text-[#021728]">Panel Admin</h1>
         </div>
 
         <input
@@ -40,7 +40,7 @@ export default function AdminLogin() {
           value={key}
           onChange={(e) => setKey(e.target.value)}
           placeholder="Ingresá tu clave"
-          className="w-full border border-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-700 placeholder:text-slate-400"
+          className="w-full border border-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:cyan-700 text-slate-700 placeholder:text-slate-400"
         />
 
         {err && <p className="text-red-600 text-sm mt-2 w-full text-center">{err}</p>}
@@ -48,7 +48,7 @@ export default function AdminLogin() {
         <button
           type="submit"
           disabled={loading}
-          className="mt-5 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded-lg transition-all"
+          className="mt-5 w-full bg-cyan-600 hover:bg-cyan-700 text-white font-medium py-2 rounded-lg transition-all"
         >
           {loading ? "Ingresando..." : "Entrar"}
         </button>
