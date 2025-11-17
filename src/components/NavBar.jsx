@@ -14,13 +14,16 @@ const LINKS = [
   { href: "/empresas", label: "EMPRESAS" },
 ];
 
+// safelist para que Tailwind no purgue la sombra custom
+const _safeAdminShadow = "shadow-[0_0_22px_rgba(255,255,255,0.22)]";
+
 export default function NavBar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
 
-  // Detect page admin
-  const isAdminLogin = pathname === "/admin/login";
+  // 👇 cualquier ruta que empiece con /admin usa el estilo admin
+  const isAdmin = pathname.startsWith("/admin");
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 6);
@@ -45,20 +48,16 @@ export default function NavBar() {
     <header
       className={[
         "fixed top-0 left-0 right-0 z-[50]",
-        isAdminLogin ? "bg-[#021728] text-white" : "bg-white text-slate-900",
+        isAdmin ? "bg-[#021728] text-white" : "bg-white text-slate-900",
         "transition-shadow",
-
-        // SOMBRA MÁS GRANDE SOLO EN ADMIN
-        isAdminLogin
+        isAdmin
           ? "shadow-[0_0_22px_rgba(255,255,255,0.22)]"
           : scrolled
             ? "shadow-[0_2px_10px_rgba(15,23,42,0.12)]"
             : "shadow-none",
       ].join(" ")}
     >
-
       <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-24 flex items-center justify-between">
-
         {/* LOGO */}
         <Link href="/" className="flex items-center gap-3">
           <Image
@@ -80,12 +79,10 @@ export default function NavBar() {
                   href={l.href}
                   className={[
                     "uppercase tracking-[0.18em] text-lg transition leading-none",
-                    isAdminLogin
+                    isAdmin
                       ? "text-white hover:text-white/90"
                       : "text-slate-700 hover:text-slate-900",
-                    isActive(l.href)
-                      ? "font-extrabold"
-                      : "",
+                    isActive(l.href) ? "font-extrabold" : "",
                   ].join(" ")}
                 >
                   {l.label}
@@ -99,7 +96,7 @@ export default function NavBar() {
             onClick={() => document.dispatchEvent(new Event("open-register"))}
             className={[
               "gap-2 text-lg rounded-full px-5 py-3 transition",
-              isAdminLogin
+              isAdmin
                 ? "bg-white text-[#021728] hover:bg-white/90"
                 : "bg-black text-white hover:opacity-90",
             ].join(" ")}
@@ -116,7 +113,7 @@ export default function NavBar() {
             onClick={() => setOpen((v) => !v)}
             className={[
               "p-2 rounded-md outline-none focus-visible:ring-2",
-              isAdminLogin
+              isAdmin
                 ? "text-white focus-visible:ring-white/70"
                 : "text-slate-900 focus-visible:ring-[var(--brand,#050057)]/70",
             ].join(" ")}
@@ -133,7 +130,7 @@ export default function NavBar() {
           "md:hidden overflow-hidden transition-[max-height,opacity] duration-700 ease-in-out",
           "max-h-0 opacity-0",
           "data-[state=open]:max-h-[80vh] data-[state=open]:opacity-100",
-          isAdminLogin
+          isAdmin
             ? "bg-[#021728] border-b border-[#021728]"
             : "bg-white border-b border-slate-200",
         ].join(" ")}
@@ -147,11 +144,11 @@ export default function NavBar() {
                   onClick={closeMenu}
                   className={[
                     "w-full rounded-md px-3 py-3 text-base text-center transition",
-                    isAdminLogin
+                    isAdmin
                       ? "text-white hover:bg-white/10"
                       : "text-slate-900 hover:bg-black/[0.04]",
                     isActive(l.href)
-                      ? isAdminLogin
+                      ? isAdmin
                         ? "bg-white/10 font-semibold"
                         : "bg-black/[0.06] font-semibold"
                       : "",
@@ -171,7 +168,7 @@ export default function NavBar() {
             }}
             className={[
               "w-full max-w-xs mx-auto mt-4",
-              isAdminLogin
+              isAdmin
                 ? "bg-white text-[#021728] hover:bg-white/90"
                 : "bg-[var(--brand,#050057)] text-white",
             ].join(" ")}

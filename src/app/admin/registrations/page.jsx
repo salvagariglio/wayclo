@@ -111,7 +111,7 @@ export default function AdminRegistrations() {
                   className={`transition-transform ${loading ? "animate-spin" : ""
                     }`}
                 />
-                {!loading && <span>Refrescar</span>}
+                {!loading}
               </button>
             </div>
           </div>

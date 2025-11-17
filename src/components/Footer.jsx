@@ -5,23 +5,23 @@ import { usePathname } from "next/navigation";
 export default function Footer() {
     const pathname = usePathname();
 
-    const isAdminLogin = pathname === "/admin/login";
-
+    const isAdmin = pathname.startsWith("/admin");
     const isEmpresas = pathname.startsWith("/empresas");
 
+    // Mostrar info solo en Home y Agenda, y nunca en admin
     const showEventInfo =
-        (pathname === "/" || pathname.startsWith("/agenda")) && !isAdminLogin;
+        (pathname === "/" || pathname.startsWith("/agenda")) && !isAdmin;
 
-    const baseBg = isAdminLogin
-        ? "bg-[#021728] text-white border-[#021728]"
+    const baseBg = isAdmin
+        ? "bg-[#021728] text-white border-[#021728]" // Footer en ADMIN (login + registros)
         : isEmpresas
-            ? "bg-[#1a1a1a] text-white"
-            : "bg-[#1a1a1a] text-white";
+            ? "bg-[#1a1a1a] text-white border-white/10" // Footer en EMPRESAS
+            : "bg-[#1a1a1a] text-white border-white/10"; // Footer default
 
     return (
         <footer className={["py-12 border-t", baseBg].join(" ")}>
 
-            {/* INFO EXTRA HOME / AGENDA */}
+            {/* INFO EXTRA SOLO PARA HOME / AGENDA */}
             {showEventInfo && (
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mb-16">
                     <h2 className="text-2xl font-bold text-center mb-10 tracking-tight">
@@ -29,8 +29,8 @@ export default function Footer() {
                     </h2>
 
                     <div className="grid md:grid-cols-2 gap-10 items-start">
-
-                        <div>
+                        {/* MAPA */}
+                        <div className="w-full">
                             <iframe
                                 className="w-full h-72 rounded-xl shadow-lg border border-white/20"
                                 loading="lazy"
@@ -39,6 +39,7 @@ export default function Footer() {
                             ></iframe>
                         </div>
 
+                        {/* INFO CONTACTO */}
                         <div className="flex flex-col justify-center space-y-5 text-lg text-center md:text-left">
                             <div>
                                 <h3 className="font-bold text-xl mb-1">Lugar</h3>
@@ -62,7 +63,7 @@ export default function Footer() {
 
             {/* COPYRIGHT */}
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div className="text-center">
+                <div className="flex justify-center items-center text-center">
                     <p className="text-sm opacity-80">
                         © {new Date().getFullYear()} Copyright Wayclo-Intercity
                     </p>
