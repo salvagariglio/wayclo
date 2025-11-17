@@ -2,8 +2,9 @@ import "server-only";
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { getSupabaseServer } from "@/lib/supabaseServer";
+import { sendEmail } from "@/lib/sendEmail";
 
-// --- VERIFICACIÓN DE TURNSTILE ---
+// --- opcional: si querés dejar Turnstile, lo mantenemos ---
 async function verifyTurnstile(token, ip) {
     const secret = process.env.TURNSTILE_SECRET_KEY;
 
@@ -32,11 +33,9 @@ async function verifyTurnstile(token, ip) {
     return { ok: !!data.success, data };
 }
 
-// ============= POST =============
 export async function POST(req) {
     try {
         const body = await req.json();
-
         const {
             first_name,
             last_name,
@@ -49,10 +48,10 @@ export async function POST(req) {
             turnstileToken,
         } = body;
 
-        // Validaciones
+        // Validaciones básicas
         const required = { first_name, last_name, email, phone, company, role };
         for (const [key, value] of Object.entries(required)) {
-            if (!value || !value.trim()) {
+            if (!value || !String(value).trim()) {
                 return NextResponse.json(
                     { error: `Falta ${key}` },
                     { status: 400 }
@@ -60,11 +59,9 @@ export async function POST(req) {
             }
         }
 
-        // IP del cliente
+        // IP + Turnstile (opcional)
         const ip =
             (headers().get("x-forwarded-for") || "").split(",")[0]?.trim() || "";
-
-        // Verificación de Turnstile
         const turn = await verifyTurnstile(turnstileToken, ip);
         if (!turn.ok) {
             console.warn("Turnstile ERROR:", turn);
@@ -76,7 +73,6 @@ export async function POST(req) {
 
         // Insert en Supabase
         const supabase = getSupabaseServer();
-
         const { data, error } = await supabase
             .from("registrations")
             .insert([
@@ -101,6 +97,25 @@ export async function POST(req) {
                 { error: "No se pudo crear el registro" },
                 { status: 500 }
             );
+        }
+
+        // 🔥 Mail de “recibimos tu registro”
+        const fullName =
+            [first_name, last_name].filter(Boolean).join(" ") || "participante";
+
+        try {
+            await sendEmail({
+                to: email,
+                subject: "Recibimos tu registro – CyberCloud",
+                html: `
+          <h2>¡Gracias por registrarte, ${fullName}!</h2>
+          <p>Recibimos tu registro para <strong>CyberCloud</strong>.</p>
+          <p>Tu estado actual es: <strong>pending</strong>.</p>
+        `,
+            });
+        } catch (mailErr) {
+            console.error("Error enviando mail de registro:", mailErr);
+            // NO tiramos error al usuario por esto; el registro ya quedó guardado
         }
 
         return NextResponse.json({ ok: true, id: data.id }, { status: 201 });
