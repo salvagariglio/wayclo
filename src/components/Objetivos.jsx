@@ -16,6 +16,11 @@ export const speakers = [
     },
 ];
 
+
+// ------------------------------------------------------
+// CARD AZUL (NO CAMBIAMOS TU DISEÑO)
+// ------------------------------------------------------
+
 export function SpeakerCard({ speaker, index }) {
     const { name, lastname, img } = speaker;
 
@@ -28,32 +33,31 @@ export function SpeakerCard({ speaker, index }) {
 
     const alignmentClass = isOdd ? "ml-auto" : "";
 
-    // ⚠️ La clave está acá
     const imageWrapperClass = isSecond
-        ? "absolute bottom-0 right-0 h-full w-[50%] flex items-end justify-center" // SIEMPRE pega abajo
-        : "absolute right-0 h-full w-[60%] flex items-center justify-center";      // centrada
+        ? "absolute bottom-0 right-0 h-full w-[50%] flex items-end justify-center"
+        : "absolute right-0 h-full w-[60%] flex items-center justify-center";
 
     const imageClass = isSecond
-        ? "object-contain object-bottom" // pega SIEMPRE al borde inferior
-        : "object-contain object-center scale-110"; // más grande y centrada
+        ? "object-contain object-bottom"
+        : "object-contain object-center scale-110";
 
     return (
         <div
             className={`
-        relative
-        w-full
-        h-[26vh]
-        sm:w-[45vh] sm:h-[24vh]
-        lg:w-[55vh] lg:h-[28vh]
-        xl:w-[65vh] xl:h-[32vh]
-        flex
-        rounded-2xl
-        px-5 sm:px-7 lg:px-8
-        text-white
-        overflow-hidden
-        ${gradientClass}
-        ${alignmentClass}
-      `}
+                relative
+                w-full
+                h-[26vh]
+                sm:w-[45vh] sm:h-[24vh]
+                lg:w-[55vh] lg:h-[28vh]
+                xl:w-[65vh] xl:h-[32vh]
+                flex
+                rounded-2xl
+                px-5 sm:px-7 lg:px-8
+                text-white
+                overflow-hidden
+                ${gradientClass}
+                ${alignmentClass}
+            `}
         >
             {/* TEXTO */}
             <div className="absolute bottom-10 left-5 flex flex-col gap-1 z-10">
@@ -70,20 +74,16 @@ export function SpeakerCard({ speaker, index }) {
 
             {/* IMAGEN */}
             <div className={imageWrapperClass}>
-                <Image
-                    src={img}
-                    alt={name}
-                    fill
-                    className={imageClass}
-                />
+                <Image src={img} alt={name} fill className={imageClass} />
             </div>
         </div>
     );
 }
 
 
-
-
+// ------------------------------------------------------
+// FILA COMPLETA (FIX DE ALINEACIÓN PERFECTA CON LA CARD)
+// ------------------------------------------------------
 
 export function SpeakerInfoRow({ speaker, index }) {
     const isOdd = index % 2 !== 0;
@@ -91,41 +91,51 @@ export function SpeakerInfoRow({ speaker, index }) {
     return (
         <div
             className={`
-        w-full 
-        flex flex-col md:flex-row gap-6
-        items-start md:items-end
-        ${isOdd ? "md:flex-row-reverse" : ""}
-      `}
+                w-full 
+                flex flex-col md:flex-row gap-6
+                ${isOdd ? "md:flex-row-reverse" : ""}
+            `}
         >
-            {/* Card azul: prioridad de espacio (no se achica) */}
+            {/* CARD AZUL */}
             <div className="w-full md:w-auto shrink-0">
                 <SpeakerCard speaker={speaker} index={index} />
             </div>
 
-            {/* Contenedor lateral de la caja de info */}
+            {/* TEXTO — MISMO ANCHO QUE LA CARD SI ES IMPAR */}
             <div
                 className={`
-          w-full 
-          md:flex-1 min-w-0 
-          flex
-          ${isOdd ? "md:justify-start" : "md:justify-end"}
-        `}
+        w-full 
+        md:flex-1 min-w-0 
+        flex flex-col justify-end 
+        ${isOdd ? "items-end" : "items-start"}   /* 🔥 siempre se alinea con la card */
+    `}
             >
-                {/* Caja blanca de info */}
-                <div className="flex flex-col bg-white rounded-xl w-full max-w-md pb-4 px-2">
-                    <div className="mt-auto flex flex-col text-left">
-                        <h3 className="text-lg  text-gray-600 leading-tight">
-                            {speaker.role}
-                        </h3>
-                    </div>
+                <div className="bg-white rounded-xl w-full max-w-md pb-4 px-2">
+                    <h3 className="
+    text-base 
+    sm:text-md 
+    md:text-lg 
+    lg:text-xl 
+    text-gray-600 
+    leading-snug 
+    sm:leading-normal 
+    md:leading-relaxed
+">
+                        {speaker.role}
+                    </h3>
+
                 </div>
             </div>
+
         </div>
     );
 }
 
 
-/** 🔹 LISTA DE SPEAKERS – SOLO LOS RENDERIZA, SIN CAMBIAR DISEÑO */
+// ------------------------------------------------------
+// LISTA COMPLETA
+// ------------------------------------------------------
+
 export default function SpeakersSection() {
     return (
         <div className="flex flex-col gap-12">

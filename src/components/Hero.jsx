@@ -20,7 +20,7 @@ export default function Hero() {
         <Image
           src={CyberCloudLogoSlogan}
           alt="CyberCloud"
-          className="h-12 sm:h-16 md:h-40 w-auto opacity-95"
+          className="h-24 sm:h-32 md:h-40 w-auto opacity-95"
           priority
         />
       </div>
@@ -87,7 +87,7 @@ export default function Hero() {
           absolute
 
           /* ✅ posición y tamaño base (mobile first) */
-          left-4 top-32 w-20
+          left-4 top-24 w-16
 
           /* ✅ overrides por breakpoint */
           sm:left-0  sm:top-18  sm:w-32
@@ -112,9 +112,9 @@ export default function Hero() {
           absolute
 
           /* ✅ posición y tamaño base (mobile first) */
-          right-1 top-[26rem] w-[130px]
+          right-1 top-[21rem] w-[120px]
           /* ✅ overrides por breakpoint */
-          sm:right-[30px] sm:top-80   sm:w-[220px]
+          sm:right-[30px] sm:top-60   sm:w-[220px]
           md:top-96   md:w-[280px]
           lg:right-[40px] lg:top-96 lg:w-[350px]
           xl:right-[-20px] xl:top-80   xl:w-[340px]
