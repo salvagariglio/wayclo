@@ -3,8 +3,8 @@ import LenovoLogo from "../../public/lenovo.png";
 
 const Sponsor = () => {
     return (
-        <div className="flex flex-col items-center justify-center py-20">
-            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 text-center mb-6">
+        <div className="flex flex-col items-center justify-center mb-2 md:mb-10 mt-12 md:mt-24">
+            <h2 className="md:text-xl text-lg text-start font-bold tracking-tight text-cyan-950 pb-6">
                 ACOMPAÑA
             </h2>
 

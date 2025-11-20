@@ -53,7 +53,7 @@ export default function CompaniesSection({ data = [] }) {
         </p>
 
         {/* Listado estático de panels, uno debajo del otro */}
-        <div className="mt-10 space-y-16 md:space-y-24">
+        <div className="mt-10 space-y-16 md:space-y-20">
           {safeData.map((c) => (
             <div key={c.id} id={c.id} className="scroll-mt-24">
               <CompanyPanel {...c} />
@@ -61,7 +61,7 @@ export default function CompaniesSection({ data = [] }) {
           ))}
         </div>
       </div>
-      <div className="flex pb-20 justify-center mt-16">
+      <div className="flex justify-center mt-6">
         <button
           type="button"
           onClick={() => document.dispatchEvent(new Event("open-register"))}

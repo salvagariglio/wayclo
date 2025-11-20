@@ -10,6 +10,7 @@ export const speakers = [
     role: "Director",
     company: "Wayclo",
     companyLogo: "/logo-wayclo-speakers.png",
+    companyLogoWidth: 130,
     linkedin: "https://www.linkedin.com/in/cristian--mercado/",
     img: "/speakers/cristian.png",
   },
@@ -19,6 +20,7 @@ export const speakers = [
     role: "Gerente de Auditorías",
     company: "Sala Hnos.",
     companyLogo: "/salahnos.png",
+    companyLogoWidth: 80,
     linkedin: "",
     img: "/speakers/martin-lovera.jpg",
   },
@@ -30,6 +32,7 @@ export const speakers = [
     role: "Socio Gerente",
     company: "Intercity Comunicaciones S.A.",
     companyLogo: "/intercity.png",
+    companyLogoWidth: 120,
     linkedin: "",
     img: "/speakers/ivan-pecovich.jpg",
   },
@@ -39,6 +42,7 @@ export const speakers = [
     role: "Director del Centro de Cómputos",
     company: "Municipalidad de Río Cuarto",
     companyLogo: "/municipalidad.png",
+    companyLogoWidth: 130,
     linkedin: "",
     img: "/speakers/eduardo.png",
   },
@@ -48,6 +52,7 @@ export const speakers = [
     role: "Técnico Centro de Cómputos",
     company: "Municipalidad de Río Cuarto",
     companyLogo: "/municipalidad.png",
+    companyLogoWidth: 130,
     linkedin: "",
     img: "/speakers/pablo-degiglio.jpg",
   },
@@ -59,6 +64,7 @@ export const speakers = [
     role: "Lider de Operaciones y Proyectos",
     company: "Wayclo",
     companyLogo: "/logo-wayclo-speakers.png",
+    companyLogoWidth: 130,
     linkedin: "https://www.linkedin.com/in/lucianogabutti",
     img: "/speakers/martin.png",
   },
@@ -68,6 +74,7 @@ export const speakers = [
     role: "Coordinador de Plataforma Backup",
     company: "Aceitera General Deheza",
     companyLogo: "/agd.png",
+    companyLogoWidth: 110,
     linkedin: "",
     img: "/speakers/martin.png",
   },
@@ -77,6 +84,7 @@ export const speakers = [
     role: "Cybersecurity Advisor",
     company: "Wayclo",
     companyLogo: "/logo-wayclo-speakers.png",
+    companyLogoWidth: 130,
     linkedin: "https://www.linkedin.com/in/gustavo-matuk-66b96613/",
     img: "/speakers/martin.png",
   },
@@ -86,14 +94,16 @@ export const speakers = [
     role: "Cybercrime Researcher - Director de carrera",
     company: "Universidad Siglo 21",
     companyLogo: "/universidadd.png",
+    companyLogoWidth: 80,
     linkedin: "https://www.linkedin.com/in/emmanuelvilas/",
     img: "/speakers/emmanuel-villas.jpg",
   },
 ];
 
 /* ============================================================
-   🔹 TARJETA UNIFICADA: CyberCloud arriba + Info + Imagen
+   🔹 TARJETA DE SPEAKER
    ============================================================ */
+
 export function SpeakerCard({ speaker, index }) {
   const isOdd = index % 2 !== 0;
 
@@ -107,64 +117,56 @@ export function SpeakerCard({ speaker, index }) {
     <div
       className={`
         w-full
-        max-w-3xl              /* más chica */
+        max-w-2xl
         ${alignClass}
         rounded-2xl
         text-white
         overflow-hidden
         ${gradientClass}
-        pt-6 px-6          /* antes 10/8 */
+        pt-6 px-6
         flex flex-col
         gap-6
       `}
     >
-      <h3 className="text-center text-2xl font-extrabold tracking-wide">
-        CyberCloud
-      </h3>
-
       <div
         className={`
-    flex flex-col md:flex-row 
-    items-center md:items-stretch
-    gap-6
-    ${isOdd ? "md:flex-row-reverse" : ""}
-  `}
+          flex flex-col md:flex-row 
+          items-center md:items-stretch
+          gap-6
+          ${isOdd ? "md:flex-row-reverse" : ""}
+        `}
       >
-        {/* Imagen más grande */}
-        {/* IMAGEN – circular en mobile, rectangular en desktop */}
+        {/* IMAGEN — circular en mobile, rectangular en desktop */}
         <div
           className="
-    w-full md:w-1/2
-    relative
-    aspect-square md:aspect-auto        /* círculo perfecto en mobile */
-    h-auto md:h-[220px]                 /* altura fija solo en desktop */
-    rounded-full md:rounded-xl          /* círculo → rectángulo */
-    overflow-hidden
-    flex items-center justify-center
-    md:bg-transparent bg-black/10
-  "
+            w-full md:w-1/2
+            relative
+            aspect-square md:aspect-auto
+            h-auto md:h-[220px]
+            rounded-full md:rounded-xl
+            overflow-hidden
+            flex items-center justify-center
+          "
         >
           <Image
             src={speaker.img}
             alt={speaker.name}
             fill
             className="
-      object-cover                      /* que llene el círculo */
-      md:object-contain                 /* en desktop se ve normal */
-      object-center
-    "
+              object-cover
+              md:object-contain
+              object-center
+            "
           />
         </div>
 
-
-
-        {/* Contenedor de texto más chico */}
+        {/* TEXTO + LOGO */}
         <div className="w-full md:w-[40%] flex flex-col justify-end pb-6">
           {speaker.companyLogo && (
             <Image
               src={speaker.companyLogo}
               alt={speaker.company}
-              width={160}
+              width={speaker.companyLogoWidth || 100}  // 👈 ancho dinámico
               height={120}
               className="object-contain mb-4 drop-shadow-lg"
             />
@@ -176,7 +178,7 @@ export function SpeakerCard({ speaker, index }) {
             </p>
 
             <p className="text-sm md:text-base opacity-90 mt-1">
-              {speaker.role} – {speaker.company}
+              {speaker.role}
             </p>
 
             {speaker.linkedin && (
@@ -192,28 +194,25 @@ export function SpeakerCard({ speaker, index }) {
           </div>
         </div>
       </div>
-
     </div>
   );
 }
 
-
-
-
 /* ============================================================
    🔹 LISTA COMPLETA DE SPEAKERS
    ============================================================ */
+
 export default function SpeakersSection() {
   return (
-    <div className="flex flex-col ">
+    <div className="flex flex-col">
       <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-center text-slate-900">
         Voces que impulsan el cambio
       </h2>
+
       <p className="text-base md:text-lg text-slate-700 text-center mt-2">
         Profesionales que comparten su mirada para potenciar el presente y futuro de las PYMES.
       </p>
 
-      {/* 🔥 CONTENEDOR ANCHO PARA QUE LAS CARDS PUEDAN PEGARSE A LOS LADOS */}
       <div className="mt-10 w-full max-w-7xl mx-auto flex flex-col gap-10">
         {speakers.map((sp, i) => (
           <SpeakerCard key={i} speaker={sp} index={i} />
@@ -246,4 +245,3 @@ export default function SpeakersSection() {
     </div>
   );
 }
-

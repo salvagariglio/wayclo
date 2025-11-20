@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
-import Logo from "../../public/logo-wayclo.png";
+import LogoSlogan from "../../public/logo-slogan.png";
 
 const LINKS = [
   { href: "/", label: "EVENTO" },
@@ -57,10 +57,10 @@ export default function NavBar() {
         {/* LOGO */}
         <Link href="/" className="flex items-center gap-3">
           <Image
-            src={Logo}
-            width={180}
+            src={LogoSlogan}
+            width={240}
             height={180}
-            alt="Wayclo logo"
+            alt="CyberCloud"
             priority
             className="object-contain"
           />
@@ -74,7 +74,7 @@ export default function NavBar() {
                 <Link
                   href={l.href}
                   className={[
-                    "uppercase tracking-[0.18em] text-lg transition leading-none",
+                    "uppercase tracking-[0.18em] text-md transition leading-none",
                     isAdmin
                       ? "text-white hover:text-white/90"
                       : "text-slate-700 hover:text-slate-900",
@@ -91,7 +91,7 @@ export default function NavBar() {
           {!isAdmin && (
             <Button
               onClick={() => document.dispatchEvent(new Event("open-register"))}
-              className="gap-2 text-lg rounded-full px-5 py-3 transition bg-black font-bold text-white hover:opacity-90"
+              className="gap-2 text-md rounded-full px-5 py-3 transition bg-black font-bold text-white hover:opacity-90"
             >
               INSCRIBITE
             </Button>

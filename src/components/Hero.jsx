@@ -2,7 +2,7 @@
 import Image from "next/image";
 import ShieldCheck from "../../public/shield-check.png";
 import LaptopShield from "../../public/laptop-shield.png";
-import WaycloLogo from "../../public/logo-wayclo.png";
+import CyberCloudLogoSlogan from "../../public/logo-slogan.png";
 
 export default function Hero() {
   return (
@@ -11,40 +11,25 @@ export default function Hero() {
         relative
         mx-auto max-w-6xl
         px-4 sm:px-6 lg:px-8
-        pb-40 md:pb-52
+        pb-32
         pt-8 md:pt-14
         text-center
       "
     >
-      <div className="mb-6 flex justify-center">
+      <div className=" flex justify-center">
         <Image
-          src={WaycloLogo}
-          alt="Wayclo"
-          className="h-12 sm:h-16 md:h-20 w-auto opacity-95"
+          src={CyberCloudLogoSlogan}
+          alt="CyberCloud"
+          className="h-12 sm:h-16 md:h-40 w-auto opacity-95"
           priority
         />
       </div>
-      {/* TITULAR */}
-      <h1
-        className="
-          text-black                      /* ✅ Título negro */
-          font-extrabold leading-tight tracking-[-0.02em]
-          text-4xl sm:text-6xl md:text-6xl lg:text-[94px]
-        "
-      >
-        La nueva era de
-        <br />
-        la ciberseguridad
-        <br />
-        empresarial
-      </h1>
-
       {/* FECHA */}
       <p
         className="
           text-black                      /* ✅ Fecha negra */
           mt-6 md:mt-10
-          text-lg  md:text-3xl
+          text-lg  md:text-2xl
           uppercase tracking-[0.2em]
         "
       >
@@ -57,7 +42,7 @@ export default function Hero() {
           mx-auto mt-4 md:mt-5
           max-w-xl
           text-[#333]                    /* ✅ Gris oscuro como en la captura */
-          text-lg md:text-2xl
+          text-lg md:text-xl
         "
       >
         El evento donde líderes y creativos se reúnen para construir el futuro
@@ -102,13 +87,13 @@ export default function Hero() {
           absolute
 
           /* ✅ posición y tamaño base (mobile first) */
-          left-4 top-48 w-20
+          left-4 top-32 w-20
 
           /* ✅ overrides por breakpoint */
-          sm:left-5  sm:top-60  sm:w-28
-          md:left-[10px] md:top-72 md:w-40
-          lg:left-[20px] lg:top-96 lg:w-48
-          xl:left-[-80px] xl:w-56
+          sm:left-0  sm:top-18  sm:w-32
+          md:left-[60px] md:top-40 md:w-40
+          lg:left-[20px] lg:top-44 lg:w-48
+          xl:left-[30px] xl:w-48
 
           drop-shadow-[0_8px_24px_rgba(0,0,0,0.20)]
           select-none pointer-events-none
@@ -127,13 +112,12 @@ export default function Hero() {
           absolute
 
           /* ✅ posición y tamaño base (mobile first) */
-          right-1 top-[28rem] w-[130px]
-
+          right-1 top-[26rem] w-[130px]
           /* ✅ overrides por breakpoint */
-          sm:right-[30px] sm:top-98   sm:w-[220px]
-          md:right-[20px] md:top-[32rem]   md:w-[300px]
-          lg:right-[40px] lg:top-[36rem] lg:w-[350px]
-          xl:right-[-80px] xl:top-90   xl:w-[400px]
+          sm:right-[30px] sm:top-80   sm:w-[220px]
+          md:top-96   md:w-[280px]
+          lg:right-[40px] lg:top-96 lg:w-[350px]
+          xl:right-[-20px] xl:top-80   xl:w-[340px]
 
           drop-shadow-[0_16px_40px_rgba(0,0,0,0.25)]
           select-none pointer-events-none

@@ -1,5 +1,4 @@
 import Agenda from "@/components/Agenda";
-import Speakers from "@/components/Speakers";
 import Sponsor from "@/components/Sponsor";
 
 export default function AgendaPage() {
@@ -8,7 +7,7 @@ export default function AgendaPage() {
       <section id="agenda" className="scroll-mt-24">
         <Agenda />
       </section>
-      <div className="mt-20">
+      <div>
         <Sponsor />
       </div>
 

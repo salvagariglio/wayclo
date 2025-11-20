@@ -108,9 +108,9 @@ export default function EmpresasPage() {
   return (
     <main>
       <CompaniesSection data={companies} />
-      <div className="my-10 ">
+      <div >
         <Sponsor />
       </div>
-    </main>
+    </main >
   );
 }
