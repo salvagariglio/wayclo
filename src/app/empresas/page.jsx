@@ -10,7 +10,8 @@ En Wayclo, la tecnología es el medio para un fin: impulsar el éxito empresaria
 `;
 
 const intercityTexto = `
-Intercity Comunicaciones S.A. es un proveedor de conectividad por fibra óptica en Río Cuarto y zona. Ofrecen planes empresariales, despliegue FTTH, soporte local y TV digital (Oy!), con soluciones para hogares, empresas e instituciones.
+Intercity Comunicaciones S.A.: somos una empresa ISP (Internet Service Provider) con sede en Río Cuarto, Córdoba. Desde hace más de dos décadas brindamos soluciones de conectividad de alta calidad a hogares, empresas e instituciones. Esta trayectoria nos permitió consolidarnos como un referente regional en innovación tecnológica, cercanía y atención personalizada a nuestros clientes.
+Ofrecemos servicios de internet por fibra óptica y Wireless, soluciones de conectividad para empresas (Land to Land, IP fijo), televisión digital y servicios integrales de telecomunicaciones adaptados a las necesidades del mercado corporativo y residencial.
 `;
 
 export default function EmpresasPage() {

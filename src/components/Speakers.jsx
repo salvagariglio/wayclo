@@ -25,13 +25,13 @@ export const speakers = [
 
   // PANEL 1 — Intercity
   {
-    name: "Pablo",
-    lastname: "Degiglio",
-    role: "Técnico Centro de Cómputos",
-    company: "Municipalidad de Río Cuarto",
-    companyLogo: "/universidad.png",
+    name: "Ivan",
+    lastname: "Pecovich",
+    role: "Socio Gerente",
+    company: "Intercity Comunicaciones S.A.",
+    companyLogo: "/intercity.png",
     linkedin: "",
-    img: "/speakers/pablo-degiglio.jpg",
+    img: "/speakers/ivan-pecovich.jpg",
   },
   {
     name: "Eduardo",
@@ -43,16 +43,34 @@ export const speakers = [
     img: "/speakers/eduardo.png",
   },
   {
-    name: "Ivan",
-    lastname: "Pecovich",
-    role: "Socio Gerente",
-    company: "Intercity Comunicaciones S.A.",
-    companyLogo: "/intercity.png",
+    name: "Pablo",
+    lastname: "Degiglio",
+    role: "Técnico Centro de Cómputos",
+    company: "Municipalidad de Río Cuarto",
+    companyLogo: "/universidad.png",
     linkedin: "",
-    img: "/speakers/ivan-pecovich.jpg",
+    img: "/speakers/pablo-degiglio.jpg",
   },
 
   // PANEL 2
+  {
+    name: "Luciano",
+    lastname: "Gabutti",
+    role: "Lider de Operaciones y Proyectos",
+    company: "Wayclo",
+    companyLogo: "/logo-wayclo.png",
+    linkedin: "https://www.linkedin.com/in/lucianogabutti",
+    img: "/speakers/martin.png",
+  },
+  {
+    name: "Juan",
+    lastname: "Ochoa",
+    role: "Coordinador de Plataforma Backup",
+    company: "Aceitera General Deheza",
+    companyLogo: "/logo-wayclo.png",
+    linkedin: "",
+    img: "/speakers/martin.png",
+  },
   {
     name: "Gustavo",
     lastname: "Matuk",
@@ -96,7 +114,6 @@ export function SpeakerCard({ speaker, index }) {
         xl:w-[65vh] xl:h-[32vh] /* pantallas muy grandes */
         flex
         rounded-2xl
-        px-5 sm:px-7 lg:px-8
         text-white
         overflow-hidden
         ${gradientClass}
@@ -203,10 +220,10 @@ export default function SpeakersSection() {
   return (
     <div className="flex flex-col ">
       <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-center text-slate-900">
-        Quiénes nos inspiran
+        Voces que impulsan el cambio
       </h2>
       <p className="text-base md:text-lg text-slate-700 text-center mt-2">
-        Especialistas con trayectoria que potencian la visión de CyberCloud.
+        Profesionales que comparten su mirada para potenciar el presente y futuro de las PYMES.
       </p>
       {speakers.map((sp, i) => (
         <SpeakerInfoRow key={i} speaker={sp} index={i} />

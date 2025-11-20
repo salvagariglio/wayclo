@@ -5,13 +5,13 @@ export const speakers = [
     {
         name: "Networking",
         lastname: "Empresarial",
-        role: "Donde las conversaciones se transforman en alianzas y las conexiones en oportunidades reales para crecer juntos.",
+        role: "Un espacio para conocerse, compartir experiencias y construir nuevas oportunidades junto a referentes y empresas de la región.",
         img: "/networking1.png",
     },
     {
-        name: "Networking &",
-        lastname: "Alianzas Estratégicas",
-        role: "Un espacio para conocerse, compartir experiencias y construir nuevas oportunidades junto a referentes y empresas de la región.",
+        name: "Cóctel de Cierre",
+        lastname: "",
+        role: "Un espacio distendido para picotear, seguir conectando y fortalecer vínculos entre empresas y referentes locales.",
         img: "/networking2.png",
     },
 ];

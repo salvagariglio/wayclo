@@ -28,15 +28,15 @@ export default function Agenda() {
     },
     {
       time: "18:15 - 18:30",
-      title: "INTRODUCCIÓN ",
+      title: "APERTURA ",
       description: "Apertura y bienvenida, Wayclo e Intercity. ",
     },
     {
-      time: "18:30 - 19.15",
-      title: " PANEL DE DISCUSIÓN: Desafíos reales y soluciones en IT en la región",
+      time: "18:30 - 19.00",
+      title: "PRIMER PANEL DE DISCUSIÓN: Desafíos reales y soluciones en IT en la región",
       description:
         "Participan Wayclo, Intercity y empresas invitadas. Casos de éxito, desafíos locales y debate sobre el futuro tecnológico de la región.",
-      tag: "Panel",
+      tag: "Panel 1",
       speakersNames: [
         "Cristian Mercado",
         "Martín Lovera",
@@ -46,19 +46,26 @@ export default function Agenda() {
       ],
     },
     {
-      time: "19:15 – 19:30",
+      time: "19:00 - 19:30",
+      title: "SEGUNDO PANEL DE DISCUSIÓN: Desafíos reales y soluciones en IT en la región",
+      description: "Participan Wayclo, Intercity y empresas invitadas. Casos de éxito, desafíos locales y debate sobre el futuro tecnológico de la región.",
+      tag: "Panel 2",
+      speakersNames: ["Luciano Gabutti", "Juan Ochoa", "Ivan Pecovich", "Grassi"],
+    },
+    {
+      time: "19:30 – 19:45",
       title: "BREAK",
       description: "Coffee break y networking informal entre asistentes.",
     },
     {
-      time: "19:30 – 20:15",
+      time: "20:00 – 20:30",
       title: "CHARLA: Ciberseguridad ",
       description: "Riesgos empresariales y legales.",
       tag: "Charla",
       speakersNames: ["Gustavo Matuk", "Emmanuel Villas"],
     },
     {
-      time: "20:15 – 21:00",
+      time: "20:30 – 21:00",
       title: "CATERING Y NETWORKING FINAL",
       description: "Cierre con cóctel distendido y networking entre empresas.",
       tag: "Cóctel",
@@ -72,7 +79,7 @@ export default function Agenda() {
           Agenda
         </h2>
         <p className="text-base md:text-lg text-slate-700 text-center mt-2 mb-10">
-          Mirá el recorrido completo del evento y organizá tu día.
+          Mirá el recorrido completo del evento.
         </p>
 
 

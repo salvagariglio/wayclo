@@ -50,7 +50,7 @@ export default function Footer() {
                         <div className="flex flex-col justify-center space-y-5 text-lg text-center md:text-left">
                             <div>
                                 <h3 className="font-bold text-xl mb-1">Lugar</h3>
-                                <p>📍 Polo Científico Tecnologico Río Cuarto</p>
+                                <p>📍 Polo Científico Tecnológico Río Cuarto</p>
                             </div>
 
                             <div>
@@ -72,7 +72,7 @@ export default function Footer() {
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-center items-center text-center">
                     <p className="text-sm opacity-80">
-                        © {new Date().getFullYear()} Copyright Wayclo-Intercity
+                        © {new Date().getFullYear()} Copyright CyberCloud
                     </p>
                 </div>
             </div>
