@@ -240,9 +240,9 @@ function SpeakerModalCard({ speaker }) {
       className={`
         relative
         w-full
-        h-[40vh]
-        sm:h-[45vh]
-        lg:h-[50vh]
+        h-[60vh]
+        sm:h-[65vh]
+        lg:h-[80vh]
         flex
         rounded-2xl
         px-5 sm:px-7 lg:px-8
