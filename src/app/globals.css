@@ -94,3 +94,16 @@ body {
   display: none;
   /* Chrome, Safari y Opera */
 }
+
+
+/* Animación reveal on scroll */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 1.2s ease;
+}
+
+.reveal.show {
+  opacity: 1;
+  transform: translateY(0);
+}

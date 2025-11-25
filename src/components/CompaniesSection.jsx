@@ -1,5 +1,5 @@
 "use client";
-
+import useScrollReveal from "@/hooks/useScrollReveal";
 import { useMemo, useState } from "react";
 import {
   ChevronDown,
@@ -54,11 +54,20 @@ export default function CompaniesSection({ data = [] }) {
 
         {/* Listado estático de panels, uno debajo del otro */}
         <div className="mt-10 space-y-16 md:space-y-20">
-          {safeData.map((c) => (
-            <div key={c.id} id={c.id} className="scroll-mt-24">
-              <CompanyPanel {...c} />
-            </div>
-          ))}
+          {safeData.map((c) => {
+            const [ref, show] = useScrollReveal();
+            return (
+              <div
+                key={c.id}
+                id={c.id}
+                ref={ref}
+                className={`reveal ${show ? "show" : ""} scroll-mt-24`}
+              >
+                <CompanyPanel {...c} />
+              </div>
+            );
+          })}
+
         </div>
       </div>
       <div className="flex justify-center mt-6">

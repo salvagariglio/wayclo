@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import { Linkedin } from "lucide-react";
+import useScrollReveal from "@/hooks/useScrollReveal";
 
 export const speakers = [
   // PANEL 1 — Wayclo
@@ -108,6 +109,9 @@ export function SpeakerCard({ speaker, index }) {
   const isOdd = index % 2 !== 0;
   const isSilhouette = speaker.img.includes("silueta");
 
+  // 👇 NUEVO
+  const [ref, show] = useScrollReveal();
+
   const gradientClass = isOdd
     ? "bg-gradient-to-r from-[#021728] to-cyan-600"
     : "bg-gradient-to-r from-cyan-600 to-[#021728]";
@@ -116,7 +120,9 @@ export function SpeakerCard({ speaker, index }) {
 
   return (
     <div
+      ref={ref}
       className={`
+        reveal ${show ? "show" : ""}
         w-full
         max-w-2xl
         ${alignClass}
@@ -129,6 +135,7 @@ export function SpeakerCard({ speaker, index }) {
         gap-6
       `}
     >
+
       <div
         className={`
           flex flex-col md:flex-row 
@@ -165,9 +172,6 @@ export function SpeakerCard({ speaker, index }) {
           />
 
         </div>
-
-
-
 
 
 

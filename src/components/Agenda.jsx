@@ -3,6 +3,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { speakers } from "@/components/Speakers"; // SpeakerCard no se usa acá, podés borrarlo del import
 import { Linkedin } from "lucide-react";
+import useScrollReveal from "@/hooks/useScrollReveal";
 
 // 👉 ahora devuelve DIRECTAMENTE el objeto speaker
 const findSpeakerByFullName = (fullName) => {
@@ -85,23 +86,27 @@ export default function Agenda() {
 
         <div className="flex flex-col gap-12">
           {agenda.map((it, idx) => {
-            const isRight = idx % 2 !== 0; // alterna lado
+            const [ref, show] = useScrollReveal();   // 👈 AGREGADO
+            const isRight = idx % 2 !== 0;
 
             return (
               <div
                 key={idx}
+                ref={ref}
                 className={`
-                  relative
-                  py-4 px-6 rounded-xl
-                  transition-all duration-300
-                  hover:bg-gray-50
-                  ${isRight
+          reveal ${show ? "show" : ""}
+          relative
+          py-4 px-6 rounded-xl
+          transition-all duration-300
+          hover:bg-gray-50
+          ${isRight
                     ? "border-r-4 border-cyan-400 text-right pr-6 ml-auto"
                     : "border-l-4 border-cyan-400 text-left pl-6 mr-auto"
                   }
-                  max-w-3xl
-                `}
+          max-w-3xl
+        `}
               >
+
                 {/* HORA + TÍTULO */}
                 <h3
                   className={`

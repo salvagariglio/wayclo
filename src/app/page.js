@@ -9,8 +9,16 @@ import SpeakersSection from "@/components/Objetivos";
 import Sponsor from "@/components/Sponsor";
 import AnimatedWordCloud from "@/components/AnimatedWordCloud";
 
+import useScrollReveal from "@/hooks/useScrollReveal";
 
 export default function HomePage() {
+
+  // 👇 animaciones sección por sección
+  const [heroRef, heroShow] = useScrollReveal();
+  const [empRef, empShow] = useScrollReveal();
+  const [expoRef, expoShow] = useScrollReveal();
+  const [nubeRef, nubeShow] = useScrollReveal();
+
   return (
     <main className="min-h-screen bg-white text-black">
       <NavBar
@@ -22,17 +30,28 @@ export default function HomePage() {
         ]}
       />
 
-      <Hero />
+      {/* HERO */}
+      <div ref={heroRef} className={`reveal ${heroShow ? "show" : ""}`}>
+        <Hero />
+      </div>
 
+      {/* EMPRESAS */}
       <section id="empresas" className="scroll-mt-24">
-        <Empresas />
+        <div ref={empRef} className={`reveal ${empShow ? "show" : ""}`}>
+          <Empresas />
+        </div>
       </section>
 
-      <ExpoFeatures />
+      {/* EXPO FEATURES */}
+      <div ref={expoRef} className={`reveal ${expoShow ? "show" : ""}`}>
+        <ExpoFeatures />
+      </div>
 
-      {/* 🌟 NUEVA NUBE EN HOME */}
-
-      <div className="mx-auto max-w-5xl px-6 py-8 text-black">
+      {/* SPEAKERS + SPONSOR */}
+      <div
+        ref={nubeRef}
+        className={`reveal ${nubeShow ? "show" : ""} mx-auto max-w-5xl px-6 py-8 text-black`}
+      >
         <SpeakersSection />
         <Sponsor />
       </div>
