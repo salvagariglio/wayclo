@@ -1,6 +1,5 @@
 import "server-only";
 import { NextResponse } from "next/server";
-import { headers } from "next/headers";
 import { getSupabaseServer } from "@/lib/supabaseServer";
 
 // --- helper: verificar Turnstile ---
@@ -25,12 +24,11 @@ async function verifyTurnstile(token, ip) {
 
 // ======================
 // GET: lista registros
-// /api/admin/registration?status=pending|approved|rejected
 // ======================
 export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url);
-    const status = searchParams.get("status"); // pending|approved|rejected
+    const status = searchParams.get("status");
     const supabase = getSupabaseServer();
 
     let q = supabase
@@ -51,15 +49,7 @@ export async function GET(req) {
 }
 
 // ======================
-// POST: crea registro con verificación Turnstile
-// Body esperado (desde tu form):
-// {
-//   first_name, last_name, email, phone, company, role,
-//   diet,         // string: ej "vegano,celiaco"
-//   diet_other,   // string|null
-//   status,       // "pending" por defecto
-//   turnstileToken
-// }
+// POST: crea registro
 // ======================
 export async function POST(req) {
   try {
@@ -79,21 +69,18 @@ export async function POST(req) {
       turnstileToken,
     } = body || {};
 
-    // IP del cliente (útil para verificación y auditoría)
-    const ip =
-      (headers().get("x-forwarded-for") || "").split(",")[0]?.trim() || "";
-
-    // 1) Verificar Turnstile
+    // 1) Verificar Turnstile (con remoteip si existe)
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "";
     const ver = await verifyTurnstile(turnstileToken, ip);
+
     if (!ver.ok) {
-      // podés loguear ver.data?.["error-codes"] si querés
       return NextResponse.json(
         { error: "Captcha inválido. Intentá nuevamente." },
         { status: 400 }
       );
     }
 
-    // 2) Validaciones mínimas de server (defensa en profundidad)
+    // 2) Validaciones mínimas
     if (!first_name?.trim()) return NextResponse.json({ error: "Falta first_name" }, { status: 400 });
     if (!last_name?.trim()) return NextResponse.json({ error: "Falta last_name" }, { status: 400 });
     if (!email?.trim()) return NextResponse.json({ error: "Falta email" }, { status: 400 });
@@ -101,7 +88,7 @@ export async function POST(req) {
     if (!company?.trim()) return NextResponse.json({ error: "Falta company" }, { status: 400 });
     if (!role?.trim()) return NextResponse.json({ error: "Falta role" }, { status: 400 });
 
-    // 3) Insertar en Supabase
+    // 3) Insertar en Supabase (sin IP)
     const { data, error } = await supabase
       .from("registrations")
       .insert([
@@ -112,10 +99,9 @@ export async function POST(req) {
           phone: phone.trim(),
           company: company.trim(),
           role: role.trim(),
-          diet: (diet || "").trim(),   // ya viene como string "vegano,celiaco"
+          diet: (diet || "").trim(),
           diet_other: diet_other ? String(diet_other).trim() : null,
           status: status || "pending",
-          ip: ip || null,              // opcional si tu tabla tiene esta columna
         },
       ])
       .select("id")
@@ -126,7 +112,6 @@ export async function POST(req) {
       return NextResponse.json({ error: "No se pudo crear el registro." }, { status: 500 });
     }
 
-    // 4) Responder éxito
     return NextResponse.json({ ok: true, id: data?.id }, { status: 201 });
   } catch (e) {
     console.error(e);
