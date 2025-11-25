@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
-import LogoSlogan from "../../public/logo-slogan.png";
+import LogoSlogan from "../../public/logo.png";
 
 const LINKS = [
   { href: "/", label: "EVENTO" },
@@ -58,7 +58,7 @@ export default function NavBar() {
         <Link href="/" className="flex items-center gap-3">
           <Image
             src={LogoSlogan}
-            width={240}
+            width={300}
             height={180}
             alt="CyberCloud"
             priority

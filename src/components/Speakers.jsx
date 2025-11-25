@@ -22,7 +22,7 @@ export const speakers = [
     companyLogo: "/salahnos.png",
     companyLogoWidth: 80,
     linkedin: "",
-    img: "/speakers/martin-lovera.jpg",
+    img: "/speakers/martin.png",
   },
 
   // PANEL 1 — Intercity
@@ -34,7 +34,7 @@ export const speakers = [
     companyLogo: "/intercity.png",
     companyLogoWidth: 120,
     linkedin: "",
-    img: "/speakers/ivan-pecovich.jpg",
+    img: "/speakers/silueta.png",
   },
   {
     name: "Eduardo",
@@ -44,7 +44,7 @@ export const speakers = [
     companyLogo: "/municipalidad.png",
     companyLogoWidth: 130,
     linkedin: "",
-    img: "/speakers/eduardo.png",
+    img: "/speakers/eduardo1.png",
   },
   {
     name: "Pablo",
@@ -54,7 +54,7 @@ export const speakers = [
     companyLogo: "/municipalidad.png",
     companyLogoWidth: 130,
     linkedin: "",
-    img: "/speakers/pablo-degiglio.jpg",
+    img: "/speakers/pablo.png",
   },
 
   // PANEL 2
@@ -66,7 +66,7 @@ export const speakers = [
     companyLogo: "/logo-wayclo-speakers.png",
     companyLogoWidth: 130,
     linkedin: "https://www.linkedin.com/in/lucianogabutti",
-    img: "/speakers/martin.png",
+    img: "/speakers/luciano.png",
   },
   {
     name: "Juan",
@@ -76,7 +76,7 @@ export const speakers = [
     companyLogo: "/agd.png",
     companyLogoWidth: 110,
     linkedin: "",
-    img: "/speakers/martin.png",
+    img: "/speakers/silueta.png",
   },
   {
     name: "Gustavo",
@@ -86,7 +86,7 @@ export const speakers = [
     companyLogo: "/logo-wayclo-speakers.png",
     companyLogoWidth: 130,
     linkedin: "https://www.linkedin.com/in/gustavo-matuk-66b96613/",
-    img: "/speakers/martin.png",
+    img: "/speakers/silueta.png",
   },
   {
     name: "Emmanuel",
@@ -94,9 +94,9 @@ export const speakers = [
     role: "Cybercrime Researcher - Director de carrera",
     company: "Universidad Siglo 21",
     companyLogo: "/universidadd.png",
-    companyLogoWidth: 80,
+    companyLogoWidth: 100,
     linkedin: "https://www.linkedin.com/in/emmanuelvilas/",
-    img: "/speakers/emmanuel-villas.jpg",
+    img: "/speakers/emmanuel.png",
   },
 ];
 
@@ -106,6 +106,7 @@ export const speakers = [
 
 export function SpeakerCard({ speaker, index }) {
   const isOdd = index % 2 !== 0;
+  const isSilhouette = speaker.img.includes("silueta");
 
   const gradientClass = isOdd
     ? "bg-gradient-to-r from-[#021728] to-cyan-600"
@@ -139,26 +140,36 @@ export function SpeakerCard({ speaker, index }) {
         {/* IMAGEN — circular en mobile, rectangular en desktop */}
         <div
           className="
-            w-full md:w-1/2
-            relative
-            aspect-square md:aspect-auto
-            h-auto md:h-[220px]
-            rounded-full md:rounded-xl
-            overflow-hidden
-            flex items-center justify-center
-          "
+    w-full md:w-1/2
+    relative
+
+    /* MOBILE → CÍRCULO COMPLETO */
+    aspect-square md:aspect-auto
+    rounded-full md:rounded-xl
+
+    overflow-hidden
+    flex items-end md:items-center justify-center
+
+    md:h-[260px]      /* altura fija en desktop para uniformidad */
+  "
         >
           <Image
             src={speaker.img}
             alt={speaker.name}
             fill
-            className="
-              object-cover
-              md:object-contain
-              object-center
-            "
+            className={`
+    ${isSilhouette ? "opacity-50" : ""}
+    object-cover md:object-contain
+    object-top md:object-bottom
+  `}
           />
+
         </div>
+
+
+
+
+
 
         {/* TEXTO + LOGO */}
         <div className="w-full md:w-[40%] flex flex-col justify-end pb-6">

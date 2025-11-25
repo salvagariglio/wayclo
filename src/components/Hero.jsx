@@ -11,8 +11,8 @@ export default function Hero() {
         relative
         mx-auto max-w-6xl
         px-4 sm:px-6 lg:px-8
-        pb-32
-        pt-8 md:pt-14
+        pb-40
+        pt-2 md:pt-2
         text-center
       "
     >
@@ -20,7 +20,7 @@ export default function Hero() {
         <Image
           src={CyberCloudLogoSlogan}
           alt="CyberCloud"
-          className="h-24 sm:h-32 md:h-40 w-auto opacity-95"
+          className="h-40 sm:h-48 md:h-60 w-auto opacity-95"
           priority
         />
       </div>
@@ -28,7 +28,6 @@ export default function Hero() {
       <p
         className="
           text-black                      /* ✅ Fecha negra */
-          mt-6 md:mt-10
           text-lg  md:text-2xl
           uppercase tracking-[0.2em]
         "
@@ -87,10 +86,10 @@ export default function Hero() {
           absolute
 
           /* ✅ posición y tamaño base (mobile first) */
-          left-4 top-24 w-16
+          left-[-3] top-36 w-16
 
           /* ✅ overrides por breakpoint */
-          sm:left-0  sm:top-18  sm:w-32
+          sm:left-0  sm:top-28  sm:w-32
           md:left-[60px] md:top-40 md:w-40
           lg:left-[20px] lg:top-44 lg:w-48
           xl:left-[30px] xl:w-48
@@ -112,12 +111,12 @@ export default function Hero() {
           absolute
 
           /* ✅ posición y tamaño base (mobile first) */
-          right-1 top-[21rem] w-[120px]
+          right-[-4] top-[22rem] w-[120px]
           /* ✅ overrides por breakpoint */
-          sm:right-[30px] sm:top-60   sm:w-[220px]
+          sm:right-[30px] sm:top-72   sm:w-[220px]
           md:top-96   md:w-[280px]
-          lg:right-[40px] lg:top-96 lg:w-[350px]
-          xl:right-[-20px] xl:top-80   xl:w-[340px]
+          lg:right-[40px] lg:top-80 lg:w-[350px]
+          xl:right-[-20px] xl:top-72   xl:w-[340px]
 
           drop-shadow-[0_16px_40px_rgba(0,0,0,0.25)]
           select-none pointer-events-none
