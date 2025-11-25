@@ -3,12 +3,12 @@
 import "server-only";
 import { NextResponse } from "next/server";
 import { getSupabaseServer } from "@/lib/supabaseServer";
-import { sendEmail } from "@/lib/sendEmail";
+import { sendEmailGraph } from "@/lib/sendEmailGraph"; // 👈 AHORA Graph API
 
 export async function POST(_req, { params }) {
   try {
     const supabase = getSupabaseServer();
-    const { id } = params; // 👈 viene de [id] en la ruta
+    const { id } = params;
 
     if (!id) {
       return NextResponse.json(
@@ -17,7 +17,6 @@ export async function POST(_req, { params }) {
       );
     }
 
-    // 1) Obtener el registro actual (para validar y tener email/nombre)
     const { data: current, error: fetchError } = await supabase
       .from("registrations")
       .select("*")
@@ -32,7 +31,6 @@ export async function POST(_req, { params }) {
       );
     }
 
-    // 2) Actualizar status a "rejected"
     const { data, error } = await supabase
       .from("registrations")
       .update({ status: "rejected" })
@@ -52,9 +50,9 @@ export async function POST(_req, { params }) {
       [data.first_name, data.last_name].filter(Boolean).join(" ") ||
       "participante";
 
-    // 3) Enviar email de rechazo (no rompe el flujo si falla)
+    // --- Enviar email con Graph ---
     try {
-      await sendEmail({
+      await sendEmailGraph({
         to: data.email,
         subject: "Tu invitación a CyberCloud fue rechazada ❌",
         html: `
@@ -65,14 +63,15 @@ export async function POST(_req, { params }) {
           <p style="opacity: 0.7;">Equipo CyberCloud</p>
         `,
       });
+
     } catch (mailErr) {
-      console.error("Error enviando mail de rechazo:", mailErr);
-      // No devolvemos error al admin: el rechazo se hizo igual en la DB
+      console.error("❌ Error enviando mail con Graph:", mailErr);
     }
 
     return NextResponse.json({ ok: true }, { status: 200 });
+
   } catch (e) {
-    console.error("POST /api/admin/registrations/[id]/reject ERROR:", e);
+    console.error("POST /reject ERROR:", e);
     return NextResponse.json(
       { error: "Server error", detail: e.message },
       { status: 500 }
