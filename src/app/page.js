@@ -7,14 +7,10 @@ import Empresas from "@/components/Empresas";
 import ExpoFeatures from "@/components/ExpoFeatures";
 import SpeakersSection from "@/components/Objetivos";
 import Sponsor from "@/components/Sponsor";
+import AnimatedWordCloud from "@/components/AnimatedWordCloud";
 
-import LiveWordCloud from "@/components/LiveWordCloud";
-import WordForm from "@/components/WordForm";
-import useWordCloud from "@/lib/useWordCloud";
 
 export default function HomePage() {
-  const { words, addWord } = useWordCloud();
-
   return (
     <main className="min-h-screen bg-white text-black">
       <NavBar
@@ -35,19 +31,6 @@ export default function HomePage() {
       <ExpoFeatures />
 
       {/* 🌟 NUEVA NUBE EN HOME */}
-      <section className="px-6 py-12">
-        <h2 className="text-3xl font-bold text-center mb-4 text-cyan-700">
-          ¿Qué representa la CyberCloud para vos?
-        </h2>
-
-        {/* Render de la nube */}
-        <LiveWordCloud words={words} />
-
-        {/* Form para enviar palabras */}
-        <div className="max-w-xl mx-auto">
-          <WordForm onSend={addWord} />
-        </div>
-      </section>
 
       <div className="mx-auto max-w-5xl px-6 py-8 text-black">
         <SpeakersSection />
