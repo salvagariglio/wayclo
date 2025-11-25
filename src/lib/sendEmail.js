@@ -15,7 +15,14 @@ export async function sendEmail({ to, subject, html }) {
     console.log("📧 Email enviado (SMTP):", info.messageId);
     return info;
   } catch (err) {
-    console.error("❌ Error enviando email SMTP:", err);
+    console.error("❌ SMTP FULL ERROR:", {
+      code: err.code,
+      command: err.command,
+      response: err.response,
+      responseCode: err.responseCode,
+      stack: err.stack,
+    });
     throw err;
   }
+
 }
