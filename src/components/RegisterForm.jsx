@@ -153,7 +153,7 @@ export default function RegisterForm({ onSuccess, onClose }) {
     };
 
     try {
-      const res = await fetch("/api/registrations", {
+      const res = await fetch("/api/admin/registrations", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
