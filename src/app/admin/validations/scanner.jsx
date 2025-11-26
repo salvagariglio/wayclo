@@ -5,94 +5,109 @@ import { BrowserMultiFormatReader } from "@zxing/browser";
 
 export default function Scanner() {
     const videoRef = useRef(null);
-    const [validation, setValidation] = useState(null);
+    const codeReaderRef = useRef(null);
+    const streamRef = useRef(null);
+
+    const [guest, setGuest] = useState(null);
+    const [error, setError] = useState(null);
+    const [info, setInfo] = useState(null);
 
     useEffect(() => {
         const codeReader = new BrowserMultiFormatReader();
-        let stream = null;
+        codeReaderRef.current = codeReader;
 
-        const start = async () => {
+        let cancelled = false;
+
+        const startScanner = async () => {
             try {
-                stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: "environment" },
+                // 1) Obtener cámara
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: "environment" }
                 });
 
-                videoRef.current.srcObject = stream;
+                streamRef.current = stream;
 
-                await codeReader.decodeFromVideoDevice(
+                const video = videoRef.current;
+                if (!video) return;
+
+                // 2) Asignar stream
+                video.srcObject = stream;
+
+                // 3) Esperar a que el video cargue ANTES de play()
+                await new Promise((resolve) => {
+                    video.onloadedmetadata = () => resolve();
+                });
+
+                await video.play().catch(() => { });
+
+                // 4) Iniciar decodificación SOLO cuando video está listo
+                codeReader.decodeFromVideoDevice(
                     undefined,
-                    videoRef.current,
-                    async (output) => {
-                        if (!output) return;
+                    video,
+                    async (result) => {
+                        if (!result || cancelled) return;
+                        if (guest) return;
 
-                        const raw = output.getText();
+                        try {
+                            const text = result.getText();
+                            const url = new URL(text);
+                            const id = url.searchParams.get("id");
+                            const token = url.searchParams.get("token");
 
-                        // El QR se arma así:
-                        // https://cybercloud.ar/validate?id=XXX&token=YYY
-                        const url = new URL(raw);
-                        const id = url.searchParams.get("id");
-                        const token = url.searchParams.get("token");
+                            const resp = await fetch("/api/admin/validations/check", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ id, token }),
+                            });
 
-                        // Enviar a backend
-                        const resp = await fetch("/api/admin/validations/check", {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ id, token }),
-                        });
+                            const json = await resp.json();
 
-                        const json = await resp.json();
-                        setValidation(json);
+                            if (!json.ok) {
+                                setError(json.error || "QR inválido");
+                                setGuest(null);
+                                setInfo(null);
+                                return;
+                            }
 
-                        // Detener escaneo temporalmente
-                        codeReader.stopContinuousDecode();
+                            setGuest(json.guest);
+                            setError(null);
+                            setInfo(null);
 
-                        setTimeout(() => {
-                            setValidation(null);
-                            codeReader.decodeFromVideoDevice(
-                                undefined,
-                                videoRef.current,
-                                () => { }
-                            );
-                        }, 2500);
+                            try { codeReader.stopContinuousDecode(); } catch { }
+                        } catch {
+                            setError("QR inválido");
+                        }
                     }
                 );
+
             } catch (e) {
-                console.error("Scanner error:", e);
+                console.error(e);
+                setError("No se pudo iniciar la cámara");
             }
         };
 
-        start();
+        startScanner();
 
+        // Limpieza
         return () => {
+            cancelled = true;
+            try { codeReader.stopContinuousDecode?.(); } catch { }
             try {
-                codeReader.stopContinuousDecode();
-            } catch { }
-            try {
-                stream?.getTracks()?.forEach((t) => t.stop());
+                streamRef.current?.getTracks()?.forEach((t) => t.stop());
             } catch { }
         };
-    }, []);
+    }, [guest]);
 
     return (
         <div className="flex flex-col items-center gap-4">
             <video
                 ref={videoRef}
-                className="w-full max-w-sm rounded-lg shadow-md"
+                className="w-full max-w-sm rounded-lg shadow-md bg-black"
                 autoPlay
                 muted
                 playsInline
             />
-
-            {validation && (
-                <div
-                    className={`p-4 rounded-lg text-lg font-semibold ${validation.ok ? "bg-green-600" : "bg-red-600"
-                        }`}
-                >
-                    {validation.ok
-                        ? `✔ Acceso permitido: ${validation.fullName}`
-                        : `❌ ${validation.error}`}
-                </div>
-            )}
+            {error && <p className="text-red-500">{error}</p>}
         </div>
     );
 }

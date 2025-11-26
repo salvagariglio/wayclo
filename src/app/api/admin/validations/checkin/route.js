@@ -10,12 +10,14 @@ export async function POST(req) {
         .update({
             qr_used: true,
             qr_used_at: new Date().toISOString(),
-            checkin_at: new Date().toISOString(),
         })
         .eq("id", id);
 
     if (error) {
-        return NextResponse.json({ ok: false, error: "No se pudo registrar el ingreso" });
+        return NextResponse.json({
+            ok: false,
+            error: "No se pudo registrar el ingreso",
+        });
     }
 
     return NextResponse.json({ ok: true });

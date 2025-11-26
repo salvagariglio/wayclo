@@ -16,7 +16,7 @@ export async function POST(req) {
     if (error || !data) {
         return NextResponse.json({
             ok: false,
-            error: "QR inválido o invitado no aprobado"
+            error: "QR inválido o invitado no aprobado",
         });
     }
 
@@ -27,7 +27,7 @@ export async function POST(req) {
             fullName: `${data.first_name} ${data.last_name}`,
             company: data.company,
             role: data.role,
-            alreadyChecked: data.qr_used
-        }
+            alreadyChecked: data.qr_used,
+        },
     });
 }
