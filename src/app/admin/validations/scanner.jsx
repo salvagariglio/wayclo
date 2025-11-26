@@ -5,55 +5,52 @@ import { BrowserMultiFormatReader } from "@zxing/browser";
 
 export default function Scanner() {
     const videoRef = useRef(null);
-    const codeReaderRef = useRef(null);
-    const streamRef = useRef(null);
-
+    const readerRef = useRef(null);
     const [guest, setGuest] = useState(null);
     const [error, setError] = useState(null);
-    const [info, setInfo] = useState(null);
+    const [isScanning, setIsScanning] = useState(false);
 
+    // 👉 Iniciar cámara + reader
     useEffect(() => {
-        const codeReader = new BrowserMultiFormatReader();
-        codeReaderRef.current = codeReader;
-
-        let cancelled = false;
-
-        const startScanner = async () => {
+        const start = async () => {
             try {
-                // 1) Obtener cámara
+                const reader = new BrowserMultiFormatReader();
+                readerRef.current = reader;
+
                 const stream = await navigator.mediaDevices.getUserMedia({
                     video: { facingMode: "environment" }
                 });
 
-                streamRef.current = stream;
-
                 const video = videoRef.current;
-                if (!video) return;
-
-                // 2) Asignar stream
                 video.srcObject = stream;
 
-                // 3) Esperar a que el video cargue ANTES de play()
                 await new Promise((resolve) => {
-                    video.onloadedmetadata = () => resolve();
+                    video.onloadedmetadata = resolve;
                 });
 
                 await video.play().catch(() => { });
 
-                // 4) Iniciar decodificación SOLO cuando video está listo
-                codeReader.decodeFromVideoDevice(
+                setIsScanning(true);
+
+                reader.decodeFromVideoDevice(
                     undefined,
                     video,
-                    async (result) => {
-                        if (!result || cancelled) return;
-                        if (guest) return;
+                    async (result, err) => {
+                        if (!result || !isScanning || guest) return;
 
                         try {
                             const text = result.getText();
                             const url = new URL(text);
+
                             const id = url.searchParams.get("id");
                             const token = url.searchParams.get("token");
 
+                            if (!id || !token) {
+                                setError("QR inválido");
+                                return;
+                            }
+
+                            // 👉 Validar QR con backend
                             const resp = await fetch("/api/admin/validations/check", {
                                 method: "POST",
                                 headers: { "Content-Type": "application/json" },
@@ -63,51 +60,117 @@ export default function Scanner() {
                             const json = await resp.json();
 
                             if (!json.ok) {
-                                setError(json.error || "QR inválido");
-                                setGuest(null);
-                                setInfo(null);
+                                setError(json.error);
                                 return;
                             }
 
+                            // Mostrar datos del invitado
                             setGuest(json.guest);
                             setError(null);
-                            setInfo(null);
 
-                            try { codeReader.stopContinuousDecode(); } catch { }
-                        } catch {
+                            // Pausar escaneo para que no repita
+                            try { reader.stopContinuousDecode(); } catch { }
+
+                        } catch (e) {
                             setError("QR inválido");
                         }
                     }
                 );
-
             } catch (e) {
                 console.error(e);
                 setError("No se pudo iniciar la cámara");
             }
         };
 
-        startScanner();
+        start();
 
-        // Limpieza
         return () => {
-            cancelled = true;
-            try { codeReader.stopContinuousDecode?.(); } catch { }
+            try { readerRef.current?.stopContinuousDecode?.(); } catch { }
             try {
-                streamRef.current?.getTracks()?.forEach((t) => t.stop());
+                videoRef.current?.srcObject?.getTracks()?.forEach((t) => t.stop());
             } catch { }
         };
-    }, [guest]);
+    }, [isScanning, guest]);
+
+    // 👉 Confirmar ingreso
+    const confirmarIngreso = async () => {
+        const resp = await fetch("/api/admin/validations/checkin", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: guest.id }),
+        });
+
+        const json = await resp.json();
+
+        if (json.ok) {
+            setGuest({ ...guest, checkin: true });
+        } else {
+            setError(json.error);
+        }
+    };
+
+    // 👉 Volver a escanear
+    const continuar = async () => {
+        setGuest(null);
+        setError(null);
+        setIsScanning(true);
+
+        try {
+            readerRef.current?.decodeFromVideoDevice(
+                undefined,
+                videoRef.current,
+                () => { }
+            );
+        } catch { }
+    };
 
     return (
         <div className="flex flex-col items-center gap-4">
+
+            {/* VIDEO */}
             <video
                 ref={videoRef}
-                className="w-full max-w-sm rounded-lg shadow-md bg-black"
+                className="w-full max-w-sm rounded-md bg-black"
                 autoPlay
-                muted
                 playsInline
+                muted
             />
-            {error && <p className="text-red-500">{error}</p>}
+
+            {error && (
+                <p className="text-red-400 text-center mt-2">{error}</p>
+            )}
+
+            {guest && (
+                <div className="mt-4 bg-white text-black p-4 rounded-lg shadow-lg w-full max-w-sm">
+                    <h3 className="text-xl font-bold">{guest.fullName}</h3>
+                    <p className="opacity-70">{guest.company}</p>
+                    <p className="opacity-70">{guest.role}</p>
+
+                    {guest.alreadyChecked && (
+                        <p className="mt-2 text-red-600">
+                            ⚠ Ya había ingresado antes
+                        </p>
+                    )}
+
+                    {!guest.checkin && (
+                        <button
+                            onClick={confirmarIngreso}
+                            className="mt-4 w-full bg-green-600 text-white py-2 rounded-lg"
+                        >
+                            Registrar ingreso
+                        </button>
+                    )}
+
+                    {guest.checkin && (
+                        <button
+                            onClick={continuar}
+                            className="mt-4 w-full bg-cyan-600 text-white py-2 rounded-lg"
+                        >
+                            Continuar escaneando
+                        </button>
+                    )}
+                </div>
+            )}
         </div>
     );
 }
