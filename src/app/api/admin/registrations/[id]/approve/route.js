@@ -113,11 +113,13 @@ export async function POST(_req, { params }) {
       `,
       attachments: [
         {
+          "@odata.type": "#microsoft.graph.fileAttachment",
           name: `CyberCloud_Ticket_${id}.pdf`,
           contentBytes: pdfBuffer.toString("base64"),
           contentType: "application/pdf",
         }
       ]
+
     });
 
     return NextResponse.json({ ok: true }, { status: 200 });
