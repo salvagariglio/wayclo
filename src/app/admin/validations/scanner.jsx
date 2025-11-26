@@ -6,14 +6,14 @@ import { BrowserMultiFormatReader } from "@zxing/browser";
 export default function Scanner() {
     const videoRef = useRef(null);
     const readerRef = useRef(null);
+
     const [guest, setGuest] = useState(null);
     const [error, setError] = useState(null);
 
-    // Iniciar cámara + escáner
     useEffect(() => {
         let stream;
 
-        const start = async () => {
+        const startScanner = async () => {
             try {
                 const reader = new BrowserMultiFormatReader();
                 readerRef.current = reader;
@@ -25,38 +25,32 @@ export default function Scanner() {
                 const video = videoRef.current;
                 video.srcObject = stream;
 
-                await new Promise((resolve) => {
-                    video.onloadedmetadata = resolve;
-                });
+                await new Promise(res => video.onloadedmetadata = res);
+                await video.play();
 
-                video.play().catch(() => { });
+                iniciarLoop(reader);
 
-                iniciarEscaneo(reader);
             } catch (e) {
                 console.error(e);
                 setError("No se pudo iniciar la cámara");
             }
         };
 
-        start();
+        startScanner();
 
         return () => {
-            try {
-                readerRef.current?.reset();
-            } catch { }
-
-            try {
-                stream?.getTracks()?.forEach((t) => t.stop());
-            } catch { }
+            try { readerRef.current?.reset(); } catch { }
+            try { stream?.getTracks()?.forEach(t => t.stop()); } catch { }
         };
     }, []);
 
-    // Inicia el loop de escaneo
-    const iniciarEscaneo = (reader) => {
+    const iniciarLoop = (reader) => {
         reader.decodeFromVideoDevice(
             undefined,
             videoRef.current,
             async (result, err) => {
+
+                // 👉 ignoramos errores normales del escáner
                 if (!result) return;
 
                 try {
@@ -66,12 +60,9 @@ export default function Scanner() {
                     const token = url.searchParams.get("token");
 
                     if (!id || !token) {
-                        setError("QR inválido");
-                        reader.reset();
-                        return;
+                        return; // no mostrar error aquí
                     }
 
-                    // Verificar en backend
                     const resp = await fetch("/api/admin/validations/check", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
@@ -82,26 +73,20 @@ export default function Scanner() {
 
                     if (!json.ok) {
                         setError(json.error);
-                        reader.reset();
-                        return;
+                    } else {
+                        setGuest(json.guest);
+                        setError(null);
                     }
 
-                    // Mostrar modal del invitado
-                    setGuest(json.guest);
-                    setError(null);
+                    reader.reset(); // detener escaneo
 
-                    // Detener escaneo
-                    reader.reset();
-                } catch (e) {
-                    console.error(e);
-                    setError("QR inválido");
-                    reader.reset();
+                } catch {
+                    // ignorar errores normales
                 }
             }
         );
     };
 
-    // Confirmar ingreso
     const confirmarIngreso = async () => {
         const resp = await fetch("/api/admin/validations/checkin", {
             method: "POST",
@@ -118,18 +103,15 @@ export default function Scanner() {
         }
     };
 
-    // Continuar escaneando
-    const continuar = () => {
+    const continuarEscaneando = () => {
         setGuest(null);
         setError(null);
 
-        try {
-            iniciarEscaneo(readerRef.current);
-        } catch { }
+        iniciarLoop(readerRef.current);
     };
 
     return (
-        <div className="flex flex-col items-center gap-4">
+        <div className="relative flex flex-col items-center">
 
             {/* VIDEO */}
             <video
@@ -140,41 +122,48 @@ export default function Scanner() {
                 muted
             />
 
-            {/* ERROR */}
-            {error && (
-                <p className="text-red-400 text-center mt-2">{error}</p>
+            {/* ERROR (solo backend) */}
+            {error && !guest && (
+                <p className="text-red-400 mt-4 text-center">{error}</p>
             )}
 
-            {/* MODAL DE INVITADO */}
+            {/* MODAL CENTRADO */}
             {guest && (
-                <div className="mt-4 bg-white text-black p-4 rounded-lg shadow-lg w-full max-w-sm">
-                    <h3 className="text-xl font-bold">{guest.fullName}</h3>
-                    <p className="opacity-70">{guest.company}</p>
-                    <p className="opacity-70">{guest.role}</p>
+                <div className="
+                    fixed inset-0 
+                    bg-black/60 backdrop-blur-sm 
+                    flex items-center justify-center 
+                    z-50
+                ">
+                    <div className="bg-white text-black p-6 rounded-xl w-full max-w-sm shadow-xl">
+                        <h3 className="text-xl font-bold">{guest.fullName}</h3>
+                        <p className="opacity-70">{guest.company}</p>
+                        <p className="opacity-70">{guest.role}</p>
 
-                    {guest.alreadyChecked && (
-                        <p className="mt-2 text-red-600">
-                            ⚠ Ya había ingresado antes
-                        </p>
-                    )}
+                        {guest.alreadyChecked && (
+                            <p className="mt-3 text-red-600 text-sm">
+                                ⚠ Esta persona ya había ingresado antes
+                            </p>
+                        )}
 
-                    {!guest.checkin && (
-                        <button
-                            onClick={confirmarIngreso}
-                            className="mt-4 w-full bg-green-600 text-white py-2 rounded-lg"
-                        >
-                            Registrar ingreso
-                        </button>
-                    )}
+                        {!guest.checkin && (
+                            <button
+                                onClick={confirmarIngreso}
+                                className="mt-6 w-full bg-green-600 text-white py-2 rounded-lg"
+                            >
+                                Registrar ingreso
+                            </button>
+                        )}
 
-                    {guest.checkin && (
-                        <button
-                            onClick={continuar}
-                            className="mt-4 w-full bg-cyan-600 text-white py-2 rounded-lg"
-                        >
-                            Continuar escaneando
-                        </button>
-                    )}
+                        {guest.checkin && (
+                            <button
+                                onClick={continuarEscaneando}
+                                className="mt-6 w-full bg-cyan-600 text-white py-2 rounded-lg"
+                            >
+                                Continuar escaneando
+                            </button>
+                        )}
+                    </div>
                 </div>
             )}
         </div>
