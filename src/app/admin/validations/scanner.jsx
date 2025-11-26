@@ -1,147 +1,106 @@
 "use client";
-
-import { useEffect, useRef, useState } from "react";
-import { BrowserMultiFormatReader } from "@zxing/library";
+import { useState, useEffect } from "react";
+import { BrowserMultiFormatReader } from "@zxing/browser";
 
 export default function Scanner() {
-    const videoRef = useRef(null);
-    const readerRef = useRef(null);
-    const [scanResult, setScanResult] = useState(null);
+    const [result, setResult] = useState(null);
+    const [error, setError] = useState(null);
     const [confirmData, setConfirmData] = useState(null);
-    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         const reader = new BrowserMultiFormatReader();
-        readerRef.current = reader;
 
-        async function start() {
+        const start = async () => {
             try {
                 const devices = await reader.listVideoInputDevices();
-
-                if (!devices.length) {
-                    console.error("No cameras detected");
+                if (devices.length === 0) {
+                    setError("No se encontró cámara");
                     return;
                 }
 
-                const deviceId = devices[0].deviceId;
+                reader.decodeFromVideoDevice(
+                    devices[0].deviceId,
+                    "video",
+                    async (decoded, err) => {
+                        if (decoded) {
+                            const text = decoded.getText();
 
-                await reader.decodeFromVideoDevice(
-                    deviceId,
-                    videoRef.current,
-                    (result) => {
-                        if (result) {
-                            reader.reset();
-                            handleDetected(result.getText());
+                            try {
+                                const url = new URL(text);
+                                const id = url.searchParams.get("id");
+                                const token = url.searchParams.get("token");
+
+                                const res = await fetch("/api/admin/validations/check", {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ id, token }),
+                                });
+
+                                const json = await res.json();
+
+                                if (json.ok) {
+                                    setConfirmData(json.guest);
+                                } else {
+                                    setError(json.error);
+                                }
+                            } catch {
+                                setError("QR inválido");
+                            }
                         }
                     }
                 );
-            } catch (err) {
-                console.error("Scanner error:", err);
+            } catch (e) {
+                console.error(e);
+                setError("No se pudo iniciar la cámara");
             }
-        }
+        };
 
         start();
 
-        return () => {
-            try {
-                readerRef.current?.reset?.();
-            } catch (e) {
-                console.warn("Cleanup scanner failed:", e);
-            }
-        };
+        return () => reader.reset();
     }, []);
 
-    // cuando detecta un QR
-    async function handleDetected(text) {
-        try {
-            const url = new URL(text);
-            const token = url.searchParams.get("token");
-
-            if (!token) {
-                setScanResult({ ok: false, error: "QR inválido" });
-                return;
-            }
-
-            // mostrar datos para confirmar
-            const res = await fetch("/api/admin/validate-qr", {
-                method: "POST",
-                body: JSON.stringify({ qr_token: token }),
-            });
-
-            const json = await res.json();
-            setConfirmData(json);
-        } catch (e) {
-            console.error(e);
-            setScanResult({ ok: false, error: "Error procesando QR" });
-        }
-    }
-
-    // confirmar entrada manualmente
-    async function confirmarIngreso() {
-        setLoading(true);
-
-        const res = await fetch("/api/admin/validate-qr", {
+    const confirmarIngreso = async () => {
+        const res = await fetch("/api/admin/validations/checkin", {
             method: "POST",
-            body: JSON.stringify({ qr_token: confirmData.qr_token }),
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: confirmData.id }),
         });
 
         const json = await res.json();
-        setScanResult(json);
-        setConfirmData(null);
-        setLoading(false);
-    }
+
+        if (json.ok) {
+            setResult("Ingreso registrado ✔");
+            setConfirmData(null);
+        } else {
+            setError(json.error);
+        }
+    };
 
     return (
-        <div className="text-white">
+        <div className="p-4 max-w-xl mx-auto text-center">
 
-            {/* Cámara */}
-            <div className="flex justify-center mb-4">
-                <video
-                    ref={videoRef}
-                    style={{
-                        width: "320px",
-                        height: "auto",
-                        borderRadius: "12px",
-                        border: "2px solid #0ea5e9",
-                    }}
-                />
-            </div>
+            <video id="video" className="w-full max-w-md rounded-lg" />
 
-            {/* Modal de confirmación */}
-            {confirmData && confirmData.ok && (
-                <div className="bg-slate-800 p-4 rounded mt-4">
-                    <h2 className="text-xl mb-2 font-bold text-cyan-400">
-                        Confirmar Ingreso
-                    </h2>
-
-                    <p><strong>Nombre:</strong> {confirmData.name}</p>
-                    <p><strong>Empresa:</strong> {confirmData.company}</p>
-
-                    <button
-                        onClick={confirmarIngreso}
-                        disabled={loading}
-                        className="mt-4 w-full py-2 bg-green-600 rounded font-bold hover:bg-green-700"
-                    >
-                        {loading ? "Validando..." : "Confirmar ingreso"}
-                    </button>
-                </div>
+            {error && (
+                <p className="mt-4 text-red-500 text-sm">{error}</p>
             )}
 
-            {/* Resultado final */}
-            {scanResult && (
-                <div
-                    className={`mt-4 p-4 rounded ${scanResult.ok ? "bg-green-700" : "bg-red-700"
-                        }`}
-                >
-                    {scanResult.ok ? (
-                        <>
-                            <h2 className="text-xl font-bold">✔ Ingreso validado</h2>
-                            <p>{scanResult.name}</p>
-                            <p>{scanResult.company}</p>
-                        </>
-                    ) : (
-                        <p className="font-bold">{scanResult.error}</p>
+            {confirmData && (
+                <div className="mt-6 bg-white p-4 rounded-lg shadow text-black">
+                    <h3 className="text-lg font-bold">{confirmData.fullName}</h3>
+                    <p>{confirmData.company}</p>
+                    <p className="opacity-70">{confirmData.role}</p>
+                    {confirmData.alreadyChecked && (
+                        <p className="text-red-500 mt-2">⚠ Ya había ingresado antes</p>
                     )}
+
+                    <button
+                        onClick={confirmIngreso}
+                        className="mt-4 px-6 py-2 rounded bg-green-600 text-white"
+                    >
+                        Registrar ingreso
+                    </button>
                 </div>
             )}
         </div>

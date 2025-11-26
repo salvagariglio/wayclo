@@ -7,18 +7,27 @@ export async function POST(req) {
 
     const { data, error } = await supabase
         .from("registrations")
-        .select("id, first_name, last_name, company, role, qr_used, checkin_at")
+        .select("*")
         .eq("id", id)
         .eq("qr_token", token)
+        .eq("status", "approved")
         .single();
 
     if (error || !data) {
-        return NextResponse.json({ ok: false, error: "QR inválido" });
+        return NextResponse.json({
+            ok: false,
+            error: "QR inválido o invitado no aprobado"
+        });
     }
 
     return NextResponse.json({
         ok: true,
-        alreadyUsed: data.qr_used,
-        ...data,
+        guest: {
+            id: data.id,
+            fullName: `${data.first_name} ${data.last_name}`,
+            company: data.company,
+            role: data.role,
+            alreadyChecked: data.qr_used
+        }
     });
 }
