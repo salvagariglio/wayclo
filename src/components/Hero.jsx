@@ -101,28 +101,29 @@ export default function Hero() {
       />
 
       {/* Laptop con escudo (derecha) */}
+      {/* Laptop con escudo (derecha) */}
       <Image
         src={LaptopShield}
         alt="Laptop con escudo"
         priority
         className="
-          /* ✅ visible en mobile */
-          block
-          absolute
+    block
+    absolute
 
-          /* ✅ posición y tamaño base (mobile first) */
-          right-[-4] top-[22rem] w-[120px]
-          /* ✅ overrides por breakpoint */
-          sm:right-[30px] sm:top-72   sm:w-[220px]
-          md:top-96   md:w-[280px]
-          lg:right-[40px] lg:top-80 lg:w-[350px]
-          xl:right-[-20px] xl:top-72   xl:w-[340px]
+    /* 📌 Mobile: ahora sí queda a la derecha */
+    right-[-1rem] top-[22rem] w-[120px]
 
-          drop-shadow-[0_16px_40px_rgba(0,0,0,0.25)]
-          select-none pointer-events-none
-          z-[1]
-        "
+    sm:right-[10px] sm:top-72 sm:w-[220px]
+    md:top-96 md:w-[280px]
+    lg:right-[40px] lg:top-80 lg:w-[350px]
+    xl:right-[-20px] xl:top-72 xl:w-[340px]
+
+    drop-shadow-[0_16px_40px_rgba(0,0,0,0.25)]
+    select-none pointer-events-none
+    z-[1]
+  "
       />
+
 
       {/* NOTA:
          - z-index de imágenes = 1 para quedar sobre el contenido del hero,

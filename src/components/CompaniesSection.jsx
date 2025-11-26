@@ -48,11 +48,13 @@ export default function CompaniesSection({ data = [] }) {
         <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-center text-slate-900">
           Empresas organizadoras
         </h2>
+
+        {/* TEXTO MISMO TAMAÑO QUE AGENDA */}
         <p className="text-base md:text-lg text-slate-700 text-center mt-2">
           Conocé a los equipos detrás del evento.
         </p>
 
-        {/* Listado estático de panels, uno debajo del otro */}
+        {/* Panels */}
         <div className="mt-10 space-y-16 md:space-y-20">
           {safeData.map((c) => {
             const [ref, show] = useScrollReveal();
@@ -67,28 +69,29 @@ export default function CompaniesSection({ data = [] }) {
               </div>
             );
           })}
-
         </div>
       </div>
+
+      {/* CTA final */}
       <div className="flex justify-center mt-6">
         <button
           type="button"
           onClick={() => document.dispatchEvent(new Event("open-register"))}
           className="
-    inline-flex items-center justify-center
-    rounded-full
-    px-10 md:px-12
-    h-14 md:h-16
-    text-md md:text-xl
-    font-semibold
-    text-cyan-600
-    border-2 border-cyan-600
-    bg-transparent
-    hover:bg-cyan-600 hover:text-white
-    transition-colors
-    shadow-[0_2px_0_0_#0891b2]
-    md:shadow-[0_3px_0_0_#0891b2]
-  "
+            inline-flex items-center justify-center
+            rounded-full
+            px-10 md:px-12
+            h-14 md:h-16
+            text-md md:text-xl
+            font-semibold
+            text-cyan-600
+            border-2 border-cyan-600
+            bg-transparent
+            hover:bg-cyan-600 hover:text-white
+            transition-colors
+            shadow-[0_2px_0_0_#0891b2]
+            md:shadow-[0_3px_0_0_#0891b2]
+          "
         >
           INSCRIBITE AHORA
         </button>
@@ -117,14 +120,11 @@ function CompanyPanel({
 
   const [expanded, setExpanded] = useState(false);
 
-  // Frase a resaltar
   const highlightText =
     "Soluciones integrales y ciberseguridad para el crecimiento empresarial";
 
-  // Render de párrafo con highlight si corresponde
   function renderParagraph(p) {
     if (!p.includes(highlightText)) return p;
-
     const [before, after] = p.split(highlightText);
 
     return (
@@ -140,19 +140,20 @@ function CompanyPanel({
 
   return (
     <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-start">
-      {/* Izquierda: texto + CTA principal */}
+      {/* IZQUIERDA */}
       <div>
+        {/* LOGO ACHICADO */}
         <div className="flex items-center gap-3 mb-4">
           {logoSrc ? (
             <img
               src={logoSrc}
               alt={`${name} logo`}
-              className="h-16 md:h-20 w-auto"
+              className="h-8 md:h-10 w-auto object-contain"
             />
           ) : null}
         </div>
 
-        {/* Contenedor "Leer más" con transición max-height */}
+        {/* Texto con mismo tamaño que Agenda */}
         <div
           className={[
             "space-y-4 relative overflow-hidden transition-all duration-500 ease-in-out",
@@ -162,23 +163,22 @@ function CompanyPanel({
           {paragraphs.map((p, idx) => (
             <p
               key={idx}
-              className="text-base md:text-lg text-slate-700/90 leading-relaxed"
+              className="text-base  text-slate-700/90 leading-relaxed"
             >
               {renderParagraph(p)}
             </p>
           ))}
 
-          {/* Fade suave en blanco */}
           {!expanded && paragraphs.length > 2 && (
             <div className="absolute bottom-0 left-0 w-full h-20 bg-gradient-to-t from-white to-transparent" />
           )}
         </div>
 
-        {/* Botón "Leer más" */}
+        {/* Leer más */}
         {paragraphs.length > 2 && (
           <button
             onClick={() => setExpanded((s) => !s)}
-            className="mt-4 inline-flex items-center gap-2 text-cyan-600 hover:text-cyan-500 text-sm md:text-base"
+            className="mt-4 inline-flex items-center gap-2 text-cyan-600 hover:text-cyan-500 md:text-sm text-xs"
           >
             {expanded ? "Ver menos" : "Leer más"}
             <ChevronDown
@@ -190,11 +190,11 @@ function CompanyPanel({
           </button>
         )}
 
-        {/* CTA Principal */}
+        {/* CTA */}
         <div className="mt-6 pt-2">
           <a
             href={ctaHref}
-            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-cyan-700 text-white px-5 py-2.5 text-sm md:text-base font-semibold hover:from-cyan-400 hover:to-cyan-600 transition"
+            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-cyan-700 text-white px-5 py-2.5 md:text-sm text-xs font-semibold hover:from-cyan-400 hover:to-cyan-600 transition"
           >
             {ctaLabel}
             <ArrowRight className="w-4 h-4 text-white" />
@@ -202,13 +202,14 @@ function CompanyPanel({
         </div>
       </div>
 
-      {/* Derecha: tarjetas de áreas y enlaces */}
+      {/* DERECHA */}
       <div className="space-y-5">
-        {/* Sección 1: Áreas Clave */}
+        {/* Áreas clave */}
         <div className="rounded-2xl border border-slate-300 bg-white/80 backdrop-blur-sm p-6 md:p-8 shadow-lg">
-          <h4 className="text-lg md:text-xl font-semibold text-slate-900 mb-4">
+          <h4 className="text-base  font-semibold text-slate-900 mb-4">
             Áreas Clave
           </h4>
+
           <ul className="space-y-3">
             {(Array.isArray(keyServices) ? keyServices : []).map((s) => (
               <li
@@ -219,11 +220,13 @@ function CompanyPanel({
                   name={s.icon}
                   className="w-5 h-5 text-cyan-500 mt-1 flex-shrink-0"
                 />
+
                 <div>
-                  <h5 className="text-base md:text-lg font-semibold text-slate-900">
+                  <h5 className="text-base  font-semibold text-slate-900">
                     {s.title}
                   </h5>
-                  <p className="text-sm md:text-base text-slate-700">
+
+                  <p className="md:text-sm text-xs text-slate-700">
                     {s.description}
                   </p>
                 </div>
@@ -232,12 +235,13 @@ function CompanyPanel({
           </ul>
         </div>
 
-        {/* Sección 2: Enlaces (Web, LinkedIn, Instagram) */}
+        {/* Enlaces */}
         {Array.isArray(links) && links.length > 0 && (
           <div className="rounded-2xl border border-slate-300 bg-white/80 backdrop-blur-sm p-6 md:p-8 shadow-lg">
-            <h4 className="text-lg md:text-xl font-semibold text-slate-900 mb-4">
+            <h4 className="text-base md:text-lg font-semibold text-slate-900 mb-4">
               Enlaces
             </h4>
+
             <div className="flex flex-wrap items-center gap-3">
               {links.map((l) => (
                 <a
@@ -246,7 +250,6 @@ function CompanyPanel({
                   target="_blank"
                   rel="noopener noreferrer"
                   className="p-3 rounded-xl border border-slate-300 bg-slate-100 text-slate-700 hover:border-cyan-400/60 hover:text-cyan-600 transition group"
-                  aria-label={`Ir a ${l.label}`}
                 >
                   <Icon
                     name={l.iconName}

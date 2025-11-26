@@ -1,6 +1,7 @@
 import "server-only";
 import { NextResponse } from "next/server";
 import { getSupabaseServer } from "@/lib/supabaseServer";
+import { sendEmailGraph } from "@/lib/sendEmailGraph"; // 👈 AGREGADO
 
 // --- helper: verificar Turnstile ---
 async function verifyTurnstile(token, ip) {
@@ -22,9 +23,6 @@ async function verifyTurnstile(token, ip) {
   return { ok: !!data?.success, data };
 }
 
-// ======================
-// GET: lista registros
-// ======================
 export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url);
@@ -48,9 +46,7 @@ export async function GET(req) {
   }
 }
 
-// ======================
 // POST: crea registro
-// ======================
 export async function POST(req) {
   try {
     const supabase = getSupabaseServer();
@@ -69,10 +65,11 @@ export async function POST(req) {
       turnstileToken,
     } = body || {};
 
-    // 1) Verificar Turnstile (con remoteip si existe)
-    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "";
-    const ver = await verifyTurnstile(turnstileToken, ip);
+    const ip =
+      (req.headers.get("x-forwarded-for") || "").split(",")[0]?.trim() || "";
 
+    // 1) Verificar Turnstile
+    const ver = await verifyTurnstile(turnstileToken, ip);
     if (!ver.ok) {
       return NextResponse.json(
         { error: "Captcha inválido. Intentá nuevamente." },
@@ -88,7 +85,7 @@ export async function POST(req) {
     if (!company?.trim()) return NextResponse.json({ error: "Falta company" }, { status: 400 });
     if (!role?.trim()) return NextResponse.json({ error: "Falta role" }, { status: 400 });
 
-    // 3) Insertar en Supabase (sin IP)
+    // 3) Insertar en Supabase
     const { data, error } = await supabase
       .from("registrations")
       .insert([
@@ -109,7 +106,27 @@ export async function POST(req) {
 
     if (error) {
       console.error("Supabase insert error:", error);
-      return NextResponse.json({ error: "No se pudo crear el registro." }, { status: 500 });
+      return NextResponse.json(
+        { error: "No se pudo crear el registro." },
+        { status: 500 }
+      );
+    }
+
+    // 4) Enviar email de confirmación de registro
+    try {
+      await sendEmailGraph({
+        to: email.trim(),
+        subject: "Recibimos tu registro – CyberCloud",
+        html: `
+          <h2>¡Gracias por registrarte, ${first_name}!</h2>
+          <p>Tu registro fue recibido correctamente y está en proceso de revisión.</p>
+          <p>En cuanto sea aprobado, vas a recibir otro correo con la confirmación.</p>
+          <br />
+          <p style="opacity: 0.7;">Equipo CyberCloud</p>
+        `,
+      });
+    } catch (mailErr) {
+      console.error("❌ Error enviando mail de registro:", mailErr);
     }
 
     return NextResponse.json({ ok: true, id: data?.id }, { status: 201 });
