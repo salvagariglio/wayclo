@@ -17,19 +17,15 @@ export default function ValidatePage() {
                 return;
             }
 
-            try {
-                const res = await fetch(`/api/validate?id=${id}&token=${token}`, {
-                    cache: "no-store",
-                });
-                const data = await res.json();
+            const res = await fetch(`/api/validate?id=${id}&token=${token}`, {
+                cache: "no-store",
+            });
+            const data = await res.json();
 
-                if (data.ok) {
-                    setStatus(`✔ Pase válido para ${data.fullName}`);
-                } else {
-                    setStatus("❌ Pase inválido");
-                }
-            } catch (err) {
-                setStatus("❌ Error de conexión");
+            if (data.ok) {
+                setStatus(`✔ Pase válido para ${data.fullName}`);
+            } else {
+                setStatus("❌ Pase inválido");
             }
         }
 
