@@ -6,19 +6,17 @@ import { BrowserMultiFormatReader } from "@zxing/browser";
 export default function Scanner() {
     const videoRef = useRef(null);
     const readerRef = useRef(null);
-
     const [guest, setGuest] = useState(null);
     const [error, setError] = useState(null);
-    const [isPaused, setIsPaused] = useState(false); // 🔥 Control real
+    const [scannerRunning, setScannerRunning] = useState(false);
 
     useEffect(() => {
         let stream;
+        const reader = new BrowserMultiFormatReader();
+        readerRef.current = reader;
 
-        const startScanner = async () => {
+        const startCamera = async () => {
             try {
-                const reader = new BrowserMultiFormatReader();
-                readerRef.current = reader;
-
                 stream = await navigator.mediaDevices.getUserMedia({
                     video: { facingMode: "environment" }
                 });
@@ -26,70 +24,80 @@ export default function Scanner() {
                 const video = videoRef.current;
                 video.srcObject = stream;
 
-                await new Promise(res => video.onloadedmetadata = res);
+                await new Promise((resolve) => {
+                    video.onloadedmetadata = resolve;
+                });
+
                 await video.play();
-
-                iniciarLoop(reader);
-
             } catch (e) {
                 console.error(e);
                 setError("No se pudo iniciar la cámara");
             }
         };
 
-        startScanner();
+        const startScanner = async () => {
+            if (!videoRef.current) return;
+
+            setScannerRunning(true);
+
+            reader.decodeFromVideoDevice(
+                null,
+                videoRef.current,
+                async (result, err) => {
+                    if (!scannerRunning || guest) return;
+                    if (!result) return;
+
+                    try {
+                        const raw = result.getText();
+                        const url = new URL(raw.trim());
+                        const id = url.searchParams.get("id");
+                        const token = url.searchParams.get("token");
+
+                        if (!id || !token) {
+                            setError("QR inválido");
+                            return;
+                        }
+
+                        // PAUSAR ESCANEO
+                        reader.reset();
+                        setScannerRunning(false);
+
+                        const resp = await fetch("/api/admin/validations/check", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ id, token }),
+                        });
+
+                        const json = await resp.json();
+
+                        if (!json.ok) {
+                            setError(json.error);
+                            return;
+                        }
+
+                        setGuest(json.guest);
+                        setError(null);
+
+                    } catch (e) {
+                        console.error(e);
+                        setError("QR inválido");
+                    }
+                }
+            );
+        };
+
+        const init = async () => {
+            await startCamera();
+            startScanner();
+        };
+
+        init();
 
         return () => {
-            try { readerRef.current?.reset(); } catch { }
-            try { stream?.getTracks()?.forEach(t => t.stop()); } catch { }
+            try { reader.reset(); } catch { }
+            try { stream?.getTracks()?.forEach((t) => t.stop()); } catch { }
         };
-    }, []);
-
-    const iniciarLoop = (reader) => {
-        reader.decodeFromVideoDevice(
-            undefined,
-            videoRef.current,
-            async (result) => {
-
-                // ⛔ NO continuar si está pausado o si hay un invitado en pantalla
-                if (isPaused || guest) return;
-
-                if (!result) return;
-
-                try {
-                    const raw = result.getText();
-                    const url = new URL(raw.trim());
-                    const id = url.searchParams.get("id");
-                    const token = url.searchParams.get("token");
-
-                    if (!id || !token) return;
-
-                    // 🔥 PAUSAR el escaneo
-                    reader.reset();
-                    setIsPaused(true);
-
-                    const resp = await fetch("/api/admin/validations/check", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ id, token }),
-                    });
-
-                    const json = await resp.json();
-
-                    if (!json.ok) {
-                        setError(json.error);
-                        return;
-                    }
-
-                    setGuest(json.guest);
-                    setError(null);
-
-                } catch {
-                    // ignora errores de frames
-                }
-            }
-        );
-    };
+    }, [scannerRunning, guest]);
 
     const confirmarIngreso = async () => {
         const resp = await fetch("/api/admin/validations/checkin", {
@@ -101,25 +109,30 @@ export default function Scanner() {
         const json = await resp.json();
 
         if (json.ok) {
-            // 🔥 NO reanudar scanner todavía
             setGuest({ ...guest, checkin: true });
         } else {
             setError(json.error);
         }
     };
 
-    const continuarEscaneando = () => {
+    const continuar = () => {
         setGuest(null);
         setError(null);
-        setIsPaused(false); // 🔥 Reanudamos
+        setScannerRunning(true);
 
-        iniciarLoop(readerRef.current);
+        // Reanudar escaneo
+        try {
+            readerRef.current.decodeFromVideoDevice(
+                null,
+                videoRef.current,
+                () => { }
+            );
+        } catch { }
     };
 
     return (
         <div className="relative flex flex-col items-center">
 
-            {/* VIDEO */}
             <video
                 ref={videoRef}
                 className="w-full max-w-sm rounded-md bg-black"
@@ -128,15 +141,13 @@ export default function Scanner() {
                 muted
             />
 
-            {/* ERROR */}
-            {error && !guest && (
+            {!guest && error && (
                 <p className="text-red-400 mt-4">{error}</p>
             )}
 
-            {/* MODAL OVERLAY */}
             {guest && (
                 <div className="
-                    fixed inset-0 bg-black/60 backdrop-blur-sm 
+                    fixed inset-0 bg-black/60 backdrop-blur-sm
                     flex items-center justify-center z-50
                 ">
                     <div className="bg-white text-black p-6 rounded-xl w-full max-w-sm shadow-xl">
@@ -147,7 +158,7 @@ export default function Scanner() {
 
                         {guest.alreadyChecked && (
                             <p className="mt-3 text-red-600">
-                                ⚠ Esta persona ya había ingresado antes
+                                ⚠ Ya había ingresado antes
                             </p>
                         )}
 
@@ -162,7 +173,7 @@ export default function Scanner() {
 
                         {guest.checkin && (
                             <button
-                                onClick={continuarEscaneando}
+                                onClick={continuar}
                                 className="mt-6 w-full bg-cyan-600 text-white py-2 rounded-lg"
                             >
                                 Continuar escaneando
@@ -171,6 +182,7 @@ export default function Scanner() {
                     </div>
                 </div>
             )}
+
         </div>
     );
 }
