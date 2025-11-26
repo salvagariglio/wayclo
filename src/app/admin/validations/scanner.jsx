@@ -1,100 +1,146 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { BrowserMultiFormatReader } from "@zxing/browser";
+import { BrowserMultiFormatReader } from "@zxing/library";
 
 export default function Scanner() {
     const videoRef = useRef(null);
-    const [userData, setUserData] = useState(null);
-    const [confirming, setConfirming] = useState(false);
+    const readerRef = useRef(null);
+    const [scanResult, setScanResult] = useState(null);
+    const [confirmData, setConfirmData] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         const reader = new BrowserMultiFormatReader();
-        let stream;
+        readerRef.current = reader;
 
-        const startScan = async () => {
+        async function start() {
             try {
-                stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: "environment" },
-                });
+                const devices = await reader.listVideoInputDevices();
 
-                videoRef.current.srcObject = stream;
-                videoRef.current.setAttribute("playsinline", true);
-                videoRef.current.play();
+                if (!devices.length) {
+                    console.error("No cameras detected");
+                    return;
+                }
 
-                reader.decodeFromVideoDevice(undefined, videoRef.current, async (result) => {
-                    if (!result) return;
+                const deviceId = devices[0].deviceId;
 
-                    const text = result.getText();
-                    const url = new URL(text);
-                    const id = url.searchParams.get("id");
-                    const token = url.searchParams.get("token");
-
-                    const resp = await fetch("/api/admin/validations/check", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ id, token }),
-                    });
-
-                    const json = await resp.json();
-                    setUserData(json);
-
-                    reader.stopContinuousDecode();
-                });
+                await reader.decodeFromVideoDevice(
+                    deviceId,
+                    videoRef.current,
+                    (result) => {
+                        if (result) {
+                            reader.reset();
+                            handleDetected(result.getText());
+                        }
+                    }
+                );
             } catch (err) {
-                console.error(err);
+                console.error("Scanner error:", err);
             }
-        };
+        }
 
-        startScan();
+        start();
 
         return () => {
-            reader.stopContinuousDecode();
-            stream?.getTracks()?.forEach((t) => t.stop());
+            try {
+                readerRef.current?.reset?.();
+            } catch (e) {
+                console.warn("Cleanup scanner failed:", e);
+            }
         };
     }, []);
 
-    const confirmEntry = async () => {
-        setConfirming(true);
+    // cuando detecta un QR
+    async function handleDetected(text) {
+        try {
+            const url = new URL(text);
+            const token = url.searchParams.get("token");
 
-        const resp = await fetch("/api/admin/validations/checkin", {
+            if (!token) {
+                setScanResult({ ok: false, error: "QR inválido" });
+                return;
+            }
+
+            // mostrar datos para confirmar
+            const res = await fetch("/api/admin/validate-qr", {
+                method: "POST",
+                body: JSON.stringify({ qr_token: token }),
+            });
+
+            const json = await res.json();
+            setConfirmData(json);
+        } catch (e) {
+            console.error(e);
+            setScanResult({ ok: false, error: "Error procesando QR" });
+        }
+    }
+
+    // confirmar entrada manualmente
+    async function confirmarIngreso() {
+        setLoading(true);
+
+        const res = await fetch("/api/admin/validate-qr", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ id: userData.id }),
+            body: JSON.stringify({ qr_token: confirmData.qr_token }),
         });
 
-        const json = await resp.json();
-        if (json.ok) {
-            alert("✔ Ingreso registrado");
-        }
-
-        window.location.reload();
-    };
+        const json = await res.json();
+        setScanResult(json);
+        setConfirmData(null);
+        setLoading(false);
+    }
 
     return (
-        <div className="space-y-4">
-            <video ref={videoRef} className="w-full rounded-lg" />
+        <div className="text-white">
 
-            {userData && (
-                <div className="p-4 bg-white/10 rounded-lg border border-white/20">
-                    <h2 className="text-lg font-bold">
-                        {userData.first_name} {userData.last_name}
+            {/* Cámara */}
+            <div className="flex justify-center mb-4">
+                <video
+                    ref={videoRef}
+                    style={{
+                        width: "320px",
+                        height: "auto",
+                        borderRadius: "12px",
+                        border: "2px solid #0ea5e9",
+                    }}
+                />
+            </div>
+
+            {/* Modal de confirmación */}
+            {confirmData && confirmData.ok && (
+                <div className="bg-slate-800 p-4 rounded mt-4">
+                    <h2 className="text-xl mb-2 font-bold text-cyan-400">
+                        Confirmar Ingreso
                     </h2>
-                    <p className="text-white/70">{userData.company}</p>
-                    <p className="text-white/70">{userData.role}</p>
 
-                    {userData.alreadyUsed && (
-                        <p className="mt-2 text-red-400 font-semibold">Este QR ya fue usado</p>
-                    )}
+                    <p><strong>Nombre:</strong> {confirmData.name}</p>
+                    <p><strong>Empresa:</strong> {confirmData.company}</p>
 
-                    {!userData.alreadyUsed && (
-                        <button
-                            onClick={confirmEntry}
-                            disabled={confirming}
-                            className="mt-4 w-full bg-green-600 py-3 rounded-md font-semibold"
-                        >
-                            Registrar Ingreso
-                        </button>
+                    <button
+                        onClick={confirmarIngreso}
+                        disabled={loading}
+                        className="mt-4 w-full py-2 bg-green-600 rounded font-bold hover:bg-green-700"
+                    >
+                        {loading ? "Validando..." : "Confirmar ingreso"}
+                    </button>
+                </div>
+            )}
+
+            {/* Resultado final */}
+            {scanResult && (
+                <div
+                    className={`mt-4 p-4 rounded ${scanResult.ok ? "bg-green-700" : "bg-red-700"
+                        }`}
+                >
+                    {scanResult.ok ? (
+                        <>
+                            <h2 className="text-xl font-bold">✔ Ingreso validado</h2>
+                            <p>{scanResult.name}</p>
+                            <p>{scanResult.company}</p>
+                        </>
+                    ) : (
+                        <p className="font-bold">{scanResult.error}</p>
                     )}
                 </div>
             )}

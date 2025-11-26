@@ -16,8 +16,8 @@ export default function ValidacionesPage() {
                 <button
                     onClick={() => setTab("scanner")}
                     className={`pb-2 text-lg font-semibold ${tab === "scanner"
-                            ? "text-cyan-400 border-b-2 border-cyan-400"
-                            : "text-white/60 hover:text-white"
+                        ? "text-cyan-400 border-b-2 border-cyan-400"
+                        : "text-white/60 hover:text-white"
                         }`}
                 >
                     Escáner
@@ -26,8 +26,8 @@ export default function ValidacionesPage() {
                 <button
                     onClick={() => setTab("ingresos")}
                     className={`pb-2 text-lg font-semibold ${tab === "ingresos"
-                            ? "text-cyan-400 border-b-2 border-cyan-400"
-                            : "text-white/60 hover:text-white"
+                        ? "text-cyan-400 border-b-2 border-cyan-400"
+                        : "text-white/60 hover:text-white"
                         }`}
                 >
                     Ingresos
