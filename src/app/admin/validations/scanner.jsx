@@ -1,64 +1,80 @@
 "use client";
-import { useState, useEffect } from "react";
+
+import { useState, useEffect, useRef } from "react";
 import { BrowserMultiFormatReader } from "@zxing/browser";
 
 export default function Scanner() {
-    const [result, setResult] = useState(null);
     const [error, setError] = useState(null);
     const [confirmData, setConfirmData] = useState(null);
+    const [cooldown, setCooldown] = useState(false);
+
+    const readerRef = useRef(null);
 
     useEffect(() => {
         const reader = new BrowserMultiFormatReader();
+        readerRef.current = reader;
 
         const start = async () => {
             try {
                 const devices = await reader.listVideoInputDevices();
                 if (devices.length === 0) {
-                    setError("No se encontró cámara");
+                    setError("No se encontró cámara disponible.");
                     return;
                 }
 
                 reader.decodeFromVideoDevice(
                     devices[0].deviceId,
                     "video",
-                    async (decoded, err) => {
-                        if (decoded) {
-                            const text = decoded.getText();
+                    async (decoded) => {
+                        if (!decoded || cooldown) return;
 
-                            try {
-                                const url = new URL(text);
-                                const id = url.searchParams.get("id");
-                                const token = url.searchParams.get("token");
+                        setCooldown(true);
+                        setTimeout(() => setCooldown(false), 1500);
 
-                                const res = await fetch("/api/admin/validations/check", {
-                                    method: "POST",
-                                    headers: { "Content-Type": "application/json" },
-                                    body: JSON.stringify({ id, token }),
-                                });
+                        const text = decoded.getText();
 
-                                const json = await res.json();
+                        try {
+                            const url = new URL(text);
+                            const id = url.searchParams.get("id");
+                            const token = url.searchParams.get("token");
 
-                                if (json.ok) {
-                                    setConfirmData(json.guest);
-                                } else {
-                                    setError(json.error);
-                                }
-                            } catch {
-                                setError("QR inválido");
+                            const res = await fetch("/api/admin/validations/check", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ id, token }),
+                            });
+
+                            const json = await res.json();
+
+                            if (json.ok) {
+                                setConfirmData(json.guest);
+                                setError(null);
+                            } else {
+                                setConfirmData(null);
+                                setError(json.error);
                             }
+                        } catch {
+                            setError("QR inválido");
                         }
                     }
                 );
             } catch (e) {
                 console.error(e);
-                setError("No se pudo iniciar la cámara");
+                setError("No se pudo iniciar el escáner");
             }
         };
 
         start();
 
-        return () => reader.reset();
-    }, []);
+        return () => {
+            try {
+                readerRef.current?.stopAsyncDecode?.();
+                readerRef.current?.reset?.();
+            } catch {
+                // ignoramos porque algunas versiones no implementan reset()
+            }
+        };
+    }, [cooldown]);
 
     const confirmarIngreso = async () => {
         const res = await fetch("/api/admin/validations/checkin", {
@@ -70,8 +86,8 @@ export default function Scanner() {
         const json = await res.json();
 
         if (json.ok) {
-            setResult("Ingreso registrado ✔");
             setConfirmData(null);
+            setError(null);
         } else {
             setError(json.error);
         }
@@ -80,10 +96,17 @@ export default function Scanner() {
     return (
         <div className="p-4 max-w-xl mx-auto text-center">
 
-            <video id="video" className="w-full max-w-md rounded-lg" />
+            <div className="w-full flex justify-center mb-4">
+                <video
+                    id="video"
+                    className="w-full max-w-md rounded-lg shadow"
+                    autoPlay
+                    muted
+                />
+            </div>
 
             {error && (
-                <p className="mt-4 text-red-500 text-sm">{error}</p>
+                <p className="mt-3 text-red-400 font-medium">{error}</p>
             )}
 
             {confirmData && (
@@ -91,13 +114,16 @@ export default function Scanner() {
                     <h3 className="text-lg font-bold">{confirmData.fullName}</h3>
                     <p>{confirmData.company}</p>
                     <p className="opacity-70">{confirmData.role}</p>
+
                     {confirmData.alreadyChecked && (
-                        <p className="text-red-500 mt-2">⚠ Ya había ingresado antes</p>
+                        <p className="text-red-500 font-semibold mt-2">
+                            ⚠ Ya había ingresado antes
+                        </p>
                     )}
 
                     <button
                         onClick={confirmIngreso}
-                        className="mt-4 px-6 py-2 rounded bg-green-600 text-white"
+                        className="mt-4 px-6 py-2 rounded bg-green-600 text-white hover:bg-green-700"
                     >
                         Registrar ingreso
                     </button>

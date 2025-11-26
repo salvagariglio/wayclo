@@ -17,66 +17,63 @@ export default function Ingresos() {
     };
 
     const filtered = items.filter((item) => {
-        if (filter === "ingresados") return item.qr_used === true;
-        if (filter === "noingresados") return item.qr_used === false;
+        if (filter === "ingresados") return item.qr_used;
+        if (filter === "noingresados") return !item.qr_used;
         return true;
     });
 
     return (
         <div className="max-w-4xl mx-auto">
 
-            {/* Filtros */}
             <div className="flex gap-4 mb-6">
-                <button
-                    onClick={() => setFilter("todos")}
-                    className={`px-4 py-2 rounded-md ${filter === "todos" ? "bg-cyan-600" : "bg-white/10"
-                        }`}
-                >
-                    Todos
-                </button>
-
-                <button
-                    onClick={() => setFilter("ingresados")}
-                    className={`px-4 py-2 rounded-md ${filter === "ingresados" ? "bg-green-600" : "bg-white/10"
-                        }`}
-                >
-                    Ingresados
-                </button>
-
-                <button
-                    onClick={() => setFilter("noingresados")}
-                    className={`px-4 py-2 rounded-md ${filter === "noingresados" ? "bg-red-600" : "bg-white/10"
-                        }`}
-                >
-                    No ingresados
-                </button>
+                {[
+                    { key: "todos", label: "Todos" },
+                    { key: "ingresados", label: "Ingresados" },
+                    { key: "noingresados", label: "No ingresados" },
+                ].map((btn) => (
+                    <button
+                        key={btn.key}
+                        onClick={() => setFilter(btn.key)}
+                        className={`px-4 py-2 rounded-md ${filter === btn.key ? "bg-cyan-600" : "bg-white/10"
+                            }`}
+                    >
+                        {btn.label}
+                    </button>
+                ))}
             </div>
 
-            {/* Tabla */}
-            <table className="w-full border-collapse">
+            <table className="w-full border-collapse text-left">
                 <thead className="bg-white/10">
                     <tr>
-                        <th className="p-3 text-left">Nombre</th>
-                        <th className="p-3 text-left">Empresa</th>
-                        <th className="p-3 text-left">Estado</th>
-                        <th className="p-3 text-left">Hora ingreso</th>
+                        <th className="p-3">Nombre</th>
+                        <th className="p-3">Empresa</th>
+                        <th className="p-3">Estado</th>
+                        <th className="p-3">Hora ingreso</th>
                     </tr>
                 </thead>
 
                 <tbody>
                     {filtered.map((item) => (
                         <tr key={item.id} className="border-b border-white/10">
-                            <td className="p-3">{item.first_name} {item.last_name}</td>
+                            <td className="p-3">
+                                {item.first_name} {item.last_name}
+                            </td>
                             <td className="p-3">{item.company}</td>
                             <td className="p-3">
                                 {item.qr_used ? (
-                                    <span className="text-green-400">Ingresado</span>
+                                    <span className="text-green-400 font-semibold">
+                                        Ingresado
+                                    </span>
                                 ) : (
-                                    <span className="text-red-400">No ingresado</span>
+                                    <span className="text-red-400 font-semibold">
+                                        No ingresado
+                                    </span>
                                 )}
                             </td>
                             <td className="p-3">
-                                {item.qr_used_at ? item.qr_used_at : "-"}
+                                {item.qr_used_at
+                                    ? new Date(item.qr_used_at).toLocaleTimeString("es-AR")
+                                    : "-"}
                             </td>
                         </tr>
                     ))}
