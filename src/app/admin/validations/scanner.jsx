@@ -1,144 +1,147 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { BrowserMultiFormatReader } from "@zxing/browser";
+import { useEffect, useRef, useState } from "react";
+import { BrowserMultiFormatReader } from "@zxing/library";
 
 export default function Scanner() {
     const videoRef = useRef(null);
     const readerRef = useRef(null);
-
-    const [error, setError] = useState(null);
+    const [scanResult, setScanResult] = useState(null);
     const [confirmData, setConfirmData] = useState(null);
-    const [cooldown, setCooldown] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        let stream = null;
         const reader = new BrowserMultiFormatReader();
         readerRef.current = reader;
 
-        const startScanner = async () => {
+        async function start() {
             try {
-                // 🔥 1) Pedir permisos explícitos ANTES de usar ZXing
-                stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: "environment" }
-                });
-
-                if (videoRef.current) {
-                    videoRef.current.srcObject = stream;
-                    videoRef.current.play();
-                }
-
-                // 🔥 2) Ahora listamos cámaras recién después del permiso
                 const devices = await reader.listVideoInputDevices();
 
-                if (!devices || devices.length === 0) {
-                    setError("No se encontró cámara.");
+                if (!devices.length) {
+                    console.error("No cameras detected");
                     return;
                 }
 
-                // 🔥 3) Decodificación continua
-                reader.decodeFromVideoDevice(
-                    devices[0].deviceId,
+                const deviceId = devices[0].deviceId;
+
+                await reader.decodeFromVideoDevice(
+                    deviceId,
                     videoRef.current,
-                    async (result) => {
-                        if (!result || cooldown) return;
-
-                        setCooldown(true);
-                        setTimeout(() => setCooldown(false), 1500);
-
-                        const text = result.getText();
-                        let id, token;
-
-                        try {
-                            const url = new URL(text);
-                            id = url.searchParams.get("id");
-                            token = url.searchParams.get("token");
-                        } catch {
-                            setError("QR inválido");
-                            return;
-                        }
-
-                        const res = await fetch("/api/admin/validations/check", {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ id, token }),
-                        });
-
-                        const json = await res.json();
-
-                        if (json.ok) {
-                            setConfirmData(json.guest);
-                            setError(null);
-                        } else {
-                            setConfirmData(null);
-                            setError(json.error);
+                    (result) => {
+                        if (result) {
+                            reader.reset();
+                            handleDetected(result.getText());
                         }
                     }
                 );
             } catch (err) {
                 console.error("Scanner error:", err);
-                setError("No se pudo iniciar el escáner");
             }
-        };
+        }
 
-        startScanner();
+        start();
 
         return () => {
             try {
-                readerRef.current?.stopContinuousDecode?.();
                 readerRef.current?.reset?.();
-                if (stream) stream.getTracks().forEach(t => t.stop());
-            } catch { }
+            } catch (e) {
+                console.warn("Cleanup scanner failed:", e);
+            }
         };
-    }, [cooldown]);
+    }, []);
 
-    const confirmarIngreso = async () => {
-        const res = await fetch("/api/admin/validations/checkin", {
+    // cuando detecta un QR
+    async function handleDetected(text) {
+        try {
+            const url = new URL(text);
+            const token = url.searchParams.get("token");
+
+            if (!token) {
+                setScanResult({ ok: false, error: "QR inválido" });
+                return;
+            }
+
+            // mostrar datos para confirmar
+            const res = await fetch("/api/admin/validate-qr", {
+                method: "POST",
+                body: JSON.stringify({ qr_token: token }),
+            });
+
+            const json = await res.json();
+            setConfirmData(json);
+        } catch (e) {
+            console.error(e);
+            setScanResult({ ok: false, error: "Error procesando QR" });
+        }
+    }
+
+    // confirmar entrada manualmente
+    async function confirmarIngreso() {
+        setLoading(true);
+
+        const res = await fetch("/api/admin/validate-qr", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ id: confirmData.id }),
+            body: JSON.stringify({ qr_token: confirmData.qr_token }),
         });
 
         const json = await res.json();
-
-        if (json.ok) {
-            setConfirmData(null);
-            setError(null);
-        } else {
-            setError(json.error);
-        }
-    };
+        setScanResult(json);
+        setConfirmData(null);
+        setLoading(false);
+    }
 
     return (
-        <div className="p-4 max-w-xl mx-auto text-center">
+        <div className="text-white">
 
-            <video
-                ref={videoRef}
-                className="w-full max-w-md rounded-lg shadow bg-black"
-                muted
-                playsInline
-            />
+            {/* Cámara */}
+            <div className="flex justify-center mb-4">
+                <video
+                    ref={videoRef}
+                    style={{
+                        width: "320px",
+                        height: "auto",
+                        borderRadius: "12px",
+                        border: "2px solid #0ea5e9",
+                    }}
+                />
+            </div>
 
-            {error && <p className="mt-4 text-red-400">{error}</p>}
+            {/* Modal de confirmación */}
+            {confirmData && confirmData.ok && (
+                <div className="bg-slate-800 p-4 rounded mt-4">
+                    <h2 className="text-xl mb-2 font-bold text-cyan-400">
+                        Confirmar Ingreso
+                    </h2>
 
-            {confirmData && (
-                <div className="mt-6 bg-white p-4 rounded-lg shadow text-black">
-                    <h3 className="text-lg font-bold">{confirmData.fullName}</h3>
-                    <p>{confirmData.company}</p>
-                    <p className="opacity-70">{confirmData.role}</p>
-
-                    {confirmData.alreadyChecked && (
-                        <p className="text-red-500 mt-2">
-                            ⚠ Ya había ingresado antes
-                        </p>
-                    )}
+                    <p><strong>Nombre:</strong> {confirmData.name}</p>
+                    <p><strong>Empresa:</strong> {confirmData.company}</p>
 
                     <button
-                        onClick={confirmIngreso}
-                        className="mt-4 px-6 py-2 bg-green-600 text-white rounded"
+                        onClick={confirmarIngreso}
+                        disabled={loading}
+                        className="mt-4 w-full py-2 bg-green-600 rounded font-bold hover:bg-green-700"
                     >
-                        Registrar ingreso
+                        {loading ? "Validando..." : "Confirmar ingreso"}
                     </button>
+                </div>
+            )}
+
+            {/* Resultado final */}
+            {scanResult && (
+                <div
+                    className={`mt-4 p-4 rounded ${scanResult.ok ? "bg-green-700" : "bg-red-700"
+                        }`}
+                >
+                    {scanResult.ok ? (
+                        <>
+                            <h2 className="text-xl font-bold">✔ Ingreso validado</h2>
+                            <p>{scanResult.name}</p>
+                            <p>{scanResult.company}</p>
+                        </>
+                    ) : (
+                        <p className="font-bold">{scanResult.error}</p>
+                    )}
                 </div>
             )}
         </div>
