@@ -1,62 +1,56 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { BrowserMultiFormatReader } from "@zxing/browser";
 
 export default function Scanner() {
     const videoRef = useRef(null);
-    const [reader, setReader] = useState(null);
-    const [stream, setStream] = useState(null);
-    const [isProcessing, setIsProcessing] = useState(false);
     const [guest, setGuest] = useState(null);
     const [error, setError] = useState(null);
+    const [isProcessing, setIsProcessing] = useState(false);
+    const readerRef = useRef(null);
 
-    // Inicializar scanner
     useEffect(() => {
-        const r = new BrowserMultiFormatReader();
-        setReader(r);
-        startScanner(r);
+        const reader = new BrowserMultiFormatReader();
+        readerRef.current = reader;
 
-        return () => {
-            stopScanner(r);
-        };
-    }, []);
+        let stream;
 
-    const stopScanner = async (r = reader) => {
-        try {
-            r?.reset();
-        } catch { }
-        try {
-            stream?.getTracks()?.forEach((t) => t.stop());
-        } catch { }
-    };
+        const startScanner = async () => {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: "environment" },
+                });
 
-    const startScanner = async (r = reader) => {
-        if (!r) return;
+                if (videoRef.current) {
+                    videoRef.current.srcObject = stream;
+                }
 
-        try {
-            // Solicitar cámara
-            const s = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: "environment" },
-            });
-
-            setStream(s);
-            videoRef.current.srcObject = s;
-
-            // Comenzar decodificación
-            await r.decodeFromVideoDevice(
-                null,
-                videoRef.current,
-                async (result, err) => {
+                reader.decodeFromVideoDevice(null, videoRef.current, async (result, err) => {
                     if (!result || isProcessing) return;
 
                     setIsProcessing(true);
 
                     try {
                         const text = result.getText();
-                        const url = new URL(text);
+
+                        let url;
+                        try {
+                            url = new URL(text.trim());
+                        } catch {
+                            setError("QR inválido.");
+                            resetScanner(reader);
+                            return;
+                        }
+
                         const id = url.searchParams.get("id");
                         const token = url.searchParams.get("token");
+
+                        if (!id || !token) {
+                            setError("QR no contiene datos válidos.");
+                            resetScanner(reader);
+                            return;
+                        }
 
                         const resp = await fetch("/api/admin/validations/check", {
                             method: "POST",
@@ -68,86 +62,78 @@ export default function Scanner() {
 
                         if (json.ok) {
                             setGuest(json.guest);
-                            setError(null);
                         } else {
-                            setGuest(null);
                             setError(json.error);
                         }
 
-                        // Pausar el scanner TEMPORALMENTE
-                        stopScanner(r);
+                        reader.reset();
 
-                        // Reiniciar luego de mostrar datos
                         setTimeout(() => {
                             setGuest(null);
                             setError(null);
                             setIsProcessing(false);
-                            startScanner(r);
-                        }, 2000);
-                    } catch (e) {
-                        setError("QR inválido");
-                        setIsProcessing(false);
+                            reader.decodeFromVideoDevice(null, videoRef.current, () => { });
+                        }, 2200);
+
+                    } catch (fatal) {
+                        console.error("FATAL QR ERROR:", fatal);
+                        setError("Error procesando el QR.");
+                        resetScanner(reader);
                     }
-                }
-            );
-        } catch (e) {
-            setError("No se pudo iniciar la cámara");
-        }
-    };
+                });
 
-    const confirmarIngreso = async () => {
-        const res = await fetch("/api/admin/validations/checkin", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ id: guest.id }),
-        });
+            } catch (e) {
+                console.error("Camera error:", e);
+                setError("No se pudo iniciar la cámara.");
+            }
+        };
 
-        const json = await res.json();
+        startScanner();
 
-        if (json.ok) {
+        return () => {
+            try {
+                reader.reset();
+            } catch { }
+            try {
+                stream?.getTracks().forEach((t) => t.stop());
+            } catch { }
+        };
+    }, []);
+
+    function resetScanner(reader) {
+        reader.reset();
+        setTimeout(() => {
             setError(null);
-            setGuest({
-                ...guest,
-                alreadyChecked: true,
-                checkInTime: json.check_in_at,
-            });
-        } else {
-            setError(json.error);
-        }
-    };
+            setIsProcessing(false);
+            reader.decodeFromVideoDevice(null, videoRef.current, () => { });
+        }, 2000);
+    }
 
     return (
-        <div className="p-4 max-w-lg mx-auto text-center">
+        <div className="p-4 max-w-xl mx-auto text-center">
+
             <video
                 ref={videoRef}
+                className="w-full max-w-md rounded-lg shadow-md"
                 autoPlay
                 muted
                 playsInline
-                className="w-full max-w-md rounded-lg shadow"
             />
 
             {error && (
-                <p className="mt-4 text-red-500 font-semibold">{error}</p>
+                <div className="mt-4 bg-red-600 text-white p-3 rounded-lg">
+                    {error}
+                </div>
             )}
 
             {guest && (
-                <div className="mt-5 bg-white text-black p-4 rounded-lg shadow">
+                <div className="mt-4 bg-green-600 text-white p-4 rounded-lg">
                     <h3 className="text-lg font-bold">{guest.fullName}</h3>
                     <p>{guest.company}</p>
-                    <p className="opacity-70">{guest.role}</p>
-
+                    <p className="opacity-80">{guest.role}</p>
                     {guest.alreadyChecked && (
-                        <p className="text-red-600 mt-2">
-                            ⚠ Ya había ingresado antes
-                        </p>
+                        <p className="mt-2 text-black font-bold">⚠ Ya ingresó antes</p>
                     )}
-
-                    <button
-                        onClick={confirmIngreso}
-                        className="mt-4 px-6 py-2 bg-green-600 text-white rounded-md"
-                    >
-                        Registrar ingreso
-                    </button>
                 </div>
             )}
         </div>
