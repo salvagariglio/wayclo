@@ -3,127 +3,117 @@
 import "server-only";
 import { NextResponse } from "next/server";
 import { getSupabaseServer } from "@/lib/supabaseServer";
-import { sendEmailGraph } from "@/lib/sendEmailGraph";
+import { sendEmail } from "@/lib/sendEmail";
 import QRCode from "qrcode";
-import crypto from "crypto";
-import { generateTicketPDF } from "@/lib/generateTicketPDF";
+import { v4 as uuidv4 } from "uuid";
 
 export async function POST(_req, { params }) {
   try {
     const supabase = getSupabaseServer();
     const { id } = params;
 
-    const { data: reg, error: fetchErr } = await supabase
+    if (!id) {
+      return NextResponse.json(
+        { error: "Falta id de registro en la URL" },
+        { status: 400 }
+      );
+    }
+
+    // 1) Buscar registro original
+    const { data: reg, error: fetchError } = await supabase
       .from("registrations")
       .select("*")
       .eq("id", id)
       .single();
 
-    if (fetchErr || !reg)
-      return NextResponse.json({ error: "Registro no encontrado" }, { status: 404 });
+    if (fetchError || !reg) {
+      console.error("Error buscando registro:", fetchError);
+      return NextResponse.json(
+        { error: "No se encontró el registro" },
+        { status: 404 }
+      );
+    }
 
-    const fullName = `${reg.first_name} ${reg.last_name}`;
-    const company = reg.company || "";
-    const role = reg.role || "";
+    // 2) GENERAR QR solo si no tiene
+    const qr_token = uuidv4();
+    const payload = JSON.stringify({ id, token: qr_token });
 
-    // 1) Generar token único
-    const token = crypto.randomBytes(16).toString("hex");
+    const qrBase64 = await QRCode.toDataURL(payload);
 
-    // 2) URL del QR
-    const qrValue = `https://cybercloud.ar/validate?id=${id}&token=${token}`;
+    const fileName = `qr-${id}.png`;
+    const base64Data = qrBase64.replace(/^data:image\/png;base64,/, "");
+    const buffer = Buffer.from(base64Data, "base64");
 
-    // 3) Generar QR como PNG buffer
-    const qrBuffer = await QRCode.toBuffer(qrValue, {
-      type: "png",
-      width: 600,
-      margin: 1
-    });
-
-    // 4) Subir QR a Storage
-    const qrFilename = `qr_${id}.png`;
-    const { data: qrUpload, error: qrErr } = await supabase.storage
-      .from("qrcodes")
-      .upload(qrFilename, qrBuffer, {
+    const { data: upload, error: uploadError } = await supabase.storage
+      .from("qr-codes")
+      .upload(fileName, buffer, {
         contentType: "image/png",
         upsert: true,
       });
 
-    if (qrErr) {
-      console.error(qrErr);
-      return NextResponse.json({ error: "No se pudo subir el QR" }, { status: 500 });
+    if (uploadError) {
+      console.error("Error subiendo QR:", uploadError);
+      return NextResponse.json(
+        { error: "No se pudo generar el QR" },
+        { status: 500 }
+      );
     }
 
-    const { data: qrPublic } = supabase.storage
-      .from("qrcodes")
-      .getPublicUrl(qrFilename);
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from("qr-codes").getPublicUrl(fileName);
 
-    const qrUrl = qrPublic.publicUrl;
-
-    // 5) Generar PDF del ticket
-    const pdfBuffer = await generateTicketPDF({
-      fullName,
-      company,
-      role,
-      qrBuffer,
-    });
-
-    const pdfFilename = `ticket_${id}.pdf`;
-
-    const { error: pdfErr } = await supabase.storage
-      .from("tickets")
-      .upload(pdfFilename, pdfBuffer, {
-        contentType: "application/pdf",
-        upsert: true,
-      });
-
-    if (pdfErr) {
-      console.error(pdfErr);
-      return NextResponse.json({ error: "No se pudo subir el PDF" }, { status: 500 });
-    }
-
-    const { data: pdfPublic } = supabase.storage
-      .from("tickets")
-      .getPublicUrl(pdfFilename);
-
-    const pdfUrl = pdfPublic.publicUrl;
-
-    // 6) Actualizar registro
-    await supabase
+    // 3) ACTUALIZAR STATUS + GUARDAR QR
+    const { data: updated, error: updateError } = await supabase
       .from("registrations")
       .update({
         status: "approved",
-        qr_token: token,
-        qr_url: qrUrl,
-        pdf_url: pdfUrl,
+        qr_token,
+        qr_url: publicUrl,
       })
-      .eq("id", id);
+      .eq("id", id)
+      .select("email, first_name, last_name, qr_url")
+      .single();
 
-    // 7) Enviar mail con QR + PDF adjunto
-    await sendEmailGraph({
-      to: reg.email,
-      subject: "Tu acceso a CyberCloud fue aprobado 🔐",
-      html: `
-        <h2>¡Hola ${fullName}!</h2>
-        <p>Tu pase digital para <strong>CyberCloud 2025</strong> está listo.</p>
-        <p>Presentá este código QR en la entrada del evento:</p>
-        <img src="${qrUrl}" style="width:200px;margin:20px 0;border-radius:8px" />
-        <p>También te dejamos adjunto el pase completo en PDF.</p>
-        <br />
-        <p style="opacity:.7;font-size:14px">Equipo CyberCloud</p>
-      `,
-      attachments: [
-        {
-          name: `CyberCloud_Ticket_${id}.pdf`,
-          contentBytes: pdfBuffer.toString("base64"),
-          contentType: "application/pdf",
-        }
-      ]
-    });
+    if (updateError) {
+      console.error("Error actualizando registro:", updateError);
+      return NextResponse.json(
+        { error: "No se pudo aprobar el registro" },
+        { status: 500 }
+      );
+    }
+
+    const fullName =
+      [updated.first_name, updated.last_name].filter(Boolean).join(" ") ||
+      "participante";
+
+    // 4) Enviar mail con el QR
+    try {
+      await sendEmail({
+        to: updated.email,
+        subject: "Tu invitación a CyberCloud fue aprobada ✅",
+        html: `
+          <h2>¡Buenas noticias, ${fullName}!</h2>
+          <p>Tu registro para <strong>CyberCloud</strong> fue <strong>aprobado</strong>.</p>
+          <p>Este es tu código QR personal para ingresar al evento:</p>
+          <br/>
+          <img src="${updated.qr_url}" width="220" style="border-radius:12px" />
+          <br/><br/>
+          <p>Mostralo en la entrada para validar tu acceso.</p>
+          <p style="opacity:0.6">Equipo CyberCloud</p>
+        `,
+      });
+    } catch (mailErr) {
+      console.error("Error enviando mail de aprobación:", mailErr);
+    }
 
     return NextResponse.json({ ok: true }, { status: 200 });
 
   } catch (e) {
-    console.error("POST /approve error:", e);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    console.error("POST /api/admin/registrations/[id]/approve ERROR:", e);
+    return NextResponse.json(
+      { error: "Server error", detail: e.message },
+      { status: 500 }
+    );
   }
 }

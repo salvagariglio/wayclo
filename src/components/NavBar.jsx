@@ -14,6 +14,12 @@ const LINKS = [
   { href: "/empresas", label: "EMPRESAS" },
 ];
 
+// 🔥 NUEVO: links exclusivos para /admin/*
+const ADMIN_LINKS = [
+  { href: "/admin/registrations", label: "INVITADOS" },
+  { href: "/admin/validations", label: "VALIDACIONES" },
+];
+
 // safelist tailwind
 const _safeAdminShadow = "shadow-[0_0_22px_rgba(255,255,255,0.22)]";
 
@@ -69,7 +75,7 @@ export default function NavBar() {
         {/* LINKS DESKTOP */}
         <div className="hidden md:flex items-center gap-6">
           <ul className="hidden md:flex items-center gap-6 text-sm">
-            {LINKS.map((l) => (
+            {(isAdmin ? ADMIN_LINKS : LINKS).map((l) => (
               <li key={l.href}>
                 <Link
                   href={l.href}
@@ -114,7 +120,7 @@ export default function NavBar() {
         </div>
       </nav>
 
-      {/* OVERLAY (fondo ligeramente oscuro y casi sin blur, debajo de la navbar) */}
+      {/* OVERLAY (mobile) */}
       {open && (
         <div
           onClick={() => setOpen(false)}
@@ -144,9 +150,9 @@ export default function NavBar() {
         ].join(" ")}
       >
         <div className="px-6 pb-8 pt-4 flex flex-col items-center gap-3">
-          {/* LINKS MOBILE — CENTRADOS */}
+          {/* LINKS MOBILE */}
           <ul className="flex flex-col items-center gap-3 w-full">
-            {LINKS.map((l) => (
+            {(isAdmin ? ADMIN_LINKS : LINKS).map((l) => (
               <li key={l.href} className="w-full flex justify-center">
                 <Link
                   href={l.href}
@@ -169,7 +175,7 @@ export default function NavBar() {
             ))}
           </ul>
 
-          {/* CTA MOBILE — NO aparece en admin */}
+          {/* CTA MOBILE — no aparece en admin */}
           {!isAdmin && (
             <Button
               onClick={() => {
