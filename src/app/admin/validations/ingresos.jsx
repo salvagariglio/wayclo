@@ -11,9 +11,9 @@ export default function Ingresos() {
     }, []);
 
     const loadData = async () => {
-        const res = await fetch("/api/admin/registrations-list");
+        const res = await fetch("/api/admin/validations/list");
         const json = await res.json();
-        setItems(json.rows || []);
+        setItems(json.items || []);
     };
 
     const filtered = items.filter((item) => {
