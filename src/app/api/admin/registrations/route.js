@@ -113,21 +113,57 @@ export async function POST(req) {
     }
 
     // 4) Enviar email de confirmación de registro
+    // 4) Enviar email de confirmación de registro
+    // 4) Enviar email de confirmación de registro
     try {
       await sendEmailGraph({
         to: email.trim(),
-        subject: "Recibimos tu registro – CyberCloud",
+        subject: "¡Un paso más cerca del CyberCloud!",
         html: `
-          <h2>¡Gracias por registrarte, ${first_name}!</h2>
-          <p>Tu registro fue recibido correctamente y está en proceso de revisión.</p>
-          <p>En cuanto sea aprobado, vas a recibir otro correo con la confirmación.</p>
-          <br />
-          <p style="opacity: 0.7;">Equipo CyberCloud</p>
-        `,
+<div style="width:100%;padding:40px 0;background:linear-gradient(180deg,#021728 0%,#00263F 100%);font-family:Arial,sans-serif;color:#fff;">
+  <div style="max-width:520px;margin:auto;background:rgba(255,255,255,0.07);padding:32px 36px;border-radius:14px;">
+    
+    <!-- LOGO -->
+    <div style="text-align:center;margin-bottom:24px;">
+      <img src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/logo-slogan.png" 
+           width="150" 
+           alt="CyberCloud" 
+           style="margin-bottom:10px;" />
+    </div>
+
+    <h2 style="text-align:center;font-size:22px;margin-bottom:26px;">
+      ¡Un paso más cerca del CyberCloud!
+    </h2>
+
+    <p>Hola <strong>${first_name}</strong>,</p>
+    <p>¡Gracias por registrarte en <strong>CyberCloud</strong>! 🙌</p>
+
+    <p>Tu inscripción fue recibida correctamente y nuestro equipo ya está revisando tu participación.
+    En breve recibirás una confirmación en este mismo correo.</p>
+
+    <p>Mientras tanto, preparate para una experiencia única junto a líderes de ciberseguridad,
+    telecomunicaciones y tecnología de la región.</p>
+
+    <p style="margin-top:28px;">Nos vemos pronto,</p>
+    <p><strong>Equipo CyberCloud</strong></p>
+
+    <!-- LOGOS -->
+    <div style="text-align:center;margin-top:32px;opacity:0.7;">
+      <img src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/logo-wayclo-speakers.png" 
+           width="80" style="margin-right:18px;" />
+      <img src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/intercity.png" 
+           width="80" />
+    </div>
+
+  </div>
+</div>
+`,
       });
     } catch (mailErr) {
       console.error("❌ Error enviando mail de registro:", mailErr);
     }
+
+
 
     return NextResponse.json({ ok: true, id: data?.id }, { status: 201 });
   } catch (e) {

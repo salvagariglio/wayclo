@@ -98,29 +98,68 @@ export async function POST(_req, { params }) {
       })
       .eq("id", id);
 
-    // 7) Enviar mail con QR + PDF adjunto
     await sendEmailGraph({
       to: reg.email,
-      subject: "Tu acceso a CyberCloud fue aprobado 🔐",
+      subject: "Confirmado: Nos vemos en CyberCloud ⚡",
       html: `
-        <h2>¡Hola ${fullName}!</h2>
-        <p>Tu pase digital para <strong>CyberCloud 2025</strong> está listo.</p>
-        <p>Presentá este código QR en la entrada del evento:</p>
-        <img src="${qrUrl}" style="width:200px;margin:20px 0;border-radius:8px" />
-        <p>También te dejamos adjunto el pase completo en PDF.</p>
-        <br />
-        <p style="opacity:.7;font-size:14px">Equipo CyberCloud</p>
-      `,
+<div style="width:100%;padding:40px 0;background:linear-gradient(180deg,#021728 0%,#00263F 100%);font-family:Arial,sans-serif;color:#fff;">
+  <div style="max-width:520px;margin:auto;background:rgba(255,255,255,0.07);padding:32px 36px;border-radius:14px;">
+    
+    <!-- LOGO -->
+    <div style="text-align:center;margin-bottom:24px;">
+      <img src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/logo-slogan.png" 
+           width="150" 
+           alt="CyberCloud" />
+    </div>
+
+    <h2 style="text-align:center;font-size:22px;margin-bottom:26px;">
+      Confirmado: Nos vemos en CyberCloud ⚡
+    </h2>
+
+    <p>¡Buenas noticias, <strong>${fullName}</strong>! 🎉</p>
+    <p>Tu inscripción a <strong>CyberCloud</strong> fue aprobada.</p>
+
+    <p>Ya podés acceder a tu entrada y presentarla el día del evento. 
+    Abajo tenés tu <strong>código QR personal</strong>:</p>
+
+    <!-- QR -->
+    <div style="text-align:center;margin:28px 0;">
+      <img src="${qrUrl}" width="180" style="border-radius:10px;" alt="QR CyberCloud" />
+    </div>
+
+    <p>
+      📅 <strong>Fecha:</strong> 12 de diciembre<br>
+      📍 <strong>Lugar:</strong> Campus Siglo 21 – Río Cuarto
+    </p>
+
+    <p>Te esperamos desde temprano para disfrutar de charlas, networking y el exclusivo 
+    <strong>Cyber After Cocktail</strong>.</p>
+
+    <p style="margin-top:28px;">¡Nos vemos ahí!</p>
+    <p><strong>Equipo CyberCloud</strong></p>
+
+    <!-- LOGOS -->
+    <div style="text-align:center;margin-top:32px;opacity:0.7;">
+      <img src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/logo-wayclo-speakers.png" 
+           width="80" style="margin-right:18px;" />
+      <img src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/intercity.png" 
+           width="80" />
+    </div>
+
+  </div>
+</div>
+`,
       attachments: [
         {
           "@odata.type": "#microsoft.graph.fileAttachment",
           name: `CyberCloud_Ticket_${id}.pdf`,
           contentBytes: pdfBuffer.toString("base64"),
           contentType: "application/pdf",
-        }
-      ]
-
+        },
+      ],
     });
+
+
 
     return NextResponse.json({ ok: true }, { status: 200 });
 

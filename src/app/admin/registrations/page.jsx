@@ -22,24 +22,34 @@ export default function AdminRegistrations() {
     })();
   }, []);
 
+  // 🔄 Cargar lista de registros
   const load = async () => {
     setLoading(true);
+
+    setItems([]); // ←🔥 FIX: evita parpadeo de usuarios previos
+
     const res = await fetch(`/api/admin/registrations?status=${status}`, {
       cache: "no-store",
     });
     const out = await res.json();
+
     setItems(out.items || []);
     setLoading(false);
   };
 
+  // ⏳ Reaccionar al cambio de estado o auth
   useEffect(() => {
-    if (auth === "ok") load();
+    if (auth === "ok") {
+      setItems([]); // ←🔥 FIX: limpiar inmediatamente
+      load();
+    }
   }, [status, auth]);
 
   const act = async (id, action) => {
     const res = await fetch(`/api/admin/registrations/${id}/${action}`, {
       method: "POST",
     });
+
     if (!res.ok) {
       const out = await res.json();
       alert(out.error || "Error");
@@ -48,7 +58,7 @@ export default function AdminRegistrations() {
     }
   };
 
-  // 🌀 Pantalla mientras valida auth
+  // 🌀 Mientras valida auth
   if (auth === "checking") {
     return (
       <main className="min-h-screen flex items-center justify-center bg-[#021728] text-white/80">
@@ -69,7 +79,8 @@ export default function AdminRegistrations() {
   return (
     <main className="min-h-screen bg-[#021728] text-white px-4 py-8 md:px-8">
       <div className="max-w-6xl mx-auto">
-        {/* HEADER + CONTROLES EN CARD TRANSLÚCIDA */}
+
+        {/* HEADER + CONTROLES */}
         <section className="mb-8">
           <div className="bg-white/5 border border-white/10 rounded-2xl px-5 py-4 md:px-6 md:py-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div className="flex items-center gap-2">
@@ -90,7 +101,7 @@ export default function AdminRegistrations() {
                   key={s}
                   onClick={() => setStatus(s)}
                   className={`capitalize px-4 py-2 rounded-full border text-xs md:text-sm font-medium transition
-                  ${status === s
+                    ${status === s
                       ? "bg-white text-[#021728] border-white shadow-sm"
                       : "bg-transparent text-white border-white/40 hover:bg-white/10"
                     }`}
@@ -102,6 +113,7 @@ export default function AdminRegistrations() {
                       : "Rechazados"}
                 </button>
               ))}
+
               <button
                 onClick={load}
                 className="px-4 py-2 rounded-full border text-xs md:text-sm font-medium bg-transparent text-white border-white/40 hover:bg-white/10 flex items-center justify-center gap-2"
@@ -117,17 +129,18 @@ export default function AdminRegistrations() {
           </div>
         </section>
 
-        {/* ESTADO LISTA */}
+        {/* ESTADOS */}
         {loading && (
           <p className="text-center py-10 text-white/70">Cargando…</p>
         )}
+
         {!loading && items.length === 0 && (
           <p className="text-center py-10 text-white/50">
             No hay registros en esta categoría.
           </p>
         )}
 
-        {/* GRID DE TARJETAS BLANCAS, COMO EL LOGIN */}
+        {/* LISTA */}
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((r) => (
             <div
@@ -138,13 +151,16 @@ export default function AdminRegistrations() {
                 <p className="text-xs text-slate-400">
                   {new Date(r.created_at).toLocaleString()}
                 </p>
+
                 <h2 className="text-lg font-semibold mt-1 text-slate-900">
                   {r.first_name} {r.last_name}
                 </h2>
+
                 <p className="text-sm text-slate-700 mt-1">{r.email}</p>
                 <p className="text-sm text-slate-700">
                   {r.company} — {r.role}
                 </p>
+
                 {r.diet && (
                   <p className="text-xs text-slate-500 mt-1">
                     Dieta: {r.diet}
@@ -161,6 +177,7 @@ export default function AdminRegistrations() {
                     Aprobar
                   </button>
                 )}
+
                 {status !== "rejected" && (
                   <button
                     onClick={() => act(r.id, "reject")}

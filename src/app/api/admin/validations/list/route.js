@@ -6,19 +6,21 @@ export async function GET(req) {
     const { searchParams } = new URL(req.url);
     const filter = searchParams.get("filter"); // "checked" | "pending" | null
 
-    let query = supabase
+    const { data, error } = await supabase
         .from("registrations")
-        .select("id, first_name, last_name, company, role, qr_used, checkin_at, pdf_url, qr_url, qr_token")
+        .select("id, first_name, last_name, company, role, qr_used, qr_used_at")
         .eq("status", "approved")
         .order("first_name", { ascending: true });
 
-    if (filter === "checked") query = query.eq("qr_used", true);
-    if (filter === "pending") query = query.eq("qr_used", false);
+    if (error) {
+        return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
+    }
 
-    const { data, error } = await query;
+    const filtered = data.filter((item) => {
+        if (filter === "checked") return item.qr_used;
+        if (filter === "pending") return !item.qr_used;
+        return true;
+    });
 
-    if (error)
-        return NextResponse.json({ error: error.message }, { status: 500 });
-
-    return NextResponse.json({ ok: true, items: data });
+    return NextResponse.json({ ok: true, items: filtered });
 }

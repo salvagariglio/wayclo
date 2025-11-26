@@ -49,12 +49,10 @@ export default function CompaniesSection({ data = [] }) {
           Empresas organizadoras
         </h2>
 
-        {/* TEXTO MISMO TAMAÑO QUE AGENDA */}
         <p className="text-base md:text-lg text-slate-700 text-center mt-2">
           Conocé a los equipos detrás del evento.
         </p>
 
-        {/* Panels */}
         <div className="mt-10 space-y-16 md:space-y-20">
           {safeData.map((c) => {
             const [ref, show] = useScrollReveal();
@@ -72,7 +70,6 @@ export default function CompaniesSection({ data = [] }) {
         </div>
       </div>
 
-      {/* CTA final */}
       <div className="flex justify-center mt-6">
         <button
           type="button"
@@ -142,18 +139,23 @@ function CompanyPanel({
     <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-start">
       {/* IZQUIERDA */}
       <div>
-        {/* LOGO ACHICADO */}
+        {/* LOGO CON TAMAÑOS PERSONALIZADOS */}
         <div className="flex items-center gap-3 mb-4">
           {logoSrc ? (
             <img
               src={logoSrc}
               alt={`${name} logo`}
-              className="h-8 md:h-10 w-auto object-contain"
+              className={`
+                w-auto object-contain
+                ${name.toLowerCase().includes("intercity")
+                  ? "h-12 md:h-16"     /* 🔥 Intercity más grande */
+                  : "h-6 md:h-8"      /* 🔥 Wayclo más chico */
+                }
+              `}
             />
           ) : null}
         </div>
 
-        {/* Texto con mismo tamaño que Agenda */}
         <div
           className={[
             "space-y-4 relative overflow-hidden transition-all duration-500 ease-in-out",
@@ -163,7 +165,7 @@ function CompanyPanel({
           {paragraphs.map((p, idx) => (
             <p
               key={idx}
-              className="text-base  text-slate-700/90 leading-relaxed"
+              className="text-base text-slate-700/90 leading-relaxed"
             >
               {renderParagraph(p)}
             </p>
@@ -174,7 +176,6 @@ function CompanyPanel({
           )}
         </div>
 
-        {/* Leer más */}
         {paragraphs.length > 2 && (
           <button
             onClick={() => setExpanded((s) => !s)}
@@ -190,7 +191,6 @@ function CompanyPanel({
           </button>
         )}
 
-        {/* CTA */}
         <div className="mt-6 pt-2">
           <a
             href={ctaHref}
@@ -204,9 +204,8 @@ function CompanyPanel({
 
       {/* DERECHA */}
       <div className="space-y-5">
-        {/* Áreas clave */}
         <div className="rounded-2xl border border-slate-300 bg-white/80 backdrop-blur-sm p-6 md:p-8 shadow-lg">
-          <h4 className="text-base  font-semibold text-slate-900 mb-4">
+          <h4 className="text-base font-semibold text-slate-900 mb-4">
             Áreas Clave
           </h4>
 
@@ -222,10 +221,9 @@ function CompanyPanel({
                 />
 
                 <div>
-                  <h5 className="text-base  font-semibold text-slate-900">
+                  <h5 className="text-base font-semibold text-slate-900">
                     {s.title}
                   </h5>
-
                   <p className="md:text-sm text-xs text-slate-700">
                     {s.description}
                   </p>
@@ -235,7 +233,6 @@ function CompanyPanel({
           </ul>
         </div>
 
-        {/* Enlaces */}
         {Array.isArray(links) && links.length > 0 && (
           <div className="rounded-2xl border border-slate-300 bg-white/80 backdrop-blur-sm p-6 md:p-8 shadow-lg">
             <h4 className="text-base md:text-lg font-semibold text-slate-900 mb-4">

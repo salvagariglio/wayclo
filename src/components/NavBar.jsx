@@ -61,6 +61,7 @@ export default function NavBar() {
     >
       <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-24 flex items-center justify-between">
         {/* LOGO */}
+        {/* LOGO */}
         <Link href="/" className="flex items-center gap-3">
           <Image
             src={LogoSlogan}
@@ -68,9 +69,16 @@ export default function NavBar() {
             height={180}
             alt="CyberCloud"
             priority
-            className="object-contain"
+            className={[
+              "object-contain transition-all",
+              isAdmin
+                ? "drop-shadow-[0_0_1px_white]"
+                : ""
+            ].join(" ")}
           />
+
         </Link>
+
 
         {/* LINKS DESKTOP */}
         <div className="hidden md:flex items-center gap-6">
