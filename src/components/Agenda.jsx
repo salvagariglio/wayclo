@@ -201,21 +201,41 @@ export default function Agenda() {
 
 
       {/* MODAL – CARD GRANDE, CENTRADA, MISMO DISEÑO */}
+      {/* MODAL NUEVO – SIEMPRE CENTRADO */}
       {selectedSpeaker && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-          <div className="relative w-full max-w-3xl mx-4">
-            {/* Botón cerrar */}
-            <button
-              onClick={() => setSelectedSpeaker(null)}
-              className="absolute -top-10 right-1 text-white text-3xl leading-none"
-            >
-              ×
-            </button>
+        <div
+          className="
+      fixed inset-0 z-50 
+      flex items-center justify-center 
+      bg-black/70 backdrop-blur-sm
+      p-4
+      animate-fadeIn
+    "
+        >
+          {/* Cerrar */}
+          <button
+            onClick={() => setSelectedSpeaker(null)}
+            className="
+        absolute top-6 right-6 
+        text-white text-4xl font-light
+        hover:opacity-80 transition
+      "
+          >
+            ×
+          </button>
 
+          <div
+            className="
+        w-full 
+        max-w-xl sm:max-w-2xl lg:max-w-3xl
+        animate-scaleIn
+      "
+          >
             <SpeakerModalCard speaker={selectedSpeaker} />
           </div>
         </div>
       )}
+
     </section>
   );
 }
@@ -227,77 +247,87 @@ export default function Agenda() {
 function SpeakerModalCard({ speaker }) {
   if (!speaker) return null;
 
-  const { name, lastname, img, role, company, linkedin } = speaker;
-
-  const index = speakers.findIndex(
-    (sp) => sp.name === name && sp.lastname === lastname
-  );
-  const isOdd = index % 2 !== 0;
-
-  const gradientClass = isOdd
-    ? "bg-gradient-to-r from-[#021728] to-cyan-600"
-    : "bg-gradient-to-r from-cyan-600 to-[#021728]";
-
-  const hasImage = typeof img === "string" && img.trim() !== "";
+  const { name, lastname, img, role, company, linkedin, companyLogo, companyLogoWidth } = speaker;
 
   return (
     <div
-      className={`
-        relative
+      className="
         w-full
-        h-[35vh]
-        sm:h-[45vh]
-        lg:h-[55vh]
-        flex
-        rounded-2xl
-        px-5 sm:px-7 lg:px-8
+        bg-gradient-to-r from-[#021728] to-cyan-600 
         text-white
+        rounded-2xl
         overflow-hidden
-        ${gradientClass}
-      `}
+        flex flex-col md:flex-row
+      "
     >
+      {/* IMAGEN – Mobile circular / Desktop contenida */}
+      <div
+        className="
+          relative
+          w-full md:w-2/5
+          aspect-square md:aspect-auto
+          h-56 md:h-auto
+          flex-shrink-0
+          overflow-hidden
+        "
+      >
+        <Image
+          src={img}
+          alt={name}
+          fill
+          className="
+            object-cover
+            md:object-contain
+            object-top md:object-bottom
+            rounded-full md:rounded-none
+            p-3 md:p-0
+          "
+        />
+      </div>
 
-      {/* ⬇️ MISMO FIX: max-w y pr */}
-      <div className="absolute bottom-10 left-5 flex flex-col gap-2 z-10 max-w-[55%] pr-3 break-words">
-        <p className="text-2xl sm:text-3xl lg:text-4xl font-semibold leading-tight">
+      {/* INFORMACIÓN */}
+      <div
+        className="
+          flex flex-col justify-center
+          p-6 sm:p-8
+          w-full
+          text-left
+        "
+      >
+        {companyLogo && (
+          <Image
+            src={companyLogo}
+            alt={company}
+            width={companyLogoWidth || 120}
+            height={120}
+            className="object-contain mb-4 drop-shadow-lg"
+          />
+        )}
+
+        <h3 className="text-2xl sm:text-3xl font-semibold leading-tight">
           {name} {lastname}
-        </p>
+        </h3>
 
-        {role && (
-          <p className="text-sm sm:text-base lg:text-lg opacity-90">
-            {role}
-          </p>
-        )}
+        <p className="text-sm sm:text-base opacity-90 mt-2">{role}</p>
 
-        {company && (
-          <p className="text-sm sm:text-base lg:text-lg opacity-80">
-            {company}
-          </p>
-        )}
+        <p className="text-sm sm:text-base opacity-80">{company}</p>
 
         {linkedin && (
           <a
             href={linkedin}
             target="_blank"
             rel="noreferrer"
-            className="mt-1 inline-flex items-center gap-2 text-xs sm:text-sm lg:text-base opacity-90 hover:opacity-100"
+            className="
+              mt-4 inline-flex items-center gap-2 
+              text-sm sm:text-base 
+              text-white/90 hover:text-white
+            "
           >
-            <Linkedin className="w-4 h-4" />
-            <span>Ver en LinkedIn</span>
+            <Linkedin className="w-5 h-5" />
+            Ver en LinkedIn
           </a>
         )}
       </div>
-
-      {hasImage && (
-        <div className="absolute bottom-0 right-0 h-full w-[50%]">
-          <Image
-            src={img}
-            alt={`${name} ${lastname} - Speaker en CyberCloud`}
-            fill
-            className="object-cover object-bottom"
-          />
-        </div>
-      )}
     </div>
   );
 }
