@@ -9,6 +9,7 @@ export default function Scanner() {
 
     const [guest, setGuest] = useState(null);
     const [error, setError] = useState(null);
+    const [isPaused, setIsPaused] = useState(false); // 🔥 Control real
 
     useEffect(() => {
         let stream;
@@ -19,7 +20,7 @@ export default function Scanner() {
                 readerRef.current = reader;
 
                 stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: "environment" },
+                    video: { facingMode: "environment" }
                 });
 
                 const video = videoRef.current;
@@ -48,9 +49,11 @@ export default function Scanner() {
         reader.decodeFromVideoDevice(
             undefined,
             videoRef.current,
-            async (result, err) => {
+            async (result) => {
 
-                // 👉 ignoramos errores normales del escáner
+                // ⛔ NO continuar si está pausado o si hay un invitado en pantalla
+                if (isPaused || guest) return;
+
                 if (!result) return;
 
                 try {
@@ -59,9 +62,11 @@ export default function Scanner() {
                     const id = url.searchParams.get("id");
                     const token = url.searchParams.get("token");
 
-                    if (!id || !token) {
-                        return; // no mostrar error aquí
-                    }
+                    if (!id || !token) return;
+
+                    // 🔥 PAUSAR el escaneo
+                    reader.reset();
+                    setIsPaused(true);
 
                     const resp = await fetch("/api/admin/validations/check", {
                         method: "POST",
@@ -73,15 +78,14 @@ export default function Scanner() {
 
                     if (!json.ok) {
                         setError(json.error);
-                    } else {
-                        setGuest(json.guest);
-                        setError(null);
+                        return;
                     }
 
-                    reader.reset(); // detener escaneo
+                    setGuest(json.guest);
+                    setError(null);
 
                 } catch {
-                    // ignorar errores normales
+                    // ignora errores de frames
                 }
             }
         );
@@ -97,6 +101,7 @@ export default function Scanner() {
         const json = await resp.json();
 
         if (json.ok) {
+            // 🔥 NO reanudar scanner todavía
             setGuest({ ...guest, checkin: true });
         } else {
             setError(json.error);
@@ -106,6 +111,7 @@ export default function Scanner() {
     const continuarEscaneando = () => {
         setGuest(null);
         setError(null);
+        setIsPaused(false); // 🔥 Reanudamos
 
         iniciarLoop(readerRef.current);
     };
@@ -122,26 +128,25 @@ export default function Scanner() {
                 muted
             />
 
-            {/* ERROR (solo backend) */}
+            {/* ERROR */}
             {error && !guest && (
-                <p className="text-red-400 mt-4 text-center">{error}</p>
+                <p className="text-red-400 mt-4">{error}</p>
             )}
 
-            {/* MODAL CENTRADO */}
+            {/* MODAL OVERLAY */}
             {guest && (
                 <div className="
-                    fixed inset-0 
-                    bg-black/60 backdrop-blur-sm 
-                    flex items-center justify-center 
-                    z-50
+                    fixed inset-0 bg-black/60 backdrop-blur-sm 
+                    flex items-center justify-center z-50
                 ">
                     <div className="bg-white text-black p-6 rounded-xl w-full max-w-sm shadow-xl">
+
                         <h3 className="text-xl font-bold">{guest.fullName}</h3>
                         <p className="opacity-70">{guest.company}</p>
                         <p className="opacity-70">{guest.role}</p>
 
                         {guest.alreadyChecked && (
-                            <p className="mt-3 text-red-600 text-sm">
+                            <p className="mt-3 text-red-600">
                                 ⚠ Esta persona ya había ingresado antes
                             </p>
                         )}
