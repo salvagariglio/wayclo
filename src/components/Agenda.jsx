@@ -1,8 +1,5 @@
 "use client";
-import Image from "next/image";
-import { useState } from "react";
-import { speakers } from "@/components/Speakers"; // SpeakerCard no se usa acá, podés borrarlo del import
-import { Linkedin } from "lucide-react";
+import { speakers } from "@/components/Speakers";
 import useScrollReveal from "@/hooks/useScrollReveal";
 
 // 👉 ahora devuelve DIRECTAMENTE el objeto speaker
@@ -17,9 +14,8 @@ const findSpeakerByFullName = (fullName) => {
   return found || null;
 };
 
-export default function Agenda() {
-  const [selectedSpeaker, setSelectedSpeaker] = useState(null);
-
+// 🔹 Agenda ahora recibe onSelectSpeaker desde la página
+export default function Agenda({ onSelectSpeaker }) {
   const agenda = [
     {
       time: "17:45 – 18:15",
@@ -34,7 +30,8 @@ export default function Agenda() {
     },
     {
       time: "18:30 - 19.00",
-      title: "PRIMER PANEL DE DISCUSIÓN: Desafíos reales y soluciones en IT en la región",
+      title:
+        "PRIMER PANEL DE DISCUSIÓN: Desafíos reales y soluciones en IT en la región",
       description:
         "Participan Wayclo, Intercity y empresas invitadas. Casos de éxito, desafíos locales y debate sobre el futuro tecnológico de la región.",
       tag: "Panel 1",
@@ -48,8 +45,10 @@ export default function Agenda() {
     },
     {
       time: "19:00 - 19:30",
-      title: "SEGUNDO PANEL DE DISCUSIÓN: Desafíos reales y soluciones en IT en la región",
-      description: "Participan Wayclo, Intercity y empresas invitadas. Casos de éxito, desafíos locales y debate sobre el futuro tecnológico de la región.",
+      title:
+        "SEGUNDO PANEL DE DISCUSIÓN: Desafíos reales y soluciones en IT en la región",
+      description:
+        "Participan Wayclo, Intercity y empresas invitadas. Casos de éxito, desafíos locales y debate sobre el futuro tecnológico de la región.",
       tag: "Panel 2",
       speakersNames: ["Luciano Gabutti", "Juan Ochoa", "Ivan Pecovich", "Grassi"],
     },
@@ -83,10 +82,9 @@ export default function Agenda() {
           Mirá el recorrido completo del evento.
         </p>
 
-
         <div className="flex flex-col gap-12">
           {agenda.map((it, idx) => {
-            const [ref, show] = useScrollReveal();   // 👈 AGREGADO
+            const [ref, show] = useScrollReveal();
             const isRight = idx % 2 !== 0;
 
             return (
@@ -94,19 +92,18 @@ export default function Agenda() {
                 key={idx}
                 ref={ref}
                 className={`
-          reveal ${show ? "show" : ""}
-          relative
-          py-4 px-6 rounded-xl
-          transition-all duration-300
-          hover:bg-gray-50
-          ${isRight
+                  reveal ${show ? "show" : ""}
+                  relative
+                  py-4 px-6 rounded-xl
+                  transition-all duration-300
+                  hover:bg-gray-50
+                  ${isRight
                     ? "border-r-4 border-cyan-400 text-right pr-6 ml-auto"
                     : "border-l-4 border-cyan-400 text-left pl-6 mr-auto"
                   }
-          max-w-3xl
-        `}
+                  max-w-3xl
+                `}
               >
-
                 {/* HORA + TÍTULO */}
                 <h3
                   className={`
@@ -161,7 +158,9 @@ export default function Agenda() {
                         <button
                           key={fullName}
                           type="button"
-                          onClick={() => setSelectedSpeaker(sp)} // 👈 ahora seteamos el speaker directamente
+                          onClick={() => {
+                            if (onSelectSpeaker) onSelectSpeaker(sp);
+                          }}
                           className="px-3 py-1 rounded-full border border-cyan-400 text-cyan-700 text-xs sm:text-sm hover:bg-cyan-50 transition"
                         >
                           {fullName}
@@ -175,159 +174,30 @@ export default function Agenda() {
           })}
         </div>
       </div>
+
       <div className="flex justify-center mt-16">
         <button
           type="button"
           onClick={() => document.dispatchEvent(new Event("open-register"))}
           className="
-    inline-flex items-center justify-center
-    rounded-full
-    px-10 md:px-12
-    h-14 md:h-16
-    text-md md:text-xl
-    font-semibold
-    text-cyan-600
-    border-2 border-cyan-600
-    bg-transparent
-    hover:bg-cyan-600 hover:text-white
-    transition-colors
-    shadow-[0_2px_0_0_#0891b2]
-    md:shadow-[0_3px_0_0_#0891b2]
-  "
+            inline-flex items-center justify-center
+            rounded-full
+            px-10 md:px-12
+            h-14 md:h-16
+            text-md md:text-xl
+            font-semibold
+            text-cyan-600
+            border-2 border-cyan-600
+            bg-transparent
+            hover:bg-cyan-600 hover:text-white
+            transition-colors
+            shadow-[0_2px_0_0_#0891b2]
+            md:shadow-[0_3px_0_0_#0891b2]
+          "
         >
           INSCRIBITE AHORA
         </button>
       </div>
-
-
-      {/* MODAL – CARD GRANDE, CENTRADA, MISMO DISEÑO */}
-      {/* MODAL NUEVO – SIEMPRE CENTRADO */}
-      {selectedSpeaker && (
-        <div
-          className="
-      fixed inset-0 z-50 
-      flex items-center justify-center 
-      bg-black/70 backdrop-blur-sm
-      p-4
-      animate-fadeIn
-    "
-        >
-          {/* Cerrar */}
-          <button
-            onClick={() => setSelectedSpeaker(null)}
-            className="
-        absolute top-6 right-6 
-        text-white text-4xl font-light
-        hover:opacity-80 transition
-      "
-          >
-            ×
-          </button>
-
-          <div
-            className="
-        w-full 
-        max-w-xl sm:max-w-2xl lg:max-w-3xl
-        animate-scaleIn
-      "
-          >
-            <SpeakerModalCard speaker={selectedSpeaker} />
-          </div>
-        </div>
-      )}
-
     </section>
-  );
-}
-
-/*
- * 🔹 CARD PARA EL MODAL
- * Replica tu SpeakerCard en grande y centrada.
-*/
-function SpeakerModalCard({ speaker }) {
-  if (!speaker) return null;
-
-  const { name, lastname, img, role, company, linkedin, companyLogo, companyLogoWidth } = speaker;
-
-  return (
-    <div
-      className="
-        w-full
-        bg-gradient-to-r from-[#021728] to-cyan-600 
-        text-white
-        rounded-2xl
-        overflow-hidden
-        flex flex-col md:flex-row
-      "
-    >
-      {/* IMAGEN – Mobile circular / Desktop contenida */}
-      <div
-        className="
-          relative
-          w-full md:w-2/5
-          aspect-square md:aspect-auto
-          h-56 md:h-auto
-          flex-shrink-0
-          overflow-hidden
-        "
-      >
-        <Image
-          src={img}
-          alt={name}
-          fill
-          className="
-            object-cover
-            md:object-contain
-            object-top md:object-bottom
-            rounded-full md:rounded-none
-            p-3 md:p-0
-          "
-        />
-      </div>
-
-      {/* INFORMACIÓN */}
-      <div
-        className="
-          flex flex-col justify-center
-          p-6 sm:p-8
-          w-full
-          text-left
-        "
-      >
-        {companyLogo && (
-          <Image
-            src={companyLogo}
-            alt={company}
-            width={companyLogoWidth || 120}
-            height={120}
-            className="object-contain mb-4 drop-shadow-lg"
-          />
-        )}
-
-        <h3 className="text-2xl sm:text-3xl font-semibold leading-tight">
-          {name} {lastname}
-        </h3>
-
-        <p className="text-sm sm:text-base opacity-90 mt-2">{role}</p>
-
-        <p className="text-sm sm:text-base opacity-80">{company}</p>
-
-        {linkedin && (
-          <a
-            href={linkedin}
-            target="_blank"
-            rel="noreferrer"
-            className="
-              mt-4 inline-flex items-center gap-2 
-              text-sm sm:text-base 
-              text-white/90 hover:text-white
-            "
-          >
-            <Linkedin className="w-5 h-5" />
-            Ver en LinkedIn
-          </a>
-        )}
-      </div>
-    </div>
   );
 }

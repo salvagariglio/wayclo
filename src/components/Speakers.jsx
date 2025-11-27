@@ -35,7 +35,7 @@ export const speakers = [
     companyLogo: "/intercity.png",
     companyLogoWidth: 120,
     linkedin: "",
-    img: "/speakers/silueta.png",
+    img: "/speakers/ivan.png",
   },
   {
     name: "Eduardo",
@@ -45,7 +45,7 @@ export const speakers = [
     companyLogo: "/municipalidad.png",
     companyLogoWidth: 130,
     linkedin: "",
-    img: "/speakers/eduardo1.png",
+    img: "/speakers/eduardo2.png",
   },
   {
     name: "Pablo",
@@ -77,7 +77,7 @@ export const speakers = [
     companyLogo: "/agd.png",
     companyLogoWidth: 110,
     linkedin: "",
-    img: "/speakers/silueta.png",
+    img: "/speakers/juan.png",
   },
   {
     name: "Gustavo",
