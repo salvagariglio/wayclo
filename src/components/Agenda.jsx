@@ -50,7 +50,7 @@ export default function Agenda({ onSelectSpeaker }) {
       description:
         "Participan Wayclo, Intercity y empresas invitadas. Casos de éxito, desafíos locales y debate sobre el futuro tecnológico de la región.",
       tag: "Panel 2",
-      speakersNames: ["Luciano Gabutti", "Juan Ochoa", "Ivan Pecovich", "Grassi"],
+      speakersNames: ["Luciano Gabutti", "Juan Ochoa", "Ivan Pecovich", "Gustavo Díaz"],
     },
     {
       time: "19:30 – 19:45",
@@ -62,7 +62,7 @@ export default function Agenda({ onSelectSpeaker }) {
       title: "CHARLA: Ciberseguridad ",
       description: "Riesgos empresariales y legales.",
       tag: "Charla",
-      speakersNames: ["Gustavo Matuk", "Emmanuel Villas"],
+      speakersNames: ["Gustavo Matuk", "Emmanuel Vilas"],
     },
     {
       time: "20:30 – 21:00",

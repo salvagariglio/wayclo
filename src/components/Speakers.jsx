@@ -81,6 +81,16 @@ export const speakers = [
   },
   {
     name: "Gustavo",
+    lastname: "Díaz",
+    role: "IT de Grassi",
+    company: "",
+    companyLogo: "/grassi.png",
+    companyLogoWidth: 110,
+    linkedin: "",
+    img: "/speakers/gustavoD.png",
+  },
+  {
+    name: "Gustavo",
     lastname: "Matuk",
     role: "Cybersecurity Advisor",
     company: "Wayclo",
