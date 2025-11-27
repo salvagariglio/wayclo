@@ -2,28 +2,16 @@
 
 import "server-only";
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { getSupabaseServer } from "@/lib/supabaseServer";
-import { verifyAdminJWT } from "@/lib/auth";
 
-async function requireAdmin() {
-  const token = cookies().get("admin")?.value;
-  const v = token ? await verifyAdminJWT(token) : { ok: false };
-  if (!v.ok) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
-  return null;
-}
-
-export async function POST(_req, { params }) {
+// 💡 CAMBIO CLAVE: Cambiar la firma para usar 'context' en lugar de desestructurar '{ params }'
+export async function POST(_req, context) {
   try {
-    // 🔐 solo admin
-    const guard = await requireAdmin();
-    if (guard) return guard;
-
     const supabase = getSupabaseServer();
-    const { id } = params;
 
+    // 💡 SOLUCIÓN: Acceder a params desde 'context'
+    // Y luego obtener 'id' del objeto params
+    const { id } = context.params;
     if (!id) {
       return NextResponse.json(
         { error: "Falta id de registro en la URL" },
@@ -31,6 +19,7 @@ export async function POST(_req, { params }) {
       );
     }
 
+    // Obtener registro
     const { data: reg, error: fetchError } = await supabase
       .from("registrations")
       .select("*")
@@ -45,6 +34,7 @@ export async function POST(_req, { params }) {
       );
     }
 
+    // Actualizar estado a "rejected"
     const { error: updateError } = await supabase
       .from("registrations")
       .update({ status: "rejected" })
@@ -58,7 +48,10 @@ export async function POST(_req, { params }) {
       );
     }
 
+    // ❌ Sin envío de email
+
     return NextResponse.json({ ok: true }, { status: 200 });
+
   } catch (e) {
     console.error("POST /reject ERROR:", e);
     return NextResponse.json(

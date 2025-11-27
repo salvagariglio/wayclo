@@ -10,25 +10,23 @@ export default function AdminRegistrations() {
   const [auth, setAuth] = useState("checking");
   const router = useRouter();
 
-  // 1) Verificar sesión
+  // 🔐 Verificar cookie de sesión
   useEffect(() => {
     (async () => {
       const res = await fetch("/api/admin/session", { method: "GET" });
-      setAuth(res.ok ? "ok" : "unauth");
+      if (!res.ok) {
+        setAuth("unauth");
+      } else {
+        setAuth("ok");
+      }
     })();
   }, []);
 
-  // 2) Redirigir si no tiene acceso
-  useEffect(() => {
-    if (auth === "unauth") {
-      router.push("/admin/login");
-    }
-  }, [auth, router]);
-
-  // 3) Cargar registros
+  // 🔄 Cargar lista de registros
   const load = async () => {
     setLoading(true);
-    setItems([]);
+
+    setItems([]); // ←🔥 FIX: evita parpadeo de usuarios previos
 
     const res = await fetch(`/api/admin/registrations?status=${status}`, {
       cache: "no-store",
@@ -39,22 +37,44 @@ export default function AdminRegistrations() {
     setLoading(false);
   };
 
+  // ⏳ Reaccionar al cambio de estado o auth
   useEffect(() => {
-    if (auth === "ok") load();
-  }, [auth, status]);
+    if (auth === "ok") {
+      setItems([]); // ←🔥 FIX: limpiar inmediatamente
+      load();
+    }
+  }, [status, auth]);
 
-  // 4) Mientras verifica auth
+  const act = async (id, action) => {
+    const res = await fetch(`/api/admin/registrations/${id}/${action}`, {
+      method: "POST",
+    });
+
+    if (!res.ok) {
+      const out = await res.json();
+      alert(out.error || "Error");
+    } else {
+      load();
+    }
+  };
+
+  // 🌀 Mientras valida auth
   if (auth === "checking") {
     return (
       <main className="min-h-screen flex items-center justify-center bg-[#021728] text-white/80">
-        <RotateCcw className="animate-spin" size={18} />
-        <p className="ml-2">Verificando acceso...</p>
+        <div className="flex items-center gap-2">
+          <RotateCcw className="animate-spin" size={18} />
+          <p>Verificando acceso...</p>
+        </div>
       </main>
     );
   }
 
-  // 5) Si se está redirigiendo no renderizar nada
-  if (auth === "unauth") return null;
+  // 🔒 Si no hay sesión, redirigir a login
+  if (auth === "unauth") {
+    router.push("/admin/login");
+    return null;
+  }
 
   return (
     <main className="min-h-screen bg-[#021728] text-white px-4 py-8 md:px-8">
