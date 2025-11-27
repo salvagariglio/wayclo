@@ -3,15 +3,20 @@
 import "server-only";
 import { NextResponse } from "next/server";
 import { getSupabaseServer } from "@/lib/supabaseServer";
+// import { sendEmailGraph } from "@/lib/sendEmailGraph"; // 👈 No se necesita si no envía email
 
-// 💡 CAMBIO CLAVE: Cambiar la firma para usar 'context' en lugar de desestructurar '{ params }'
-export async function POST(_req, context) {
+// 💡 CAMBIO CLAVE: Usamos 'request' y extraemos el ID manualmente
+export async function POST(request) {
   try {
     const supabase = getSupabaseServer();
 
-    // 💡 SOLUCIÓN: Acceder a params desde 'context'
-    // Y luego obtener 'id' del objeto params
-    const { id } = context.params;
+    // ✅ SOLUCIÓN ROBUSTA: Acceder al ID desde el pathname de la URL
+    // Esto evita el error 'sync-dynamic-apis' que persiste con 'context.params'
+    const pathname = new URL(request.url).pathname;
+    const segments = pathname.split('/');
+    // El ID es el segmento anterior a 'reject'
+    const id = segments[segments.length - 2];
+
     if (!id) {
       return NextResponse.json(
         { error: "Falta id de registro en la URL" },
@@ -19,7 +24,7 @@ export async function POST(_req, context) {
       );
     }
 
-    // Obtener registro
+    // Obtener registro (Opcional, pero bueno para verificar existencia)
     const { data: reg, error: fetchError } = await supabase
       .from("registrations")
       .select("*")
@@ -47,8 +52,6 @@ export async function POST(_req, context) {
         { status: 500 }
       );
     }
-
-    // ❌ Sin envío de email
 
     return NextResponse.json({ ok: true }, { status: 200 });
 

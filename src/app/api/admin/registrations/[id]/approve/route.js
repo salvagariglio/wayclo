@@ -3,12 +3,22 @@
 import "server-only";
 import { NextResponse } from "next/server";
 import { getSupabaseServer } from "@/lib/supabaseServer";
-import { sendEmailGraph } from "@/lib/sendEmailGraph"; // 👈 AHORA Graph API
+import { sendEmailGraph } from "@/lib/sendEmailGraph";
+import QRCode from "qrcode";
+import crypto from "crypto";
 
-export async function POST(_req, { params }) {
+// 💡 CORRECCIÓN 1: Usamos 'request' y extraemos el ID manualmente de la URL
+// Esto elimina el error 'sync-dynamic-apis' que persiste con 'params'
+export async function POST(request) {
   try {
     const supabase = getSupabaseServer();
-    const { id } = params;
+
+    // ✅ ACCESO MÁS ROBUSTO: Extraer el ID del pathname de la URL
+    // Esto es compatible y no genera el error de Next.js
+    const pathname = new URL(request.url).pathname;
+    const segments = pathname.split('/');
+    // El ID es el segmento anterior a 'approve'
+    const id = segments[segments.length - 2];
 
     if (!id) {
       return NextResponse.json(
@@ -17,43 +27,81 @@ export async function POST(_req, { params }) {
       );
     }
 
-    const { data: current, error: fetchError } = await supabase
+    // 1) Obtener datos del registro
+    const { data: reg, error: fetchErr } = await supabase
       .from("registrations")
       .select("*")
       .eq("id", id)
       .single();
 
-    if (fetchError || !current) {
-      console.error("Error buscando registro:", fetchError);
+    if (fetchErr || !reg) {
+      console.error("Error buscando registro:", fetchErr);
       return NextResponse.json(
         { error: "No se encontró el registro" },
         { status: 404 }
       );
     }
 
-    const { data, error } = await supabase
-      .from("registrations")
-      .update({ status: "approved" })
-      .eq("id", id)
-      .select("email, first_name, last_name")
-      .single();
+    const fullName = [reg.first_name, reg.last_name].filter(Boolean).join(" ") || "participante";
 
-    if (error) {
-      console.error("Error actualizando registro:", error);
+    // --- Lógica del QR ---
+
+    // 2) Generar token único
+    const token = crypto.randomBytes(16).toString("hex");
+
+    // 3) URL del QR (URL de validación)
+    const qrValue = `https://cybercloud.ar/validate?id=${id}&token=${token}`;
+
+    // 4) Generar QR como PNG buffer
+    const qrBuffer = await QRCode.toBuffer(qrValue, {
+      type: "png",
+      width: 600,
+      margin: 1
+    });
+
+    // 5) Subir QR a Storage
+    const qrFilename = `qr_${id}.png`;
+    const { error: qrErr } = await supabase.storage
+      .from("qr-codes")
+      .upload(qrFilename, qrBuffer, {
+        contentType: "image/png",
+        upsert: true,
+      });
+
+    if (qrErr) {
+      console.error("Error subiendo QR:", qrErr);
+    }
+
+    const { data: qrPublic } = supabase.storage
+      .from("qr-codes")
+      .getPublicUrl(qrFilename);
+
+    const qrUrl = qrPublic.publicUrl;
+
+    // 6) Actualizar registro con el nuevo estado, token y URL del QR
+    const { error: updateError } = await supabase
+      .from("registrations")
+      .update({
+        status: "approved",
+        qr_token: token,
+        qr_url: qrUrl,
+        pdf_url: null,
+      })
+      .eq("id", id);
+
+    if (updateError) {
+      console.error("Error actualizando registro:", updateError);
       return NextResponse.json(
         { error: "No se pudo aprobar el registro" },
         { status: 500 }
       );
     }
 
-    const fullName =
-      [data.first_name, data.last_name].filter(Boolean).join(" ") ||
-      "participante";
+    // --- Enviar Email ---
 
-    // --- enviar email con Microsoft Graph ---
     try {
       await sendEmailGraph({
-        to: data.email,
+        to: reg.email,
         subject: "Confirmado: Nos vemos en CyberCloud ⚡",
         html: `
 <div style="width:100%;padding:40px 0;background:linear-gradient(180deg,#021728 0%,#00263F 100%);font-family:Arial,sans-serif;color:#fff;">
@@ -104,6 +152,7 @@ export async function POST(_req, { params }) {
 
     } catch (mailErr) {
       console.error("❌ Error enviando mail con Graph:", mailErr);
+      // El error de envío de mail no impide la respuesta OK de la aprobación
     }
 
     return NextResponse.json({ ok: true }, { status: 200 });
