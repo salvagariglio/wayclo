@@ -1,7 +1,18 @@
 import "server-only";
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { getSupabaseServer } from "@/lib/supabaseServer";
-import { sendEmailGraph } from "@/lib/sendEmailGraph"; // 👈 AGREGADO
+import { sendEmailGraph } from "@/lib/sendEmailGraph";
+import { verifyAdminJWT } from "@/lib/auth";
+
+async function requireAdmin() {
+  const token = cookies().get("admin")?.value;
+  const v = token ? await verifyAdminJWT(token) : { ok: false };
+  if (!v.ok) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+  return null;
+}
 
 // --- helper: verificar Turnstile ---
 async function verifyTurnstile(token, ip) {
@@ -10,14 +21,17 @@ async function verifyTurnstile(token, ip) {
   const secret = process.env.TURNSTILE_SECRET_KEY || "";
   if (!secret) return { ok: false, reason: "missing-secret" };
 
-  const res = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
-    method: "POST",
-    body: new URLSearchParams({
-      secret,
-      response: token,
-      remoteip: ip || "",
-    }),
-  });
+  const res = await fetch(
+    "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+    {
+      method: "POST",
+      body: new URLSearchParams({
+        secret,
+        response: token,
+        remoteip: ip || "",
+      }),
+    }
+  );
 
   const data = await res.json();
   return { ok: !!data?.success, data };
@@ -25,6 +39,10 @@ async function verifyTurnstile(token, ip) {
 
 export async function GET(req) {
   try {
+    // 🔐 solo admin para listar
+    const guard = await requireAdmin();
+    if (guard) return guard;
+
     const { searchParams } = new URL(req.url);
     const status = searchParams.get("status");
     const supabase = getSupabaseServer();
@@ -46,7 +64,7 @@ export async function GET(req) {
   }
 }
 
-// POST: crea registro
+// POST: crea registro (público, con Turnstile)
 export async function POST(req) {
   try {
     const supabase = getSupabaseServer();
@@ -68,7 +86,6 @@ export async function POST(req) {
     const ip =
       (req.headers.get("x-forwarded-for") || "").split(",")[0]?.trim() || "";
 
-    // 1) Verificar Turnstile
     const ver = await verifyTurnstile(turnstileToken, ip);
     if (!ver.ok) {
       return NextResponse.json(
@@ -77,15 +94,19 @@ export async function POST(req) {
       );
     }
 
-    // 2) Validaciones mínimas
-    if (!first_name?.trim()) return NextResponse.json({ error: "Falta first_name" }, { status: 400 });
-    if (!last_name?.trim()) return NextResponse.json({ error: "Falta last_name" }, { status: 400 });
-    if (!email?.trim()) return NextResponse.json({ error: "Falta email" }, { status: 400 });
-    if (!phone?.trim()) return NextResponse.json({ error: "Falta phone" }, { status: 400 });
-    if (!company?.trim()) return NextResponse.json({ error: "Falta company" }, { status: 400 });
-    if (!role?.trim()) return NextResponse.json({ error: "Falta role" }, { status: 400 });
+    if (!first_name?.trim())
+      return NextResponse.json({ error: "Falta first_name" }, { status: 400 });
+    if (!last_name?.trim())
+      return NextResponse.json({ error: "Falta last_name" }, { status: 400 });
+    if (!email?.trim())
+      return NextResponse.json({ error: "Falta email" }, { status: 400 });
+    if (!phone?.trim())
+      return NextResponse.json({ error: "Falta phone" }, { status: 400 });
+    if (!company?.trim())
+      return NextResponse.json({ error: "Falta company" }, { status: 400 });
+    if (!role?.trim())
+      return NextResponse.json({ error: "Falta role" }, { status: 400 });
 
-    // 3) Insertar en Supabase
     const { data, error } = await supabase
       .from("registrations")
       .insert([
@@ -112,9 +133,6 @@ export async function POST(req) {
       );
     }
 
-    // 4) Enviar email de confirmación de registro
-    // 4) Enviar email de confirmación de registro
-    // 4) Enviar email de confirmación de registro
     try {
       await sendEmailGraph({
         to: email.trim(),
@@ -162,8 +180,6 @@ export async function POST(req) {
     } catch (mailErr) {
       console.error("❌ Error enviando mail de registro:", mailErr);
     }
-
-
 
     return NextResponse.json({ ok: true, id: data?.id }, { status: 201 });
   } catch (e) {

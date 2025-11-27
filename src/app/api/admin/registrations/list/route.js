@@ -2,18 +2,25 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { getSupabaseServer } from "@/lib/supabaseServer";
+import { verifyAdminJWT } from "@/lib/auth";
+
+async function requireAdmin() {
+    const token = cookies().get("admin")?.value;
+    const v = token ? await verifyAdminJWT(token) : { ok: false };
+    if (!v.ok) {
+        return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+    }
+    return null;
+}
 
 export async function GET(req) {
     try {
-        // Auth opcional (si querés proteger el listado)
-        const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
-        const auth = req.headers.get("authorization") || "";
-        if (ADMIN_TOKEN && auth !== `Bearer ${ADMIN_TOKEN}`) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
+        // 🔐 solo admin
+        const guard = await requireAdmin();
+        if (guard) return guard;
 
-        // 🔍 Diagnóstico de envs (booleans, sin exponer valores)
         const envDiag = {
             has_SUPABASE_URL: !!process.env.SUPABASE_URL,
             has_SUPABASE_SERVICE_ROLE: !!process.env.SUPABASE_SERVICE_ROLE,
@@ -23,7 +30,6 @@ export async function GET(req) {
         try {
             supabase = getSupabaseServer();
         } catch (e) {
-            // Si falta alguna env o el helper arroja error, lo mostramos
             return NextResponse.json(
                 { error: "Supabase init failed", message: e?.message, env: envDiag },
                 { status: 500 }
@@ -36,9 +42,14 @@ export async function GET(req) {
             .order("created_at", { ascending: false });
 
         if (error) {
-            // Devolver detalle para depurar ahora
             return NextResponse.json(
-                { error: "DB error", code: error.code, message: error.message, details: error.details, env: envDiag },
+                {
+                    error: "DB error",
+                    code: error.code,
+                    message: error.message,
+                    details: error.details,
+                    env: envDiag,
+                },
                 { status: 500 }
             );
         }

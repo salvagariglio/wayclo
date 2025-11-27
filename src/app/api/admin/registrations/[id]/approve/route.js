@@ -2,14 +2,29 @@
 
 import "server-only";
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { getSupabaseServer } from "@/lib/supabaseServer";
 import { sendEmailGraph } from "@/lib/sendEmailGraph";
 import QRCode from "qrcode";
 import crypto from "crypto";
 import { generateTicketPDF } from "@/lib/generateTicketPDF";
+import { verifyAdminJWT } from "@/lib/auth";
+
+async function requireAdmin() {
+  const token = cookies().get("admin")?.value;
+  const v = token ? await verifyAdminJWT(token) : { ok: false };
+  if (!v.ok) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+  return null;
+}
 
 export async function POST(_req, { params }) {
   try {
+    // 🔐 solo admin
+    const guard = await requireAdmin();
+    if (guard) return guard;
+
     const supabase = getSupabaseServer();
     const { id } = params;
 
@@ -20,7 +35,10 @@ export async function POST(_req, { params }) {
       .single();
 
     if (fetchErr || !reg)
-      return NextResponse.json({ error: "Registro no encontrado" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Registro no encontrado" },
+        { status: 404 }
+      );
 
     const fullName = `${reg.first_name} ${reg.last_name}`;
     const company = reg.company || "";
@@ -36,7 +54,7 @@ export async function POST(_req, { params }) {
     const qrBuffer = await QRCode.toBuffer(qrValue, {
       type: "png",
       width: 600,
-      margin: 1
+      margin: 1,
     });
 
     // 4) Subir QR a Storage
@@ -50,7 +68,10 @@ export async function POST(_req, { params }) {
 
     if (qrErr) {
       console.error(qrErr);
-      return NextResponse.json({ error: "No se pudo subir el QR" }, { status: 500 });
+      return NextResponse.json(
+        { error: "No se pudo subir el QR" },
+        { status: 500 }
+      );
     }
 
     const { data: qrPublic } = supabase.storage
@@ -78,7 +99,10 @@ export async function POST(_req, { params }) {
 
     if (pdfErr) {
       console.error(pdfErr);
-      return NextResponse.json({ error: "No se pudo subir el PDF" }, { status: 500 });
+      return NextResponse.json(
+        { error: "No se pudo subir el PDF" },
+        { status: 500 }
+      );
     }
 
     const { data: pdfPublic } = supabase.storage
@@ -159,10 +183,7 @@ export async function POST(_req, { params }) {
       ],
     });
 
-
-
     return NextResponse.json({ ok: true }, { status: 200 });
-
   } catch (e) {
     console.error("POST /approve error:", e);
     return NextResponse.json({ error: "Server error" }, { status: 500 });

@@ -1,8 +1,23 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { getSupabaseServer } from "@/lib/supabaseServer";
+import { verifyAdminJWT } from "@/lib/auth";
+
+async function requireAdmin() {
+    const token = cookies().get("admin")?.value;
+    const v = token ? await verifyAdminJWT(token) : { ok: false };
+    if (!v.ok) {
+        return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
+    }
+    return null;
+}
 
 export async function POST(req) {
     try {
+        // 🔐 solo admin (scanner)
+        const guard = await requireAdmin();
+        if (guard) return guard;
+
         const { id, token } = await req.json();
 
         if (!id || !token) {
@@ -14,7 +29,6 @@ export async function POST(req) {
 
         const supabase = getSupabaseServer();
 
-        // Buscar el registro aprobado con ese ID + token
         const { data, error } = await supabase
             .from("registrations")
             .select("*")
@@ -41,7 +55,6 @@ export async function POST(req) {
                 checkInTime: data.qr_used_at || null,
             },
         });
-
     } catch (e) {
         console.error("CHECK ERROR:", e);
         return NextResponse.json({
