@@ -1,5 +1,6 @@
 import Speakers from "@/components/Speakers";
 import Sponsor from "@/components/Sponsor";
+import ModeratorCard from "@/components/ModeratorCard";
 
 export default function AgendaPage() {
     return (

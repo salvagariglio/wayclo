@@ -2,72 +2,18 @@
 import Image from "next/image";
 import { Linkedin } from "lucide-react";
 import useScrollReveal from "@/hooks/useScrollReveal";
+import ModeratorCard from "./ModeratorCard";
 
 export const speakers = [
-  // PANEL 1 — Wayclo
   {
-    name: "Cristian",
-    lastname: "Mercado",
-    role: "Director",
-    company: "Wayclo",
-    companyLogo: "/logo-wayclo-speakers.png",
-    companyLogoWidth: 130,
-    linkedin: "https://www.linkedin.com/in/cristian--mercado/",
-    img: "/speakers/cristian.png",
-  },
-  {
-    name: "Martín",
-    lastname: "Lovera",
-    role: "Gerente de Auditorías",
-    company: "Sala Hnos.",
-    companyLogo: "/salahnos.PNG",
-    companyLogoWidth: 80,
-    linkedin: "",
-    img: "/speakers/silueta.png",
-  },
-
-  // PANEL 1 — Intercity
-  {
-    name: "Ivan",
-    lastname: "Pecovich",
-    role: "Socio Gerente",
-    company: "Intercity Comunicaciones S.A.",
-    companyLogo: "/intercity.png",
-    companyLogoWidth: 120,
-    linkedin: "",
-    img: "/speakers/ivan.png",
-  },
-  {
-    name: "Eduardo",
-    lastname: "Ochoa",
-    role: "Director del Centro de Cómputos",
-    company: "Municipalidad de Río Cuarto",
-    companyLogo: "/municipalidad.png",
-    companyLogoWidth: 130,
-    linkedin: "",
-    img: "/speakers/eduardo2.png",
-  },
-  {
-    name: "Pablo",
-    lastname: "Degiglio",
-    role: "Técnico Centro de Cómputos",
-    company: "Municipalidad de Río Cuarto",
-    companyLogo: "/municipalidad.png",
-    companyLogoWidth: 130,
-    linkedin: "",
-    img: "/speakers/pablo.png",
-  },
-
-  // PANEL 2
-  {
-    name: "Luciano",
-    lastname: "Gabutti",
-    role: "Lider de Operaciones y Proyectos",
-    company: "Wayclo",
-    companyLogo: "/logo-wayclo-speakers.png",
-    companyLogoWidth: 130,
-    linkedin: "https://www.linkedin.com/in/lucianogabutti",
-    img: "/speakers/luciano.png",
+    name: "Emmanuel",
+    lastname: "Vilas",
+    role: "Director de carrera - Lic. en Seguridad Informática",
+    company: "Universidad Siglo 21",
+    companyLogo: "/universidadd.PNG",
+    companyLogoWidth: 100,
+    linkedin: "https://www.linkedin.com/in/emmanuelvilas/",
+    img: "/speakers/emmanuel.png",
   },
   {
     name: "Juan",
@@ -80,11 +26,41 @@ export const speakers = [
     img: "/speakers/juan.png",
   },
   {
+    name: "Martín",
+    lastname: "Lovera",
+    role: "Gerente de Auditorías",
+    company: "Sala Hnos.",
+    companyLogo: "/logo-salas.png",
+    companyLogoWidth: 140,
+    linkedin: "",
+    img: "/speakers/silueta.png",
+  },
+  {
+    name: "Pablo",
+    lastname: "Degiglio",
+    role: "Técnico Centro de Cómputos",
+    company: "Municipalidad de Río Cuarto",
+    companyLogo: "/municipalidad.png",
+    companyLogoWidth: 130,
+    linkedin: "",
+    img: "/speakers/pablo.png",
+  },
+  {
+    name: "Eduardo",
+    lastname: "Ochoa",
+    role: "Director del Centro de Cómputos",
+    company: "Municipalidad de Río Cuarto",
+    companyLogo: "/municipalidad.png",
+    companyLogoWidth: 130,
+    linkedin: "",
+    img: "/speakers/eduardo2.png",
+  },
+  {
     name: "Gustavo",
     lastname: "Díaz",
     role: "IT de Grassi",
     company: "",
-    companyLogo: "/grassi.png",
+    companyLogo: "/grassi1.png",
     companyLogoWidth: 110,
     linkedin: "",
     img: "/speakers/gustavoD.png",
@@ -100,14 +76,34 @@ export const speakers = [
     img: "/speakers/martin.png",
   },
   {
-    name: "Emmanuel",
-    lastname: "Vilas",
-    role: "Director de carrera - Lic. en Seguridad Informática",
-    company: "Universidad Siglo 21",
-    companyLogo: "/universidadd.PNG",
-    companyLogoWidth: 100,
-    linkedin: "https://www.linkedin.com/in/emmanuelvilas/",
-    img: "/speakers/emmanuel.png",
+    name: "Luciano",
+    lastname: "Gabutti",
+    role: "Lider de Operaciones y Proyectos",
+    company: "Wayclo",
+    companyLogo: "/logo-wayclo-speakers.png",
+    companyLogoWidth: 130,
+    linkedin: "https://www.linkedin.com/in/lucianogabutti",
+    img: "/speakers/luciano.png",
+  },
+  {
+    name: "Ivan",
+    lastname: "Pecovich",
+    role: "Socio Gerente",
+    company: "Intercity Comunicaciones S.A.",
+    companyLogo: "/intercity.png",
+    companyLogoWidth: 120,
+    linkedin: "",
+    img: "/speakers/ivan.png",
+  },
+  {
+    name: "Cristian",
+    lastname: "Mercado",
+    role: "Director",
+    company: "Wayclo",
+    companyLogo: "/logo-wayclo-speakers.png",
+    companyLogoWidth: 130,
+    linkedin: "https://www.linkedin.com/in/cristian--mercado/",
+    img: "/speakers/cristian.png",
   },
 ];
 
@@ -242,6 +238,9 @@ export default function SpeakersSection() {
         {speakers.map((sp, i) => (
           <SpeakerCard key={i} speaker={sp} index={i} />
         ))}
+      </div>
+      <div>
+        <ModeratorCard />
       </div>
 
       <div className="flex justify-center mt-20">

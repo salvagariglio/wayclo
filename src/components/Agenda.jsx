@@ -61,7 +61,7 @@ export default function Agenda({ onSelectSpeaker }) {
       time: "20:00 – 20:30",
       title: "CHARLA: Ciberseguridad ",
       description: "Riesgos empresariales y legales.",
-      tag: "Charla",
+      tag: "Panel 3",
       speakersNames: ["Gustavo Matuk", "Emmanuel Vilas"],
     },
     {
