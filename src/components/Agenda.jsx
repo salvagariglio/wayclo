@@ -31,26 +31,22 @@ export default function Agenda({ onSelectSpeaker }) {
     {
       time: "18:30 - 19.00",
       title:
-        "PRIMER PANEL DE DISCUSIÓN: Desafíos reales y soluciones en IT en la región",
+        "Panel 1: “Expansión Segura: El Desafío de la Red de Sucursales”",
       description:
         "Participan Wayclo, Intercity y empresas invitadas. Casos de éxito, desafíos locales y debate sobre el futuro tecnológico de la región.",
       tag: "Panel 1",
       speakersNames: [
-        "Cristian Mercado",
-        "Martín Lovera",
-        "Pablo Degiglio",
-        "Eduardo Ochoa",
-        "Ivan Pecovich",
+        "Luciano Gabutti", "Martín Lovera", "Ivan Pecovich", "Gustavo Díaz"
       ],
     },
     {
       time: "19:00 - 19:30",
       title:
-        "SEGUNDO PANEL DE DISCUSIÓN: Desafíos reales y soluciones en IT en la región",
+        "Panel 2: “El Diseño de redes resilientes para la continuidad empresarial.”",
       description:
         "Participan Wayclo, Intercity y empresas invitadas. Casos de éxito, desafíos locales y debate sobre el futuro tecnológico de la región.",
       tag: "Panel 2",
-      speakersNames: ["Luciano Gabutti", "Juan Ochoa", "Ivan Pecovich", "Gustavo Díaz"],
+      speakersNames: ["Cristian Mercado", "Juan Ochoa", "Pablo Degiglio", "Eduardo Ochoa", "Ivan Pecovich"],
     },
     {
       time: "19:30 – 19:45",
@@ -59,7 +55,7 @@ export default function Agenda({ onSelectSpeaker }) {
     },
     {
       time: "20:00 – 20:30",
-      title: "CHARLA: Ciberseguridad ",
+      title: "Panel 3: Ciberseguridad",
       description: "Riesgos empresariales y legales.",
       tag: "Panel 3",
       speakersNames: ["Gustavo Matuk", "Emmanuel Vilas"],
