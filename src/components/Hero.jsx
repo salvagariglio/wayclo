@@ -2,7 +2,7 @@
 import Image from "next/image";
 import ShieldCheck from "../../public/shield-check.png";
 import LaptopShield from "../../public/laptop-shield.png";
-import CyberCloudLogoSlogan from "../../public/logo-slogan.png";
+import CyberCloudLogoSlogan from "../../public/logo-1.png";
 
 export default function Hero() {
   return (
@@ -20,7 +20,7 @@ export default function Hero() {
         <Image
           src={CyberCloudLogoSlogan}
           alt="CyberCloud"
-          className="h-40 sm:h-48 md:h-60 w-auto opacity-95"
+          className="h-24 sm:h-48 mb-8 mt-4 w-auto opacity-95"
           priority
         />
       </div>
