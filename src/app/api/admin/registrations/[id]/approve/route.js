@@ -128,8 +128,8 @@ export async function POST(request) {
     </div>
 
     <p>
-      📅 <strong>Fecha:</strong> 12 de diciembre<br>
-      📍 <strong>Lugar:</strong> Campus Siglo 21 – Río Cuarto
+      📅 <strong>Fecha:</strong> 15 de diciembre<br>
+      📍 <strong>Lugar:</strong> Polo Científico Tecnológico – Río Cuarto
     </p>
 
     <p>Te esperamos desde temprano para disfrutar de charlas, networking y el exclusivo 

@@ -21,19 +21,19 @@ export default function Agenda({ onSelectSpeaker }) {
       time: "17:45 – 18:15",
       title: "RECEPCIÓN Y ACREDITACIÓN",
       description:
-        "Bienvenida a los participantes con café de recepción. Networking inicial entre decisores y asistentes técnicos.",
+        "Recepción con café y espacio de networking inicial entre decisores y equipos técnicos.",
     },
     {
       time: "18:15 - 18:30",
       title: "APERTURA ",
-      description: "Apertura y bienvenida, Wayclo e Intercity. ",
+      description: "Apertura y bienvenida por parte de Wayclo e Intercity.",
     },
     {
       time: "18:30 - 19.00",
       title:
         "Panel 1: “Expansión Segura: El Desafío de la Red de Sucursales”",
       description:
-        "Participan Wayclo, Intercity y empresas invitadas. Casos de éxito, desafíos locales y debate sobre el futuro tecnológico de la región.",
+        "Un espacio para analizar los desafíos de crecer: expansión de sucursales, seguridad en la conectividad y decisiones presupuestarias que acompañan la adopción de ciberseguridad.",
       tag: "Panel 1",
       speakersNames: [
         "Luciano Gabutti", "Martín Lovera", "Ivan Pecovich", "Gustavo Díaz"
@@ -44,14 +44,14 @@ export default function Agenda({ onSelectSpeaker }) {
       title:
         "Panel 2: “El Diseño de redes resilientes para la continuidad empresarial.”",
       description:
-        "Participan Wayclo, Intercity y empresas invitadas. Casos de éxito, desafíos locales y debate sobre el futuro tecnológico de la región.",
+        "Un espacio para abordar cómo las organizaciones garantizan la continuidad operativa a través de procesos internos claros, conectividad resiliente y redes distribuidas que mantienen el servicio aun ante imprevistos.",
       tag: "Panel 2",
       speakersNames: ["Cristian Mercado", "Juan Ochoa", "Pablo Degiglio", "Eduardo Ochoa", "Ivan Pecovich"],
     },
     {
       time: "19:30 – 19:45",
       title: "BREAK",
-      description: "Coffee break y networking informal entre asistentes.",
+      description: "Coffee break acompañado de un espacio de networking para conectar e intercambiar experiencias.",
     },
     {
       time: "20:00 – 20:30",
@@ -63,7 +63,7 @@ export default function Agenda({ onSelectSpeaker }) {
     {
       time: "20:30 – 21:00",
       title: "CATERING Y NETWORKING FINAL",
-      description: "Cierre con cóctel distendido y networking entre empresas.",
+      description: "Cóctel de cierre y networking entre las empresas participantes.",
       tag: "Cóctel",
     },
   ];
