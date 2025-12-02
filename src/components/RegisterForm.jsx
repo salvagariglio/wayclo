@@ -22,7 +22,9 @@ export default function RegisterForm({ onSuccess, onClose }) {
   const [captchaToken, setCaptchaToken] = useState("");
   const [captchaError, setCaptchaError] = useState("");
 
-  // --- CAPTCHA ---
+  // ❗ Nuevo: error del backend
+  const [serverError, setServerError] = useState("");
+
   useEffect(() => {
     // @ts-ignore
     window.onTurnstileVerified = (token) => {
@@ -113,6 +115,7 @@ export default function RegisterForm({ onSuccess, onClose }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setServerError(""); // limpiar si había uno
     setTouched({
       name: true,
       lastname: true,
@@ -152,17 +155,27 @@ export default function RegisterForm({ onSuccess, onClose }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+
       const out = await res.json();
+
       if (!res.ok) {
-        alert(out?.detail || out?.error || "No se pudo registrar.");
+        setServerError(out?.detail || out?.error || "No se pudo registrar.");
         setLoading(false);
+
+        // ❗ Scroll al mensaje de error
+        setTimeout(() => {
+          const el = document.getElementById("server-error-box");
+          el?.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 150);
+
         return;
       }
+
       setLoading(false);
       onSuccess?.(out);
     } catch (err) {
       console.error(err);
-      alert("Error inesperado. Intentá de nuevo.");
+      setServerError("Error inesperado. Intentá de nuevo.");
       setLoading(false);
     }
   };
@@ -203,6 +216,17 @@ export default function RegisterForm({ onSuccess, onClose }) {
         src="https://challenges.cloudflare.com/turnstile/v0/api.js"
         strategy="afterInteractive"
       />
+
+      {/* ❗ Bloque de error del servidor */}
+      {serverError && (
+        <div
+          id="server-error-box"
+          className="mb-4 p-3 rounded-md bg-rose-100 border border-rose-300 text-rose-700 text-sm"
+        >
+          <p className="font-semibold">Ocurrió un error al enviar la inscripción:</p>
+          <p>{serverError}</p>
+        </div>
+      )}
 
       <h3 className="mb-1 text-slate-900 font-semibold leading-tight">
         Inscripción al evento
