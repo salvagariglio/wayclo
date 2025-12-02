@@ -189,7 +189,7 @@ export async function POST(req) {
       <tr>
         <td align="center">
           <img 
-            src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/logo.svg"
+            src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/pixelcut-export.png"
             alt="CyberCloud"
             width="200"
             style="display:block; margin:auto; margin-bottom:10px;"
@@ -215,30 +215,58 @@ export async function POST(req) {
     <p style="margin-top:28px;">Nos vemos pronto,</p>
     <p><strong>Equipo CyberCloud</strong></p>
 
-    <!-- LOGOS INFERIORES -->
-    <table width="100%" style="margin-top:36px;">
+<!-- ============================================== -->
+    <!-- ORGANIZAN -->
+    <!-- ============================================== -->
+    <h3 style="text-align:center; font-size:16px; margin-top:46px; margin-bottom:18px; letter-spacing:1px; opacity:0.9;">
+      ORGANIZAN
+    </h3>
+
+    <table width="100%" style="margin-bottom:38px;">
       <tr>
-        <td align="center" style="opacity:0.85;">
+        <td align="center">
           <table style="margin:auto;">
             <tr>
-              <td align="center" style="padding-right:24px;">
+              <td align="center" style="padding-right:32px;">
                 <img 
                   src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/logo-wayclo-speakers.png"
-                  width="90"
-                  style="display:block;"
+                  width="110"
                   alt="Wayclo"
+                  style="display:block;"
                 />
               </td>
-              <td align="center" style="padding-left:24px;">
+
+              <td align="center" style="padding-left:32px;">
                 <img 
                   src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/intercity.png"
-                  width="90"
-                  style="display:block;"
+                  width="110"
                   alt="Intercity"
+                  style="display:block;"
                 />
               </td>
             </tr>
           </table>
+        </td>
+      </tr>
+    </table>
+
+
+    <!-- ============================================== -->
+    <!-- ACOMPAÑA -->
+    <!-- ============================================== -->
+    <h3 style="text-align:center; font-size:16px; margin-bottom:18px; letter-spacing:1px; opacity:0.9;">
+      ACOMPAÑA
+    </h3>
+
+    <table width="100%" style="margin-bottom:10px;">
+      <tr>
+        <td align="center">
+          <img 
+            src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/lenovo.png"
+            width="140"
+            alt="Lenovo"
+            style="display:block; margin:auto;"
+          />
         </td>
       </tr>
     </table>

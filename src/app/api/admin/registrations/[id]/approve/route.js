@@ -115,7 +115,7 @@ export async function POST(request) {
       <tr>
         <td align="center">
           <img 
-            src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/logo-slogan.png"
+            src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/pixelcut-export.png"
             alt="CyberCloud"
             width="220"
             style="display:block; margin:auto; margin-bottom:10px;"
@@ -136,8 +136,7 @@ export async function POST(request) {
     </p>
 
     <p style="font-size:15px;">
-      Ya podés acceder a tu entrada oficial. Presentá este 
-      <strong>código QR personal</strong> el día del evento:
+      Presentá este <strong>código QR personal</strong> el día del evento:
     </p>
 
     <!-- QR -->
@@ -161,7 +160,7 @@ export async function POST(request) {
     </p>
 
     <p style="font-size:15px;">
-      Llegá temprano para disfrutar de un espacio único de aprendizaje, networking y el exclusivo 
+      Te esperamos para un día lleno de charlas, networking y el exclusivo 
       <strong>Cyber After Cocktail</strong>.
     </p>
 
@@ -170,31 +169,59 @@ export async function POST(request) {
       <strong>Equipo CyberCloud</strong>
     </p>
 
-    <!-- LOGOS INFERIORES -->
-    <table width="100%" style="margin-top:36px;">
+
+    <!-- ============================================== -->
+    <!-- ORGANIZAN -->
+    <!-- ============================================== -->
+    <h3 style="text-align:center; font-size:16px; margin-top:46px; margin-bottom:18px; letter-spacing:1px; opacity:0.9;">
+      ORGANIZAN
+    </h3>
+
+    <table width="100%" style="margin-bottom:38px;">
       <tr>
-        <td align="center" style="opacity:0.85;">
+        <td align="center">
           <table style="margin:auto;">
             <tr>
-              <td align="center" style="padding-right:26px;">
+              <td align="center" style="padding-right:32px;">
                 <img 
                   src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/logo-wayclo-speakers.png"
-                  width="95"
+                  width="110"
                   alt="Wayclo"
                   style="display:block;"
                 />
               </td>
 
-              <td align="center" style="padding-left:26px;">
+              <td align="center" style="padding-left:32px;">
                 <img 
                   src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/intercity.png"
-                  width="95"
+                  width="110"
                   alt="Intercity"
                   style="display:block;"
                 />
               </td>
             </tr>
           </table>
+        </td>
+      </tr>
+    </table>
+
+
+    <!-- ============================================== -->
+    <!-- ACOMPAÑA -->
+    <!-- ============================================== -->
+    <h3 style="text-align:center; font-size:16px; margin-bottom:18px; letter-spacing:1px; opacity:0.9;">
+      ACOMPAÑA
+    </h3>
+
+    <table width="100%" style="margin-bottom:10px;">
+      <tr>
+        <td align="center">
+          <img 
+            src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/lenovo.png"
+            width="140"
+            alt="Lenovo"
+            style="display:block; margin:auto;"
+          />
         </td>
       </tr>
     </table>
