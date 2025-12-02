@@ -16,23 +16,32 @@ export default function RegisterForm({ onSuccess, onClose }) {
     dietas: [],
     dietaOtro: "",
   });
+
   const [touched, setTouched] = useState({});
   const [loading, setLoading] = useState(false);
 
   const [captchaToken, setCaptchaToken] = useState("");
   const [captchaError, setCaptchaError] = useState("");
 
-  // ❗ Nuevo: error del backend
-  const [serverError, setServerError] = useState("");
+  // ❗ NUEVO — Errores del backend por campo
+  const [serverFieldErrors, setServerFieldErrors] = useState({});
 
+  // ============================
+  // RESET CAPTCHA AL ABRIR/CERRAR
+  // ============================
   useEffect(() => {
-    // @ts-ignore
+    if (typeof window !== "undefined" && window.turnstile) {
+      window.turnstile.reset();
+    }
+  }, [onClose, onSuccess]);
+
+  // Turnstile callback
+  useEffect(() => {
     window.onTurnstileVerified = (token) => {
       setCaptchaToken(token || "");
       setCaptchaError("");
     };
     return () => {
-      // @ts-ignore
       delete window.onTurnstileVerified;
     };
   }, []);
@@ -56,7 +65,10 @@ export default function RegisterForm({ onSuccess, onClose }) {
 
   const onlyDigits = (s = "") => (s.match(/\d/g) || []).join("");
 
-  const errors = useMemo(() => {
+  // ============================
+  // ERRORES DE VALIDACIÓN LOCAL
+  // ============================
+  const localErrors = useMemo(() => {
     const e = {};
     if (!/^[A-Za-zÁÉÍÓÚÑáéíóúñ' -]{2,}$/.test(form.name || ""))
       e.name = "Ingresá un nombre válido (2+ letras).";
@@ -79,8 +91,14 @@ export default function RegisterForm({ onSuccess, onClose }) {
     return e;
   }, [form]);
 
-  const hasErrors = Object.keys(errors).length > 0;
+  // ❗ FUSIÓN de errores local + backend
+  const mergedErrors = { ...localErrors, ...serverFieldErrors };
 
+  const hasErrors = Object.keys(mergedErrors).length > 0;
+
+  // ============================
+  // HANDLERS
+  // ============================
   const handleChange = (e) =>
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
 
@@ -113,9 +131,13 @@ export default function RegisterForm({ onSuccess, onClose }) {
     });
   };
 
+  // ============================
+  // SUBMIT
+  // ============================
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setServerError(""); // limpiar si había uno
+
+    setServerFieldErrors({});
     setTouched({
       name: true,
       lastname: true,
@@ -159,32 +181,39 @@ export default function RegisterForm({ onSuccess, onClose }) {
       const out = await res.json();
 
       if (!res.ok) {
-        setServerError(out?.detail || out?.error || "No se pudo registrar.");
+        // El backend debe mandar errores así:
+        //
+        // {
+        //   detail: "Errores en campos",
+        //   field_errors: {
+        //      email: "Ese email ya existe",
+        //      phone: "Ya hay alguien con este teléfono"
+        //   }
+        // }
+
+        setServerFieldErrors(out?.field_errors || {});
         setLoading(false);
-
-        // ❗ Scroll al mensaje de error
-        setTimeout(() => {
-          const el = document.getElementById("server-error-box");
-          el?.scrollIntoView({ behavior: "smooth", block: "center" });
-        }, 150);
-
         return;
       }
 
       setLoading(false);
       onSuccess?.(out);
+
     } catch (err) {
       console.error(err);
-      setServerError("Error inesperado. Intentá de nuevo.");
+      setServerFieldErrors({ general: "Error inesperado. Intentá de nuevo." });
       setLoading(false);
     }
   };
 
+  // ============================
+  // ESTILOS
+  // ============================
   const inputClass = (invalid) =>
     [
       "mt-1 w-full rounded-md border px-3 py-2 min-w-0",
       "bg-white text-slate-900 placeholder:text-slate-400",
-      "focus-visible:ring-2 focus-visible:ring-[var(--brand,#050057)] focus-visible:border-[var(--brand,#050057)]",
+      "focus-visible:ring-2 focus-visible:ring-[#050057] focus-visible:border-[#050057]",
       invalid ? "border-rose-400" : "border-slate-300",
     ].join(" ");
 
@@ -195,11 +224,14 @@ export default function RegisterForm({ onSuccess, onClose }) {
       "inline-flex items-center justify-center",
       "transition select-none",
       active
-        ? "bg-[var(--brand,#050057)] text-white border-[var(--brand,#050057)] shadow-sm"
+        ? "bg-[#050057] text-white border-[#050057] shadow-sm"
         : "bg-white text-slate-800 border-slate-300 hover:bg-slate-50",
       invalid ? "ring-2 ring-rose-400 ring-offset-0" : "",
     ].join(" ");
 
+  // ============================
+  // RENDER
+  // ============================
   return (
     <form
       onSubmit={handleSubmit}
@@ -207,9 +239,7 @@ export default function RegisterForm({ onSuccess, onClose }) {
         relative rounded-xl bg-white text-slate-900 
         shadow-[0_10px_25px_rgba(0,0,0,0.12)] border border-slate-200
         p-4 sm:p-6 
-        w-full max-w-full overflow-hidden
       "
-      style={{ ["--brand"]: "#050057" }}
       noValidate
     >
       <Script
@@ -217,14 +247,19 @@ export default function RegisterForm({ onSuccess, onClose }) {
         strategy="afterInteractive"
       />
 
-      {/* ❗ Bloque de error del servidor */}
-      {serverError && (
-        <div
-          id="server-error-box"
-          className="mb-4 p-3 rounded-md bg-rose-100 border border-rose-300 text-rose-700 text-sm"
-        >
-          <p className="font-semibold">Ocurrió un error al enviar la inscripción:</p>
-          <p>{serverError}</p>
+      {/* ===================================== */}
+      {/* BLOQUE DE ERRORES COMBINADOS */}
+      {/* ===================================== */}
+      {Object.keys(mergedErrors).length > 0 && (
+        <div className="mb-4 p-3 rounded-md bg-rose-100 border border-rose-300 text-rose-700 text-sm">
+          <p className="font-semibold mb-1">Tu inscripción tiene errores:</p>
+          <ul className="list-disc pl-4">
+            {Object.entries(mergedErrors).map(([field, msg]) => (
+              <li key={field}>
+                <strong>{field}:</strong> {msg}
+              </li>
+            ))}
+          </ul>
         </div>
       )}
 
