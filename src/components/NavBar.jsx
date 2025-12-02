@@ -14,7 +14,7 @@ const LINKS = [
   { href: "/speakers", label: "SPEAKERS" },
   { href: "/empresas", label: "EMPRESAS" },
 ];
-
+//
 // 🔥 NUEVO: links exclusivos para /admin/*
 const ADMIN_LINKS = [
   { href: "/admin/registrations", label: "INVITADOS" },
