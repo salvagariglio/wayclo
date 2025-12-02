@@ -23,19 +23,18 @@ export default function RegisterForm({ onSuccess, onClose }) {
   const [captchaToken, setCaptchaToken] = useState("");
   const [captchaError, setCaptchaError] = useState("");
 
-  // ❗ NUEVO — Errores del backend por campo
+  // --- NUEVO: errores del backend ---
   const [serverFieldErrors, setServerFieldErrors] = useState({});
+  const [generalServerError, setGeneralServerError] = useState("");
 
-  // ============================
-  // RESET CAPTCHA AL ABRIR/CERRAR
-  // ============================
+  // --- RESET CAPTCHA CUANDO EL FORM SE ABRE O CIERRA ---
   useEffect(() => {
     if (typeof window !== "undefined" && window.turnstile) {
       window.turnstile.reset();
     }
-  }, [onClose, onSuccess]);
+  }, [onClose]);
 
-  // Turnstile callback
+  // --- CAPTCHA ---
   useEffect(() => {
     window.onTurnstileVerified = (token) => {
       setCaptchaToken(token || "");
@@ -65,15 +64,18 @@ export default function RegisterForm({ onSuccess, onClose }) {
 
   const onlyDigits = (s = "") => (s.match(/\d/g) || []).join("");
 
-  // ============================
-  // ERRORES DE VALIDACIÓN LOCAL
-  // ============================
+  // ---------------------------
+  // VALIDACIÓN LOCAL
+  // ---------------------------
   const localErrors = useMemo(() => {
     const e = {};
+
     if (!/^[A-Za-zÁÉÍÓÚÑáéíóúñ' -]{2,}$/.test(form.name || ""))
       e.name = "Ingresá un nombre válido (2+ letras).";
+
     if (!/^[A-Za-zÁÉÍÓÚÑáéíóúñ' -]{2,}$/.test(form.lastname || ""))
       e.lastname = "Ingresá un apellido válido (2+ letras).";
+
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email || ""))
       e.email = "Ingresá un email válido.";
 
@@ -81,24 +83,34 @@ export default function RegisterForm({ onSuccess, onClose }) {
     if (digits.length < 8 || digits.length > 12)
       e.phoneRest = "Ingresá un teléfono válido (8–12 dígitos).";
 
-    if (!form.empresa?.trim()) e.empresa = "Este campo es obligatorio.";
-    if (!form.puesto?.trim()) e.puesto = "Este campo es obligatorio.";
+    if (!form.empresa.trim())
+      e.empresa = "Este campo es obligatorio.";
 
-    if (!form.dietas.length) e.dietas = "Seleccioná al menos una opción.";
+    if (!form.puesto.trim())
+      e.puesto = "Este campo es obligatorio.";
+
+    if (!form.dietas.length)
+      e.dietas = "Seleccioná al menos una opción.";
+
     if (form.dietas.includes("otro") && !form.dietaOtro.trim())
       e.dietaOtro = "Especificá tu dieta.";
 
     return e;
   }, [form]);
 
-  // ❗ FUSIÓN de errores local + backend
-  const mergedErrors = { ...localErrors, ...serverFieldErrors };
+  // ⚠️ ACÁ FILTRAMOS LOS ERRORES REALES:
+  // solo se muestran LOCAL si impiden enviar
+  // solo se muestran SERVER si vienen del backend
+  const mergedErrors =
+    Object.keys(serverFieldErrors).length > 0
+      ? serverFieldErrors
+      : localErrors;
 
   const hasErrors = Object.keys(mergedErrors).length > 0;
 
-  // ============================
+  // ---------------------------
   // HANDLERS
-  // ============================
+  // ---------------------------
   const handleChange = (e) =>
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
 
@@ -116,9 +128,8 @@ export default function RegisterForm({ onSuccess, onClose }) {
       if (current.has(val)) {
         current.delete(val);
       } else {
-        if (val === "ninguno") {
+        if (val === "ninguno")
           return { ...f, dietas: ["ninguno"], dietaOtro: "" };
-        }
         current.delete("ninguno");
         current.add(val);
       }
@@ -131,13 +142,15 @@ export default function RegisterForm({ onSuccess, onClose }) {
     });
   };
 
-  // ============================
+  // ---------------------------
   // SUBMIT
-  // ============================
+  // ---------------------------
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     setServerFieldErrors({});
+    setGeneralServerError("");
+
     setTouched({
       name: true,
       lastname: true,
@@ -149,13 +162,16 @@ export default function RegisterForm({ onSuccess, onClose }) {
       dietaOtro: true,
     });
 
+    // --- CAPTCHA ---
     if (!captchaToken) {
       setCaptchaError("Por favor resolvé el verificado de seguridad.");
       return;
     }
 
-    if (hasErrors) return;
+    // --- ERRORES LOCALES ---
+    if (Object.keys(localErrors).length > 0) return;
 
+    // --- ENVIAR ---
     setLoading(true);
 
     const payload = {
@@ -181,18 +197,13 @@ export default function RegisterForm({ onSuccess, onClose }) {
       const out = await res.json();
 
       if (!res.ok) {
-        // El backend debe mandar errores así:
-        //
-        // {
-        //   detail: "Errores en campos",
-        //   field_errors: {
-        //      email: "Ese email ya existe",
-        //      phone: "Ya hay alguien con este teléfono"
-        //   }
-        // }
-
-        setServerFieldErrors(out?.field_errors || {});
+        setServerFieldErrors(out.field_errors || {});
+        setGeneralServerError(out.detail || "");
         setLoading(false);
+
+        // reset captcha por seguridad
+        if (window.turnstile) window.turnstile.reset();
+
         return;
       }
 
@@ -200,15 +211,15 @@ export default function RegisterForm({ onSuccess, onClose }) {
       onSuccess?.(out);
 
     } catch (err) {
-      console.error(err);
-      setServerFieldErrors({ general: "Error inesperado. Intentá de nuevo." });
+      setGeneralServerError("Error inesperado. Intentá de nuevo.");
+      if (window.turnstile) window.turnstile.reset();
       setLoading(false);
     }
   };
 
-  // ============================
+  // ---------------------------
   // ESTILOS
-  // ============================
+  // ---------------------------
   const inputClass = (invalid) =>
     [
       "mt-1 w-full rounded-md border px-3 py-2 min-w-0",
@@ -217,29 +228,10 @@ export default function RegisterForm({ onSuccess, onClose }) {
       invalid ? "border-rose-400" : "border-slate-300",
     ].join(" ");
 
-  const pillClass = (active, invalid) =>
-    [
-      "block w-full h-10 min-w-0",
-      "rounded-xl border text-sm text-center",
-      "inline-flex items-center justify-center",
-      "transition select-none",
-      active
-        ? "bg-[#050057] text-white border-[#050057] shadow-sm"
-        : "bg-white text-slate-800 border-slate-300 hover:bg-slate-50",
-      invalid ? "ring-2 ring-rose-400 ring-offset-0" : "",
-    ].join(" ");
-
-  // ============================
-  // RENDER
-  // ============================
   return (
     <form
       onSubmit={handleSubmit}
-      className="
-        relative rounded-xl bg-white text-slate-900 
-        shadow-[0_10px_25px_rgba(0,0,0,0.12)] border border-slate-200
-        p-4 sm:p-6 
-      "
+      className="relative rounded-xl bg-white text-slate-900 shadow-[0_10px_25px_rgba(0,0,0,0.12)] border border-slate-200 p-4 sm:p-6"
       noValidate
     >
       <Script
@@ -247,19 +239,22 @@ export default function RegisterForm({ onSuccess, onClose }) {
         strategy="afterInteractive"
       />
 
-      {/* ===================================== */}
-      {/* BLOQUE DE ERRORES COMBINADOS */}
-      {/* ===================================== */}
-      {Object.keys(mergedErrors).length > 0 && (
+      {/* ---------- BLOQUE DE ERRORES REALES ---------- */}
+      {(hasErrors || generalServerError) && (
         <div className="mb-4 p-3 rounded-md bg-rose-100 border border-rose-300 text-rose-700 text-sm">
-          <p className="font-semibold mb-1">Tu inscripción tiene errores:</p>
-          <ul className="list-disc pl-4">
-            {Object.entries(mergedErrors).map(([field, msg]) => (
-              <li key={field}>
-                <strong>{field}:</strong> {msg}
-              </li>
-            ))}
-          </ul>
+          <p className="font-semibold mb-1">No se pudo completar la inscripción:</p>
+
+          {generalServerError && <p>{generalServerError}</p>}
+
+          {Object.keys(mergedErrors).length > 0 && (
+            <ul className="list-disc pl-4">
+              {Object.entries(mergedErrors).map(([field, msg]) => (
+                <li key={field}>
+                  <strong>{field}:</strong> {msg}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       )}
 
