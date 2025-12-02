@@ -92,7 +92,7 @@ export default function Hero() {
     left-[-3] top-36 w-16
 
     sm:left-0  sm:top-28  sm:w-32
-    md:left-[60px] md:top-40 md:w-40
+    md:left-[20px] md:top-40 md:w-40
     lg:left-[20px] lg:top-44 lg:w-48
     xl:left-[30px] xl:w-48
 
@@ -116,7 +116,7 @@ export default function Hero() {
 
     right-[-1rem] top-[22rem] w-[120px]
 
-    sm:right-[10px] sm:top-72 sm:w-[220px]
+    sm:right-[10px] sm:top-74 sm:w-[220px]
     md:top-96 md:w-[280px]
     lg:right-[40px] lg:top-80 lg:w-[350px]
     xl:right-[-20px] xl:top-72 xl:w-[340px]

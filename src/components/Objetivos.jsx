@@ -16,9 +16,8 @@ export const speakers = [
     },
 ];
 
-
 // ------------------------------------------------------
-// CARD AZUL (NO CAMBIAMOS TU DISEÑO)
+// CARD AZUL — con ajustes mínimos en md (1024px)
 // ------------------------------------------------------
 
 export function SpeakerCard({ speaker, index }) {
@@ -33,14 +32,6 @@ export function SpeakerCard({ speaker, index }) {
 
     const alignmentClass = isOdd ? "ml-auto" : "";
 
-    const imageWrapperClass = isSecond
-        ? "absolute bottom-0 right-0 h-full w-[50%] flex items-end justify-center"
-        : "absolute right-0 h-full w-[60%] flex items-center justify-center";
-
-    const imageClass = isSecond
-        ? "object-contain object-bottom"
-        : "object-contain object-center scale-110";
-
     return (
         <div
             className={`
@@ -48,8 +39,7 @@ export function SpeakerCard({ speaker, index }) {
                 w-full
                 h-[26vh]
                 sm:w-[45vh] sm:h-[24vh]
-                lg:w-[55vh] lg:h-[28vh]
-                xl:w-[65vh] xl:h-[32vh]
+                md:w-[65vh] md:h-[32vh]
                 flex
                 rounded-2xl
                 px-5 sm:px-7 lg:px-8
@@ -60,7 +50,7 @@ export function SpeakerCard({ speaker, index }) {
             `}
         >
             {/* TEXTO */}
-            <div className="absolute bottom-10 left-5 flex flex-col gap-1 z-10">
+            <div className="absolute bottom-10 md:bottom-12 left-5 flex flex-col gap-1 z-10">
                 <p className="text-lg sm:text-xl lg:text-2xl font-semibold leading-tight">
                     {name}
                 </p>
@@ -73,16 +63,26 @@ export function SpeakerCard({ speaker, index }) {
             </div>
 
             {/* IMAGEN */}
-            <div className={imageWrapperClass}>
-                <Image src={img} alt={name} fill className={imageClass} />
+            <div
+                className={
+                    isSecond
+                        ? "absolute bottom-0 right-0 h-full w-[50%] md:w-[45%] flex items-end justify-center" /* ⭐ ajuste md */
+                        : "absolute right-0 h-full w-[60%] md:w-[55%] flex items-center justify-center" /* ⭐ ajuste md */
+                }
+            >
+                <Image
+                    src={img}
+                    alt={name}
+                    fill
+                    className={isSecond ? "object-contain object-bottom" : "object-contain object-center"}
+                />
             </div>
         </div>
     );
 }
 
-
 // ------------------------------------------------------
-// FILA COMPLETA (FIX DE ALINEACIÓN PERFECTA CON LA CARD)
+// FILA COMPLETA
 // ------------------------------------------------------
 
 export function SpeakerInfoRow({ speaker, index }) {
@@ -101,36 +101,35 @@ export function SpeakerInfoRow({ speaker, index }) {
                 <SpeakerCard speaker={speaker} index={index} />
             </div>
 
-            {/* TEXTO — MISMO ANCHO QUE LA CARD SI ES IMPAR */}
+            {/* TEXTO — alineado con la card */}
             <div
                 className={`
-        w-full 
-        md:flex-1 min-w-0 
-        flex flex-col justify-end 
-        ${isOdd ? "items-end" : "items-start"}   /* 🔥 siempre se alinea con la card */
-    `}
+                    w-full 
+                    md:flex-1 min-w-0 
+                    flex flex-col justify-end 
+                    ${isOdd ? "items-end" : "items-start"}
+                `}
             >
-                <div className="bg-white rounded-xl w-full max-w-md pb-4 px-2">
-                    <h3 className="
-    text-base 
-    sm:text-md 
-    md:text-lg 
-    lg:text-xl 
-    text-gray-600 
-    leading-snug 
-    sm:leading-normal 
-    md:leading-relaxed
-">
+                <div className="bg-white rounded-xl w-full md:max-w-lg pb-4 px-2">
+                    <h3
+                        className="
+                            text-base 
+                            sm:text-md 
+                            md:text-lg 
+                            lg:text-xl 
+                            text-gray-600 
+                            leading-snug 
+                            sm:leading-normal 
+                            md:leading-relaxed
+                        "
+                    >
                         {speaker.role}
                     </h3>
-
                 </div>
             </div>
-
         </div>
     );
 }
-
 
 // ------------------------------------------------------
 // LISTA COMPLETA

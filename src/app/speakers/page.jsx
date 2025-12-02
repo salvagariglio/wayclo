@@ -3,7 +3,7 @@ import Sponsor from "@/components/Sponsor";
 
 export default function AgendaPage() {
     return (
-        <main className="px-4 py-16 text-black">
+        <main className="px-6 py-16 text-black">
             <section id="speaker" className="scroll-mt-24 max-w-7xl mx-auto">
                 <Speakers />
             </section>

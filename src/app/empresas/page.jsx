@@ -106,7 +106,7 @@ export default function EmpresasPage() {
   ];
 
   return (
-    <main>
+    <main className="px-2">
       <CompaniesSection data={companies} />
       <div >
         <Sponsor />
