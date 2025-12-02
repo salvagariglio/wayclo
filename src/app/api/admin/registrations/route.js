@@ -178,37 +178,75 @@ export async function POST(req) {
         to: email.trim(),
         subject: "¡Un paso más cerca del CyberCloud!",
         html: `
-          <div style="width:100%;padding:40px 0;background:linear-gradient(180deg,#021728 0%,#00263F 100%);font-family:Arial,sans-serif;color:#fff;">
-            <div style="max-width:520px;margin:auto;background:rgba(255,255,255,0.07);padding:32px 36px;border-radius:14px;">
-              
-              <div style="text-align:center;margin-bottom:24px;">
-                <img src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/logo-slogan.png" 
-                     width="150" 
-                     alt="CyberCloud" 
-                     style="margin-bottom:10px;" />
-              </div>
+<!-- Contenedor general -->
+<div style="width:100%; padding:40px 0; background:linear-gradient(180deg,#021728 0%,#00263F 100%); font-family:Arial,sans-serif; color:#fff;">
 
-              <h2 style="text-align:center;font-size:22px;margin-bottom:26px;">
-                ¡Un paso más cerca del CyberCloud!
-              </h2>
+  <!-- Card -->
+  <div style="max-width:560px; margin:auto; background:rgba(255,255,255,0.08); padding:40px 36px; border-radius:16px;">
 
-              <p>Hola <strong>${first_name}</strong>,</p>
-              <p>¡Gracias por registrarte en <strong>CyberCloud</strong>! 🙌</p>
-              <p>Tu inscripción fue recibida y estamos procesándola.</p>
+    <!-- LOGO PRINCIPAL -->
+    <table width="100%" style="margin-bottom:32px;">
+      <tr>
+        <td align="center">
+          <img 
+            src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/logo.svg"
+            alt="CyberCloud"
+            width="200"
+            style="display:block; margin:auto; margin-bottom:10px;"
+          />
+        </td>
+      </tr>
+    </table>
 
-              <p style="margin-top:28px;">Nos vemos pronto,</p>
-              <p><strong>Equipo CyberCloud</strong></p>
+    <!-- TÍTULO -->
+    <h2 style="text-align:center; font-size:24px; margin-bottom:26px; font-weight:600;">
+      ¡Un paso más cerca del CyberCloud!
+    </h2>
 
-              <div style="text-align:center;margin-top:32px;opacity:0.7;">
-                <img src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/logo-wayclo-speakers.png" 
-                     width="80" style="margin-right:18px;" />
-                <img src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/intercity.png" 
-                     width="80" />
-              </div>
+    <!-- TEXTO -->
+    <p>Hola <strong>${first_name}</strong>,</p>
+    <p>¡Gracias por registrarte en <strong>CyberCloud</strong>! 🙌</p>
 
-            </div>
-          </div>
-        `,
+    <p>
+      Tu inscripción fue recibida correctamente y nuestro equipo ya está revisando tu participación.
+      En breve recibirás la confirmación definitiva en este mismo correo.
+    </p>
+
+    <p style="margin-top:28px;">Nos vemos pronto,</p>
+    <p><strong>Equipo CyberCloud</strong></p>
+
+    <!-- LOGOS INFERIORES -->
+    <table width="100%" style="margin-top:36px;">
+      <tr>
+        <td align="center" style="opacity:0.85;">
+          <table style="margin:auto;">
+            <tr>
+              <td align="center" style="padding-right:24px;">
+                <img 
+                  src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/logo-wayclo-speakers.png"
+                  width="90"
+                  style="display:block;"
+                  alt="Wayclo"
+                />
+              </td>
+              <td align="center" style="padding-left:24px;">
+                <img 
+                  src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/intercity.png"
+                  width="90"
+                  style="display:block;"
+                  alt="Intercity"
+                />
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+
+  </div>
+</div>
+`,
+
       });
     } catch (mailErr) {
       console.error("❌ Error enviando mail:", mailErr);

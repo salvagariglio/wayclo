@@ -104,50 +104,105 @@ export async function POST(request) {
         to: reg.email,
         subject: "Confirmado: Nos vemos en CyberCloud ⚡",
         html: `
-<div style="width:100%;padding:40px 0;background:linear-gradient(180deg,#021728 0%,#00263F 100%);font-family:Arial,sans-serif;color:#fff;">
-  <div style="max-width:520px;margin:auto;background:rgba(255,255,255,0.07);padding:32px 36px;border-radius:14px;">
-    
-    <div style="text-align:center;margin-bottom:24px;">
-      <img src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/logo-slogan.png" 
-            width="150" 
-            alt="CyberCloud" />
-    </div>
+<!-- Contenedor general -->
+<div style="width:100%; padding:40px 0; background:linear-gradient(180deg,#021728 0%,#00263F 100%); font-family:Arial,sans-serif; color:#fff;">
 
-    <h2 style="text-align:center;font-size:22px;margin-bottom:26px;">
+  <!-- Card -->
+  <div style="max-width:560px; margin:auto; background:rgba(255,255,255,0.08); padding:40px 36px; border-radius:16px;">
+
+    <!-- LOGO PRINCIPAL -->
+    <table width="100%" style="margin-bottom:32px;">
+      <tr>
+        <td align="center">
+          <img 
+            src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/logo-slogan.png"
+            alt="CyberCloud"
+            width="220"
+            style="display:block; margin:auto; margin-bottom:10px;"
+          />
+        </td>
+      </tr>
+    </table>
+
+    <!-- TÍTULO -->
+    <h2 style="text-align:center; font-size:24px; margin-bottom:26px; font-weight:600;">
       Confirmado: Nos vemos en CyberCloud ⚡
     </h2>
 
-    <p>¡Buenas noticias, <strong>${fullName}</strong>! 🎉</p>
-    <p>Tu inscripción a <strong>CyberCloud</strong> fue aprobada.</p>
-
-    <p>Ya podés acceder a tu entrada y presentarla el día del evento. 
-    Abajo tenés tu <strong>código QR personal</strong>:</p>
-
-    <div style="text-align:center;margin:28px 0;">
-      <img src="${qrUrl}" width="180" style="border-radius:10px;" alt="QR CyberCloud" />
-    </div>
-
-    <p>
-      📅 <strong>Fecha:</strong> 15 de diciembre<br>
-      📍 <strong>Lugar:</strong> Polo Científico Tecnológico – Río Cuarto
+    <!-- TEXTO -->
+    <p style="font-size:15px;">
+      ¡Buenas noticias, <strong>${fullName}</strong>! 🎉<br/>
+      Tu inscripción a <strong>CyberCloud</strong> fue aprobada.
     </p>
 
-    <p>Te esperamos desde temprano para disfrutar de charlas, networking y el exclusivo 
-    <strong>Cyber After Cocktail</strong>.</p>
+    <p style="font-size:15px;">
+      Ya podés acceder a tu entrada oficial. Presentá este 
+      <strong>código QR personal</strong> el día del evento:
+    </p>
 
-    <p style="margin-top:28px;">¡Nos vemos ahí!</p>
-    <p><strong>Equipo CyberCloud</strong></p>
+    <!-- QR -->
+    <table width="100%" style="margin:28px 0;">
+      <tr>
+        <td align="center">
+          <img 
+            src="${qrUrl}" 
+            width="220" 
+            style="display:block; border-radius:12px;" 
+            alt="QR CyberCloud"
+          />
+        </td>
+      </tr>
+    </table>
 
-    <div style="text-align:center;margin-top:32px;opacity:0.7;">
-      <img src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/logo-wayclo-speakers.png" 
-            width="80" style="margin-right:18px;" />
-      <img src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/intercity.png" 
-            width="80" />
-    </div>
+    <!-- INFO -->
+    <p style="font-size:15px; line-height:1.6;">
+      📅 <strong>Fecha:</strong> 15 de diciembre<br/>
+      📍 <strong>Lugar:</strong> Polo Científico Tecnológico — Río Cuarto
+    </p>
+
+    <p style="font-size:15px;">
+      Llegá temprano para disfrutar de un espacio único de aprendizaje, networking y el exclusivo 
+      <strong>Cyber After Cocktail</strong>.
+    </p>
+
+    <p style="margin-top:28px; font-size:15px;">
+      ¡Nos vemos ahí!<br/>
+      <strong>Equipo CyberCloud</strong>
+    </p>
+
+    <!-- LOGOS INFERIORES -->
+    <table width="100%" style="margin-top:36px;">
+      <tr>
+        <td align="center" style="opacity:0.85;">
+          <table style="margin:auto;">
+            <tr>
+              <td align="center" style="padding-right:26px;">
+                <img 
+                  src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/logo-wayclo-speakers.png"
+                  width="95"
+                  alt="Wayclo"
+                  style="display:block;"
+                />
+              </td>
+
+              <td align="center" style="padding-left:26px;">
+                <img 
+                  src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/intercity.png"
+                  width="95"
+                  alt="Intercity"
+                  style="display:block;"
+                />
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
 
   </div>
 </div>
 `,
+
       });
 
     } catch (mailErr) {
