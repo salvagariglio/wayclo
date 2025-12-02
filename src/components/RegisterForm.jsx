@@ -23,18 +23,21 @@ export default function RegisterForm({ onSuccess, onClose }) {
   const [captchaToken, setCaptchaToken] = useState("");
   const [captchaError, setCaptchaError] = useState("");
 
-  // --- NUEVO: errores del backend ---
+  // errores del backend
   const [serverFieldErrors, setServerFieldErrors] = useState({});
   const [generalServerError, setGeneralServerError] = useState("");
 
-  // --- RESET CAPTCHA CUANDO EL FORM SE ABRE O CIERRA ---
+  // NUEVO → solo mostrar errores después de que el usuario intenta enviar
+  const [submitted, setSubmitted] = useState(false);
+
+  // reset captcha
   useEffect(() => {
     if (typeof window !== "undefined" && window.turnstile) {
       window.turnstile.reset();
     }
   }, [onClose]);
 
-  // --- CAPTCHA ---
+  // captcha callback
   useEffect(() => {
     window.onTurnstileVerified = (token) => {
       setCaptchaToken(token || "");
@@ -64,9 +67,7 @@ export default function RegisterForm({ onSuccess, onClose }) {
 
   const onlyDigits = (s = "") => (s.match(/\d/g) || []).join("");
 
-  // ---------------------------
   // VALIDACIÓN LOCAL
-  // ---------------------------
   const localErrors = useMemo(() => {
     const e = {};
 
@@ -98,9 +99,8 @@ export default function RegisterForm({ onSuccess, onClose }) {
     return e;
   }, [form]);
 
-  // ⚠️ ACÁ FILTRAMOS LOS ERRORES REALES:
-  // solo se muestran LOCAL si impiden enviar
-  // solo se muestran SERVER si vienen del backend
+  // Solo se muestran errores del server si el server mandó algo.  
+  // Sino local.
   const mergedErrors =
     Object.keys(serverFieldErrors).length > 0
       ? serverFieldErrors
@@ -130,6 +130,7 @@ export default function RegisterForm({ onSuccess, onClose }) {
       } else {
         if (val === "ninguno")
           return { ...f, dietas: ["ninguno"], dietaOtro: "" };
+
         current.delete("ninguno");
         current.add(val);
       }
@@ -148,6 +149,7 @@ export default function RegisterForm({ onSuccess, onClose }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    setSubmitted(true); // NUEVO → ahora sí se pueden mostrar errores
     setServerFieldErrors({});
     setGeneralServerError("");
 
@@ -162,16 +164,16 @@ export default function RegisterForm({ onSuccess, onClose }) {
       dietaOtro: true,
     });
 
-    // --- CAPTCHA ---
+    // captcha vacío
     if (!captchaToken) {
       setCaptchaError("Por favor resolvé el verificado de seguridad.");
       return;
     }
 
-    // --- ERRORES LOCALES ---
+    // errores locales → no enviar
     if (Object.keys(localErrors).length > 0) return;
 
-    // --- ENVIAR ---
+    // enviar
     setLoading(true);
 
     const payload = {
@@ -198,10 +200,9 @@ export default function RegisterForm({ onSuccess, onClose }) {
 
       if (!res.ok) {
         setServerFieldErrors(out.field_errors || {});
-        setGeneralServerError(out.detail || "");
+        setGeneralServerError(out.detail || "Error al enviar la inscripción.");
         setLoading(false);
 
-        // reset captcha por seguridad
         if (window.turnstile) window.turnstile.reset();
 
         return;
@@ -228,6 +229,21 @@ export default function RegisterForm({ onSuccess, onClose }) {
       invalid ? "border-rose-400" : "border-slate-300",
     ].join(" ");
 
+  const pillClass = (active, invalid) =>
+    [
+      "block w-full h-10 min-w-0",
+      "rounded-xl border text-sm text-center",
+      "inline-flex items-center justify-center",
+      "transition select-none",
+      active
+        ? "bg-[#050057] text-white border-[#050057] shadow-sm"
+        : "bg-white text-slate-800 border-slate-300 hover:bg-slate-50",
+      invalid ? "ring-2 ring-rose-400 ring-offset-0" : "",
+    ].join(" ");
+
+  // ---------------------------
+  // RENDER
+  // ---------------------------
   return (
     <form
       onSubmit={handleSubmit}
@@ -239,10 +255,12 @@ export default function RegisterForm({ onSuccess, onClose }) {
         strategy="afterInteractive"
       />
 
-      {/* ---------- BLOQUE DE ERRORES REALES ---------- */}
-      {(hasErrors || generalServerError) && (
+      {/* ---------- SOLO MOSTRAR ERRORES DESPUÉS DE ENVIAR ---------- */}
+      {submitted && (hasErrors || generalServerError) && (
         <div className="mb-4 p-3 rounded-md bg-rose-100 border border-rose-300 text-rose-700 text-sm">
-          <p className="font-semibold mb-1">No se pudo completar la inscripción:</p>
+          <p className="font-semibold mb-1">
+            No se pudo completar la inscripción:
+          </p>
 
           {generalServerError && <p>{generalServerError}</p>}
 
@@ -258,6 +276,7 @@ export default function RegisterForm({ onSuccess, onClose }) {
         </div>
       )}
 
+      {/* --- Título --- */}
       <h3 className="mb-1 text-slate-900 font-semibold leading-tight">
         Inscripción al evento
       </h3>
@@ -265,6 +284,7 @@ export default function RegisterForm({ onSuccess, onClose }) {
         Todos los campos son obligatorios
       </p>
 
+      {/* --- FORM --- */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 min-w-0">
 
         {/* Nombre */}
@@ -272,16 +292,13 @@ export default function RegisterForm({ onSuccess, onClose }) {
           <label className="text-sm">Nombre*</label>
           <input
             name="name"
-            required
-            minLength={2}
-            pattern="^[A-Za-zÁÉÍÓÚÑáéíóúñ' -]{2,}$"
             value={form.name}
             onChange={handleChange}
             onBlur={handleBlur}
-            className={inputClass(touched.name && !!errors.name)}
+            className={inputClass(touched.name && !!mergedErrors.name)}
           />
-          {touched.name && errors.name && (
-            <p className="mt-1 text-xs text-rose-500">{errors.name}</p>
+          {touched.name && mergedErrors.name && (
+            <p className="mt-1 text-xs text-rose-500">{mergedErrors.name}</p>
           )}
         </div>
 
@@ -290,16 +307,13 @@ export default function RegisterForm({ onSuccess, onClose }) {
           <label className="text-sm">Apellido*</label>
           <input
             name="lastname"
-            required
-            minLength={2}
-            pattern="^[A-Za-zÁÉÍÓÚÑáéíóúñ' -]{2,}$"
             value={form.lastname}
             onChange={handleChange}
             onBlur={handleBlur}
-            className={inputClass(touched.lastname && !!errors.lastname)}
+            className={inputClass(touched.lastname && !!mergedErrors.lastname)}
           />
-          {touched.lastname && errors.lastname && (
-            <p className="mt-1 text-xs text-rose-500">{errors.lastname}</p>
+          {touched.lastname && mergedErrors.lastname && (
+            <p className="mt-1 text-xs text-rose-500">{mergedErrors.lastname}</p>
           )}
         </div>
 
@@ -309,14 +323,13 @@ export default function RegisterForm({ onSuccess, onClose }) {
           <input
             name="email"
             type="email"
-            required
             value={form.email}
             onChange={handleChange}
             onBlur={handleBlur}
-            className={inputClass(touched.email && !!errors.email)}
+            className={inputClass(touched.email && !!mergedErrors.email)}
           />
-          {touched.email && errors.email && (
-            <p className="mt-1 text-xs text-rose-500">{errors.email}</p>
+          {touched.email && mergedErrors.email && (
+            <p className="mt-1 text-xs text-rose-500">{mergedErrors.email}</p>
           )}
         </div>
 
@@ -324,28 +337,28 @@ export default function RegisterForm({ onSuccess, onClose }) {
         <div className="min-w-0">
           <label className="text-sm">Teléfono*</label>
 
-          <div className="flex gap-2 max-[360px]:flex-col max-[360px]:gap-1 w-full min-w-0">
+          <div className="flex gap-2 max-[360px]:flex-col max-[360px]:gap-1 w-full">
             <input
               value={PHONE_PREFIX}
               readOnly
-              className="
-                mt-1 w-24 rounded-md border px-3 py-2 
-                bg-slate-100 text-slate-500 border-slate-300
-              "
+              className="mt-1 w-24 rounded-md border px-3 py-2 bg-slate-100 text-slate-500 border-slate-300"
             />
             <input
               name="phoneRest"
-              required
               value={form.phoneRest}
               onChange={handlePhoneChange}
               onBlur={handleBlur}
               placeholder="(351) 123-4567"
-              className={inputClass(touched.phoneRest && !!errors.phoneRest)}
+              className={inputClass(
+                touched.phoneRest && !!mergedErrors.phoneRest
+              )}
             />
           </div>
 
-          {touched.phoneRest && errors.phoneRest && (
-            <p className="mt-1 text-xs text-rose-500">{errors.phoneRest}</p>
+          {touched.phoneRest && mergedErrors.phoneRest && (
+            <p className="mt-1 text-xs text-rose-500">
+              {mergedErrors.phoneRest}
+            </p>
           )}
         </div>
 
@@ -354,14 +367,13 @@ export default function RegisterForm({ onSuccess, onClose }) {
           <label className="text-sm">Empresa*</label>
           <input
             name="empresa"
-            required
             value={form.empresa}
             onChange={handleChange}
             onBlur={handleBlur}
-            className={inputClass(touched.empresa && !!errors.empresa)}
+            className={inputClass(touched.empresa && !!mergedErrors.empresa)}
           />
-          {touched.empresa && errors.empresa && (
-            <p className="mt-1 text-xs text-rose-500">{errors.empresa}</p>
+          {touched.empresa && mergedErrors.empresa && (
+            <p className="mt-1 text-xs text-rose-500">{mergedErrors.empresa}</p>
           )}
         </div>
 
@@ -370,14 +382,13 @@ export default function RegisterForm({ onSuccess, onClose }) {
           <label className="text-sm">Puesto*</label>
           <input
             name="puesto"
-            required
             value={form.puesto}
             onChange={handleChange}
             onBlur={handleBlur}
-            className={inputClass(touched.puesto && !!errors.puesto)}
+            className={inputClass(touched.puesto && !!mergedErrors.puesto)}
           />
-          {touched.puesto && errors.puesto && (
-            <p className="mt-1 text-xs text-rose-500">{errors.puesto}</p>
+          {touched.puesto && mergedErrors.puesto && (
+            <p className="mt-1 text-xs text-rose-500">{mergedErrors.puesto}</p>
           )}
         </div>
 
@@ -385,14 +396,13 @@ export default function RegisterForm({ onSuccess, onClose }) {
         <div className="sm:col-span-2 min-w-0">
           <label className="text-sm">Preferencias de dieta*</label>
 
-          <div className="mt-1 grid grid-cols-2 sm:grid-cols-3 gap-2 min-w-0">
+          <div className="mt-1 grid grid-cols-2 sm:grid-cols-3 gap-2">
             {DIET_OPTIONS.map((opt) => {
               const active = form.dietas.includes(opt.value);
               return (
-                <label key={opt.value} className="cursor-pointer w-full min-w-0">
+                <label key={opt.value} className="cursor-pointer w-full">
                   <input
                     type="checkbox"
-                    name="dietas"
                     value={opt.value}
                     checked={active}
                     onChange={() => toggleDiet(opt.value)}
@@ -404,7 +414,7 @@ export default function RegisterForm({ onSuccess, onClose }) {
                   <span
                     className={pillClass(
                       active,
-                      touched.dietas && !!errors.dietas
+                      touched.dietas && !!mergedErrors.dietas
                     )}
                   >
                     {opt.label}
@@ -414,23 +424,25 @@ export default function RegisterForm({ onSuccess, onClose }) {
             })}
           </div>
 
-          {touched.dietas && errors.dietas && (
-            <p className="mt-1 text-xs text-rose-500">{errors.dietas}</p>
+          {touched.dietas && mergedErrors.dietas && (
+            <p className="mt-1 text-xs text-rose-500">{mergedErrors.dietas}</p>
           )}
 
           {form.dietas.includes("otro") && (
-            <div className="mt-2 min-w-0">
+            <div className="mt-2">
               <input
                 name="dietaOtro"
                 placeholder="Especificá tu dieta"
                 value={form.dietaOtro}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                className={inputClass(touched.dietaOtro && !!errors.dietaOtro)}
+                className={inputClass(
+                  touched.dietaOtro && !!mergedErrors.dietaOtro
+                )}
               />
-              {touched.dietaOtro && errors.dietaOtro && (
+              {touched.dietaOtro && mergedErrors.dietaOtro && (
                 <p className="mt-1 text-xs text-rose-500">
-                  {errors.dietaOtro}
+                  {mergedErrors.dietaOtro}
                 </p>
               )}
             </div>
@@ -439,7 +451,7 @@ export default function RegisterForm({ onSuccess, onClose }) {
       </div>
 
       {/* CAPTCHA */}
-      <div className="mt-4 min-w-0">
+      <div className="mt-4">
         <div
           className="cf-turnstile"
           data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
@@ -452,14 +464,14 @@ export default function RegisterForm({ onSuccess, onClose }) {
       </div>
 
       {/* Botones */}
-      <div className="mt-6 flex flex-col sm:flex-row gap-3 min-w-0">
+      <div className="mt-6 flex flex-col sm:flex-row gap-3">
         <button
           type="submit"
           disabled={loading}
           className="
             flex-1 py-3 rounded-md bg-[var(--brand,#050057)] 
             text-white font-semibold hover:opacity-90 
-            disabled:opacity-60 transition min-w-0
+            disabled:opacity-60 transition
           "
         >
           {loading ? "Enviando..." : "Enviar registro"}
@@ -470,7 +482,7 @@ export default function RegisterForm({ onSuccess, onClose }) {
           onClick={onClose}
           className="
             py-3 px-4 rounded-md border border-slate-300 
-            text-slate-700 hover:bg-slate-50 transition min-w-0
+            text-slate-700 hover:bg-slate-50 transition
           "
         >
           Cancelar
