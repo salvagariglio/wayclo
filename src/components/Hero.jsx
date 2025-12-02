@@ -76,31 +76,32 @@ export default function Hero() {
 
       {/* ======= IMÁGENES DECORATIVAS ======= */}
       {/* Escudo con check (izquierda) */}
+      {/* Escudo con check (izquierda) */}
       <Image
         src={ShieldCheck}
         alt="Escudo con check"
         priority
         className="
-          /* ✅ visible en mobile */
-          block
-          absolute
+    block
+    absolute
 
-          /* ✅ posición y tamaño base (mobile first) */
-          left-[-3] top-36 w-16
+    /* 🔥 ocultar en pantallas menores a 410px */
+    max-[410px]:hidden
 
-          /* ✅ overrides por breakpoint */
-          sm:left-0  sm:top-28  sm:w-32
-          md:left-[60px] md:top-40 md:w-40
-          lg:left-[20px] lg:top-44 lg:w-48
-          xl:left-[30px] xl:w-48
+    /* Mobile base */
+    left-[-3] top-36 w-16
 
-          drop-shadow-[0_8px_24px_rgba(0,0,0,0.20)]
-          select-none pointer-events-none
-          z-[1]
-        "
+    sm:left-0  sm:top-28  sm:w-32
+    md:left-[60px] md:top-40 md:w-40
+    lg:left-[20px] lg:top-44 lg:w-48
+    xl:left-[30px] xl:w-48
+
+    drop-shadow-[0_8px_24px_rgba(0,0,0,0.20)]
+    select-none pointer-events-none
+    z-[1]
+  "
       />
 
-      {/* Laptop con escudo (derecha) */}
       {/* Laptop con escudo (derecha) */}
       <Image
         src={LaptopShield}
@@ -110,7 +111,9 @@ export default function Hero() {
     block
     absolute
 
-    /* 📌 Mobile: ahora sí queda a la derecha */
+    /* 🔥 ocultar en pantallas menores a 350px */
+    max-[410px]:hidden
+
     right-[-1rem] top-[22rem] w-[120px]
 
     sm:right-[10px] sm:top-72 sm:w-[220px]
@@ -123,6 +126,7 @@ export default function Hero() {
     z-[1]
   "
       />
+
 
 
       {/* NOTA:

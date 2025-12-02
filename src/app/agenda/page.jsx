@@ -17,7 +17,7 @@ export default function AgendaPage() {
 
   return (
     <>
-      <main className="mx-auto max-w-5xl px-6 py-16 text-black relative">
+      <main className="mx-auto max-w-5xl px-4 py-10 text-black relative">
         <section id="agenda" className="scroll-mt-24" ref={agendaRef}>
           <div className={`reveal ${agendaShow ? "show" : ""}`}>
             {/* Le pasamos el callback al componente Agenda */}

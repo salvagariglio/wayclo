@@ -20,7 +20,7 @@ export default function HomePage() {
   const [nubeRef, nubeShow] = useScrollReveal();
 
   return (
-    <main className="min-h-screen bg-white text-black">
+    <main className="px-4 bg-white text-black">
       <NavBar
         items={[
           { href: "#speakers", label: "Speakers" },
