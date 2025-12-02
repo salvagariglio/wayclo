@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import LogoSlogan from "../../public/logo.png";
+import LogoAdmin from "../../public/logo2.png";
 
 const LINKS = [
   { href: "/", label: "EVENTO" },
@@ -64,18 +65,17 @@ export default function NavBar() {
         {/* LOGO */}
         <Link href="/" className="flex items-center gap-3">
           <Image
-            src={LogoSlogan}
-            width={300}
+            src={isAdmin ? LogoAdmin : LogoSlogan}   // 👈 Cambia el logo según ruta
+            width={300}              // 👈 Opcional: distinto tamaño
             height={180}
             alt="CyberCloud"
             priority
             className={[
               "object-contain transition-all",
-              isAdmin
-                ? "drop-shadow-[0_0_1px_white]"
-                : ""
+              isAdmin ? "drop-shadow-[0_0_1px_white]" : ""
             ].join(" ")}
           />
+
 
         </Link>
 

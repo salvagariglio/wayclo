@@ -18,14 +18,26 @@ export default function Scanner() {
                 const reader = new BrowserMultiFormatReader();
                 readerRef.current = reader;
 
+                // ⭐ Esperar a que el <video> exista
+                await new Promise(resolve => {
+                    const check = () => {
+                        if (videoRef.current) resolve();
+                        else requestAnimationFrame(check);
+                    };
+                    check();
+                });
+
+                // ⭐ Pedir cámara
                 stream = await navigator.mediaDevices.getUserMedia({
                     video: { facingMode: "environment" },
                 });
 
                 const video = videoRef.current;
+                if (!video) return; // <- evita crash si se desmontó
+
                 video.srcObject = stream;
 
-                await new Promise(res => video.onloadedmetadata = res);
+                await new Promise(res => (video.onloadedmetadata = res));
                 await video.play();
 
                 iniciarLoop(reader);
@@ -49,8 +61,6 @@ export default function Scanner() {
             undefined,
             videoRef.current,
             async (result, err) => {
-
-                // 👉 ignoramos errores normales del escáner
                 if (!result) return;
 
                 try {
@@ -59,9 +69,7 @@ export default function Scanner() {
                     const id = url.searchParams.get("id");
                     const token = url.searchParams.get("token");
 
-                    if (!id || !token) {
-                        return; // no mostrar error aquí
-                    }
+                    if (!id || !token) return;
 
                     const resp = await fetch("/api/admin/validations/check", {
                         method: "POST",
@@ -71,18 +79,15 @@ export default function Scanner() {
 
                     const json = await resp.json();
 
-                    if (!json.ok) {
-                        setError(json.error);
-                    } else {
+                    if (!json.ok) setError(json.error);
+                    else {
                         setGuest(json.guest);
                         setError(null);
                     }
 
-                    reader.reset(); // detener escaneo
+                    reader.reset();
 
-                } catch {
-                    // ignorar errores normales
-                }
+                } catch { }
             }
         );
     };
@@ -96,24 +101,18 @@ export default function Scanner() {
 
         const json = await resp.json();
 
-        if (json.ok) {
-            setGuest({ ...guest, checkin: true });
-        } else {
-            setError(json.error);
-        }
+        if (json.ok) setGuest({ ...guest, checkin: true });
+        else setError(json.error);
     };
 
     const continuarEscaneando = () => {
         setGuest(null);
         setError(null);
-
         iniciarLoop(readerRef.current);
     };
 
     return (
         <div className="relative flex flex-col items-center">
-
-            {/* VIDEO */}
             <video
                 ref={videoRef}
                 className="w-full max-w-sm rounded-md bg-black"
@@ -122,19 +121,12 @@ export default function Scanner() {
                 muted
             />
 
-            {/* ERROR (solo backend) */}
             {error && !guest && (
                 <p className="text-red-400 mt-4 text-center">{error}</p>
             )}
 
-            {/* MODAL CENTRADO */}
             {guest && (
-                <div className="
-                    fixed inset-0 
-                    bg-black/60 backdrop-blur-sm 
-                    flex items-center justify-center 
-                    z-50
-                ">
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
                     <div className="bg-white text-black p-6 rounded-xl w-full max-w-sm shadow-xl">
                         <h3 className="text-xl font-bold">{guest.fullName}</h3>
                         <p className="opacity-70">{guest.company}</p>

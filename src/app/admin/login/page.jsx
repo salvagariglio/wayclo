@@ -25,7 +25,7 @@ export default function AdminLogin() {
   };
 
   return (
-    <main className="h-[75vh] flex items-center justify-center bg-[#021728] p-6">
+    <main className="h-[85vh] flex items-center justify-center bg-[#021728] p-6">
       <form
         onSubmit={login}
         className="bg-white shadow-xl border border-slate-200 rounded-2xl p-8 w-full max-w-sm flex flex-col items-center"
