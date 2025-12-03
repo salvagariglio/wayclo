@@ -2,7 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { RotateCcw, LockKeyhole, Download, Edit, Volume2, ChevronDown, ChevronUp } from "lucide-react";
+import {
+    RotateCcw,
+    LockKeyhole,
+    Download,
+    Edit,
+    Volume2,
+    ChevronDown,
+    ChevronUp,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 /* ──────────────────────────────
@@ -13,7 +21,6 @@ function Modal({ open, onClose, title, children, onSave }) {
 
     return (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-
             {/* Overlay */}
             <div
                 className="absolute inset-0 bg-black/80 backdrop-blur-sm"
@@ -23,29 +30,31 @@ function Modal({ open, onClose, title, children, onSave }) {
             {/* Contenido */}
             <div
                 className="
-                    relative bg-[#0a1a2a]/95 text-white 
-                    border border-white/10 rounded-2xl 
-                    w-full max-w-3xl p-6 shadow-2xl 
-                    max-h-[90vh] overflow-y-auto
-                    animate-[scaleIn_.25s_ease-out]
-                "
+          relative bg-[#0a1a2a]/95 text-white 
+          border border-white/10 rounded-2xl 
+          w-full max-w-3xl p-6 shadow-2xl 
+          max-h-[90vh] overflow-y-auto
+          animate-[scaleIn_.25s_ease-out]
+        "
             >
                 <h2 className="text-2xl font-bold text-cyan-300 mb-4">{title}</h2>
 
                 <div className="space-y-4">{children}</div>
 
                 {/* Footer */}
-                <div className="
-                    flex justify-end gap-3 mt-6 
-                    border-t border-white/10 pt-4
-                    sticky bottom-0 bg-[#0a1a2a]/95
-                ">
+                <div
+                    className="
+            flex justify-end gap-3 mt-6 
+            border-t border-white/10 pt-4
+            sticky bottom-0 bg-[#0a1a2a]/95
+          "
+                >
                     <button
                         onClick={onClose}
                         className="
-                            px-5 py-2 rounded-lg bg-white/10 
-                            border border-white/20 hover:bg-white/20 transition
-                        "
+              px-5 py-2 rounded-lg bg-white/10 
+              border border-white/20 hover:bg-white/20 transition
+            "
                     >
                         Cancelar
                     </button>
@@ -53,9 +62,9 @@ function Modal({ open, onClose, title, children, onSave }) {
                     <button
                         onClick={onSave}
                         className="
-                            px-5 py-2 rounded-lg bg-cyan-400 text-black font-bold 
-                            hover:bg-cyan-300 transition
-                        "
+              px-5 py-2 rounded-lg bg-cyan-400 text-black font-bold 
+              hover:bg-cyan-300 transition
+            "
                     >
                         Guardar cambios
                     </button>
@@ -87,13 +96,13 @@ export default function AdminPanelsPage() {
 
     useEffect(() => {
         if (auth === "unauth") router.push("/admin/login");
-    }, [auth]);
+    }, [auth, router]);
 
     /* ──────────────────────────────
        🔄 Cargar paneles
     ─────────────────────────────── */
     async function fetchPanels() {
-        const res = await fetch("/api/panels/list", { cache: "no-store" });
+        const res = await fetch("/api/admin/ia/panels/list", { cache: "no-store" });
         const data = await res.json();
         if (data.success) setPanels(data.panels);
     }
@@ -114,7 +123,7 @@ export default function AdminPanelsPage() {
         fd.append("audio", file);
         fd.append("panelName", panelName);
 
-        const res = await fetch("/api/panels/process", {
+        const res = await fetch("/api/admin/ia/panels/process", {
             method: "POST",
             body: fd,
         });
@@ -135,72 +144,69 @@ export default function AdminPanelsPage() {
     ─────────────────────────────── */
     if (auth === "checking") {
         return (
-            <main className="min-h-screen flex items-center justify-center bg-[#021728] text-white/80">
-                <RotateCcw className="animate-spin" size={20} />
+            <div className="min-h-[40vh] flex items-center justify-center text-white/80">
+                <RotateCcw className="animate-spin mr-2" size={20} />
                 Verificando...
-            </main>
+            </div>
         );
     }
 
     return (
-        <main className="min-h-screen bg-[#021728] text-white px-4 py-10 md:px-10">
-            <div className="max-w-6xl mx-auto">
-
-                {/* HEADER */}
-                <section className="mb-10">
-                    <div className="bg-white/5 border border-white/10 rounded-2xl px-5 py-5 flex items-center gap-4">
-                        <LockKeyhole size={22} className="text-cyan-400" />
-                        <div>
-                            <h1 className="text-2xl font-semibold">Procesador de Charlas</h1>
-                            <p className="text-white/60 text-sm">
-                                Subí audios y generá reportes automáticos.
-                            </p>
-                        </div>
+        <>
+            {/* HEADER original de Panels */}
+            <section className="mb-10">
+                <div className="bg-white/5 border border-white/10 rounded-2xl px-5 py-5 flex items-center gap-4">
+                    <LockKeyhole size={22} className="text-cyan-400" />
+                    <div>
+                        <h1 className="text-2xl font-semibold">Procesador de Charlas</h1>
+                        <p className="text-white/60 text-sm">
+                            Subí audios y generá reportes automáticos.
+                        </p>
                     </div>
-                </section>
-
-                {/* FORM */}
-                <div className="bg-white/5 border border-white/10 p-6 rounded-xl mb-12">
-                    <h2 className="text-xl font-semibold mb-4">Subir audio del panel</h2>
-
-                    <input
-                        type="text"
-                        value={panelName}
-                        placeholder="Nombre del panel"
-                        onChange={(e) => setPanelName(e.target.value)}
-                        className="w-full p-3 rounded-md text-black mb-3"
-                    />
-
-                    <input
-                        type="file"
-                        accept="audio/*,video/*"
-                        onChange={(e) => setFile(e.target.files?.[0] || null)}
-                        className="w-full mb-4"
-                    />
-
-                    <Button
-                        onClick={handleUpload}
-                        disabled={loading}
-                        className="bg-white text-black font-bold px-5 py-3 rounded-lg"
-                    >
-                        {loading ? "Procesando..." : "Subir y procesar"}
-                    </Button>
                 </div>
+            </section>
 
-                {/* LISTADO */}
-                <h2 className="text-2xl font-bold mb-4">Charlas procesadas</h2>
+            {/* FORM */}
+            <div className="bg-white/5 border border-white/10 p-6 rounded-xl mb-12">
+                <h2 className="text-xl font-semibold mb-4">Subir audio del panel</h2>
 
-                {panels.length === 0 && (
-                    <p className="text-white/60">Todavía no se procesaron charlas.</p>
-                )}
+                <input
+                    type="text"
+                    value={panelName}
+                    placeholder="Nombre del panel"
+                    onChange={(e) => setPanelName(e.target.value)}
+                    className="w-full p-3 rounded-md text-black mb-3"
+                />
 
-                <div className="flex flex-col gap-10">
-                    {panels.map((panel) => (
-                        <PanelCard key={panel.id} panel={panel} refresh={fetchPanels} />
-                    ))}
-                </div>
+                <input
+                    type="file"
+                    accept="audio/*,video/*"
+                    onChange={(e) => setFile(e.target.files?.[0] || null)}
+                    className="w-full mb-4"
+                />
+
+                <Button
+                    onClick={handleUpload}
+                    disabled={loading}
+                    className="bg-white text-black font-bold px-5 py-3 rounded-lg"
+                >
+                    {loading ? "Procesando..." : "Subir y procesar"}
+                </Button>
             </div>
-        </main>
+
+            {/* LISTADO */}
+            <h2 className="text-2xl font-bold mb-4">Charlas procesadas</h2>
+
+            {panels.length === 0 && (
+                <p className="text-white/60">Todavía no se procesaron charlas.</p>
+            )}
+
+            <div className="flex flex-col gap-10">
+                {panels.map((panel) => (
+                    <PanelCard key={panel.id} panel={panel} refresh={fetchPanels} />
+                ))}
+            </div>
+        </>
     );
 }
 
@@ -208,8 +214,6 @@ export default function AdminPanelsPage() {
    TARJETA DE PANEL + acordiones + modales
 ──────────────────────────────────────────── */
 function PanelCard({ panel, refresh }) {
-
-    // 🔥 Estado que permite abrir más de un acordeón
     const [openSections, setOpenSections] = useState({
         summary: false,
         transcript: false,
@@ -217,9 +221,9 @@ function PanelCard({ panel, refresh }) {
     });
 
     const toggle = (key) => {
-        setOpenSections(prev => ({
+        setOpenSections((prev) => ({
             ...prev,
-            [key]: !prev[key],   // alterna el seleccionado sin cerrar los demás
+            [key]: !prev[key],
         }));
     };
 
@@ -230,7 +234,7 @@ function PanelCard({ panel, refresh }) {
     const [editSummary, setEditSummary] = useState(panel.summary);
 
     async function saveTranscript() {
-        await fetch("/api/panels/update", {
+        await fetch("/api/admin/ia/panels/update", {
             method: "POST",
             body: JSON.stringify({
                 id: panel.id,
@@ -242,7 +246,7 @@ function PanelCard({ panel, refresh }) {
     }
 
     async function saveSummary() {
-        await fetch("/api/panels/update", {
+        await fetch("/api/admin/ia/panels/update", {
             method: "POST",
             body: JSON.stringify({
                 id: panel.id,
@@ -255,7 +259,6 @@ function PanelCard({ panel, refresh }) {
 
     return (
         <div className="bg-white/5 border border-white/10 p-6 rounded-xl shadow-lg">
-
             <h3 className="text-2xl font-semibold mb-1">{panel.panel_name}</h3>
             <p className="text-white/50 text-sm mb-6">
                 {new Date(panel.created_at).toLocaleString()}
@@ -292,7 +295,7 @@ function PanelCard({ panel, refresh }) {
                 </button>
             </div>
 
-            {/* 🔥 ACORDEONES (independientes) */}
+            {/* ACORDEONES */}
             <Accordion
                 title="Resumen del panel"
                 open={openSections.summary}
@@ -347,11 +350,9 @@ function PanelCard({ panel, refresh }) {
                     className="w-full h-80 p-3 border rounded-md text-black"
                 />
             </Modal>
-
         </div>
     );
 }
-
 
 /* ──────────────────────────────
    BOTÓN DE DESCARGA
@@ -361,7 +362,7 @@ function DownloadBtn({ path, label }) {
 
     return (
         <a
-            href={`/api/panels/download?path=${path}`}
+            href={`/api/admin/ia/panels/download?path=${path}`}
             className="bg-white text-black font-semibold px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-white/90 transition"
         >
             <Download size={18} />

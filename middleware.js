@@ -6,10 +6,10 @@ export async function middleware(req) {
 
   // Rutas protegidas nuevas (AUDIO/IA)
   const protectedPanelAPIs = [
-    "/api/panels/process",
-    "/api/panels/list",
-    "/api/panels/update",
-    "/api/panels/download",
+    "/api/admin/ia/panels/process",
+    "/api/admin/ia/panels/list",
+    "/api/admin/ia/panels/update",
+    "/api/admin/ia/panels/download",
   ];
 
   // Rutas ya protegidas por vos
@@ -92,6 +92,6 @@ export const config = {
   matcher: [
     "/admin/:path*",
     "/api/admin/:path*",
-    "/api/panels/:path*", // 👈 Ahora está protegido
+    "/api/admin/ia/panels/:path*", // 👈 Ahora está protegido
   ],
 };
