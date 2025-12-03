@@ -19,6 +19,8 @@ const LINKS = [
 const ADMIN_LINKS = [
   { href: "/admin/registrations", label: "INVITADOS" },
   { href: "/admin/validations", label: "VALIDACIONES" },
+  { href: "/admin/panels", label: "CHARLAS" },
+
 ];
 
 // safelist tailwind

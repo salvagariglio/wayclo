@@ -1,12 +1,20 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";   // 👈 IMPORTANTE
 import LogoChat from "../../public/logo-chat.png";
 import "./ChatBubble.css";
 
 const CYAN = "#00E0FF";
 
 export default function ChatBubble() {
+    const pathname = usePathname();            // 👈 Detecta ruta actual
+
+    // ❌ Si estamos en /admin o cualquier subruta (ej: /admin/login, /admin/users)
+    if (pathname.startsWith("/admin")) {
+        return null; // 👈 No mostramos el chat
+    }
+
     const [open, setOpen] = useState(false);
     const btnRef = useRef(null);
     const panelRef = useRef(null);
