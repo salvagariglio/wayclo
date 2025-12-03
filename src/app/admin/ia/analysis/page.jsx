@@ -7,6 +7,7 @@ import {
     Building2,
     UserCircle2,
     AlertTriangle,
+    Download, // 👈 nuevo
 } from "lucide-react";
 
 export default function AnalysisPage() {
@@ -165,12 +166,13 @@ export default function AnalysisPage() {
                 <div>
                     <h2 className="text-2xl font-semibold">Análisis de invitados</h2>
                     <p className="text-white/60 text-sm">
-                        Distribución por dietas, empresas y roles para definir el catering y
-                        los cuidados especiales.
+                        Distribución por dietas, empresas y roles para definir el catering,
+                        los cuidados especiales y el brief para el proveedor.
                     </p>
                 </div>
 
-                <div className="flex gap-3">
+                <div className="flex flex-wrap gap-3 justify-start md:justify-end">
+                    {/* Botón IA */}
                     <button
                         onClick={handleGeneratePlan}
                         disabled={loadingPlan}
@@ -178,6 +180,15 @@ export default function AnalysisPage() {
                     >
                         {loadingPlan ? "Generando plan..." : "Generar plan de menú con IA"}
                     </button>
+
+                    {/* Botón DOCX */}
+                    <a
+                        href="/api/admin/ia/report"
+                        className="flex items-center gap-2 bg-white text-black font-semibold px-4 py-2 rounded-lg hover:bg-white/90"
+                    >
+                        <Download size={18} />
+                        Descargar reporte DOCX
+                    </a>
                 </div>
             </section>
 
@@ -340,17 +351,14 @@ export default function AnalysisPage() {
                     <>
                         {/* Bloques de catering */}
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                            {/* Recepción */}
                             <BlockCard
                                 title="Recepción (17:45 - 18:15)"
                                 data={plan.reception}
                             />
-                            {/* Coffee break */}
                             <BlockCard
                                 title="Coffee break (19:30 - 19:45)"
                                 data={plan.coffee_break}
                             />
-                            {/* Cóctel */}
                             <BlockCard
                                 title="Cóctel de cierre (20:30 - 21:00)"
                                 data={plan.cocktail}
