@@ -1,0 +1,61 @@
+.chat-size {
+    width: 92px;
+    height: 92px;
+}
+
+.chat-icon {
+    width: 72%;
+    height: 72%;
+}
+
+@media (max-width: 900px) {
+    .chat-size {
+        width: 82px;
+        height: 82px;
+    }
+
+    .chat-icon {
+        width: 73%;
+        height: 73%;
+    }
+}
+
+@media (max-width: 480px) {
+    .chat-size {
+        width: 72px;
+        height: 72px;
+    }
+
+    .chat-icon {
+        width: 74%;
+        height: 74%;
+    }
+}
+
+.orbit-layer {
+    background:
+        radial-gradient(circle at 50% 50%,
+            rgba(0, 224, 255, 0.20) 0%,
+            rgba(0, 60, 100, 0.05) 45%,
+            rgba(0, 224, 255, 0.00) 70%),
+        conic-gradient(from 0deg,
+            rgba(0, 224, 255, 0.90),
+            rgba(0, 60, 100, 0.25),
+            rgba(0, 224, 255, 0.90));
+    animation: spinOrbit 3.2s linear infinite;
+    opacity: 0.58;
+}
+
+@keyframes spinOrbit {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.spinning-orbit {
+    box-shadow: 0 0 18px rgba(0, 224, 255, 0.35);
+}

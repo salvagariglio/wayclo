@@ -1,1 +1,0 @@
-Pagos vía Mercado Pago.

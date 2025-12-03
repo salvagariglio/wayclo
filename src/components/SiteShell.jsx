@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
+import ChatBubble from "@/components/ChatBubble";
 import {
   Dialog,
   DialogContent,
@@ -19,23 +20,31 @@ export default function SiteShell({ children }) {
     setOpen(false);
     setTimeout(() => setMode("form"), 250);
   };
+
   useEffect(() => {
     const openFromEvent = () => setOpen(true);
     document.addEventListener("open-register", openFromEvent);
-    if (typeof window !== "undefined" && window.location.hash === "#registro")
+
+    if (typeof window !== "undefined" && window.location.hash === "#registro") {
       setOpen(true);
+    }
+
     return () => document.removeEventListener("open-register", openFromEvent);
   }, []);
 
   return (
     <div className="relative min-h-screen flex flex-col">
-      {/* ✅ NavBar recibe si el dialog está abierto para oscurecerse */}
+      {/* 🔹 Navbar se oscurece cuando open = true */}
       <NavBar dimmed={open} />
 
       <main className="pt-24">{children}</main>
 
       <Footer />
 
+      {/* 🟦 ChatBubble afectado por el estado del modal */}
+      <ChatBubble dimmed={open} />
+
+      {/* 🔸 Dialog de registro */}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent
           className="
