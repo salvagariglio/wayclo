@@ -86,10 +86,10 @@ export default function Hero() {
     absolute
 
     /* 🔥 ocultar en pantallas menores a 410px */
-    max-[410px]:hidden
+    max-[420px]:hidden
 
     /* Mobile base */
-    left-[-10] top-36 w-16
+    left-0 top-36 w-16
 
     sm:left-0  sm:top-28  sm:w-32
     md:left-[20px] md:top-40 md:w-40
@@ -112,7 +112,7 @@ export default function Hero() {
     absolute
 
     /* 🔥 ocultar en pantallas menores a 350px */
-    max-[410px]:hidden
+    max-[420px]:hidden
 
     right-[-1rem] top-[22rem] w-[120px]
 
