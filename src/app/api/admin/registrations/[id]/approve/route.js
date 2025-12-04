@@ -104,130 +104,162 @@ export async function POST(request) {
         to: reg.email,
         subject: "Confirmado: Nos vemos en CyberCloud ⚡",
         html: `
-<!-- Contenedor general -->
-<div style="width:100%; padding:40px 0; background:linear-gradient(180deg,#021728 0%,#00263F 100%); font-family:Arial,sans-serif; color:#fff;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="font-family: Arial, sans-serif; padding: 40px 0;">
+  <tr>
+    <td align="center">
 
-  <!-- Card -->
-  <div style="max-width:560px; margin:auto; background:rgba(255,255,255,0.08); padding:40px 36px; border-radius:16px;">
+      <!-- CARD -->
+      <table width="560" cellpadding="0" cellspacing="0" border="0" style="width: 560px; background: #ffffff; border-radius: 12px; padding: 40px 32px;">
 
-    <!-- LOGO PRINCIPAL -->
-    <table width="100%" style="margin-bottom:32px;">
+        <!-- LOGO -->
+        <tr>
+          <td align="center" style="padding-bottom: 24px;">
+            <img 
+              src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/pixelcut-export.png"
+              alt="CyberCloud"
+              width="180"
+            />
+          </td>
+        </tr>
+
+        <!-- TÍTULO -->
+        <tr>
+          <td align="center" style="font-size: 22px; font-weight: bold; padding-bottom: 20px;">
+            Confirmado: ¡Nos vemos en CyberCloud! ⚡
+          </td>
+        </tr>
+
+        <!-- TEXTO -->
+        <tr>
+          <td style="font-size: 15px; font-weight: bold; line-height: 1.6;">
+            ¡Buenas noticias, <strong>${fullName}</strong>! 🎉<br/>
+            Tu inscripción fue aprobada.
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding-top: 16px; font-size: 15px; font-weight: bold;">
+            Presentá este código QR personal el día del evento:
+          </td>
+        </tr>
+
+        <!-- QR -->
+        <tr>
+          <td align="center" style="padding: 28px 0;">
+            <img 
+              src="${qrUrl}" 
+              width="220" 
+              style="display:block; border-radius:12px;" 
+              alt="QR CyberCloud"
+            />
+          </td>
+        </tr>
+
+        <!-- INFO DEL EVENTO -->
+        <tr>
+          <td style="font-size: 15px; line-height: 1.6; font-weight: bold;">
+            📅 <strong>Fecha:</strong> 15 de diciembre<br/>
+            📍 <strong>Lugar:</strong> Polo Científico Tecnológico — Río Cuarto
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding-top: 16px; font-size: 15px; font-weight: bold;">
+            Te esperamos para un día lleno de charlas, networking y el exclusivo <strong>Cyber After Cocktail</strong>.
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding-top: 28px; font-size: 15px; font-weight: bold;">
+            ¡Nos vemos pronto!<br/>
+            <strong>Equipo CyberCloud</strong>
+          </td>
+        </tr>
+
+        <!-- ORGANIZAN -->
+<tr>
+  <td align="center" style="padding-top: 40px; font-size: 14px; font-weight: bold; letter-spacing: 1px; opacity: 0.8;">
+    ORGANIZAN
+  </td>
+</tr>
+
+<tr>
+  <td align="center" style="padding-top: 16px;">
+    <table>
       <tr>
-        <td align="center">
-          <img 
-            src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/pixelcut-export.png"
-            alt="CyberCloud"
-            width="220"
-            style="display:block; margin:auto; margin-bottom:10px;"
-          />
-        </td>
-      </tr>
-    </table>
 
-    <!-- TÍTULO -->
-    <h2 style="text-align:center; font-size:24px; margin-bottom:26px; font-weight:600;">
-      Confirmado: Nos vemos en CyberCloud ⚡
-    </h2>
+        <!-- WAYCLO -->
+        <td align="center" style="padding-right: 32px;">
 
-    <!-- TEXTO -->
-    <p style="font-size:15px;">
-      ¡Buenas noticias, <strong>${fullName}</strong>! 🎉<br/>
-      Tu inscripción a <strong>CyberCloud</strong> fue aprobada.
-    </p>
-
-    <p style="font-size:15px;">
-      Presentá este <strong>código QR personal</strong> el día del evento:
-    </p>
-
-    <!-- QR -->
-    <table width="100%" style="margin:28px 0;">
-      <tr>
-        <td align="center">
-          <img 
-            src="${qrUrl}" 
-            width="220" 
-            style="display:block; border-radius:12px;" 
-            alt="QR CyberCloud"
-          />
-        </td>
-      </tr>
-    </table>
-
-    <!-- INFO -->
-    <p style="font-size:15px; line-height:1.6;">
-      📅 <strong>Fecha:</strong> 15 de diciembre<br/>
-      📍 <strong>Lugar:</strong> Polo Científico Tecnológico — Río Cuarto
-    </p>
-
-    <p style="font-size:15px;">
-      Te esperamos para un día lleno de charlas, networking y el exclusivo 
-      <strong>Cyber After Cocktail</strong>.
-    </p>
-
-    <p style="margin-top:28px; font-size:15px;">
-      ¡Nos vemos ahí!<br/>
-      <strong>Equipo CyberCloud</strong>
-    </p>
-
-
-    <!-- ============================================== -->
-    <!-- ORGANIZAN -->
-    <!-- ============================================== -->
-    <h3 style="text-align:center; font-size:16px; margin-top:46px; margin-bottom:18px; letter-spacing:1px; opacity:0.9;">
-      ORGANIZAN
-    </h3>
-
-    <table width="100%" style="margin-bottom:38px;">
-      <tr>
-        <td align="center">
-          <table style="margin:auto;">
-            <tr>
-              <td align="center" style="padding-right:32px;">
-                <img 
-                  src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/logo-wayclo-speakers.png"
-                  width="110"
-                  alt="Wayclo"
-                  style="display:block;"
-                />
-              </td>
-
-              <td align="center" style="padding-left:32px;">
-                <img 
-                  src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/intercity.png"
-                  width="110"
-                  alt="Intercity"
-                  style="display:block;"
-                />
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>
-
-
-    <!-- ============================================== -->
-    <!-- ACOMPAÑA -->
-    <!-- ============================================== -->
-    <h3 style="text-align:center; font-size:16px; margin-bottom:18px; letter-spacing:1px; opacity:0.9;">
-      ACOMPAÑA
-    </h3>
-
-    <table width="100%" style="margin-bottom:10px;">
-      <tr>
-        <td align="center">
-          <img 
-            src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/lenovo.png"
-            width="140"
-            alt="Lenovo"
+          <!-- LOGO CLARO -->
+          <img
+            src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/logo-wayclo.png"
+            width="100"
             style="display:block; margin:auto;"
+            alt="Wayclo"
+            class="wayclo-light"
+          />
+
+          <!-- LOGO OSCURO -->
+          <img
+            src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/logo-wayclo-speakers.png"
+            width="100"
+            style="display:none; margin:auto;"
+            alt="Wayclo Dark"
+            class="wayclo-dark"
+          />
+
+        </td>
+
+        <!-- INTERCITY -->
+        <td align="center" style="padding-left: 32px;">
+          <img 
+            src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/intercity.png"
+            width="100"
+            alt="Intercity"
           />
         </td>
+
       </tr>
     </table>
+  </td>
+</tr>
 
-  </div>
-</div>
+
+        <!-- ACOMPAÑA -->
+        <tr>
+          <td align="center" style="padding-top: 36px; font-size: 14px; font-weight: bold; letter-spacing: 1px; opacity: 0.8;">
+            ACOMPAÑA
+          </td>
+        </tr>
+
+        <tr>
+          <td align="center" style="padding-top: 16px;">
+            <img 
+              src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/lenovo.png"
+              width="130"
+              alt="Lenovo"
+            />
+          </td>
+        </tr>
+
+      </table>
+
+    </td>
+  </tr>
+</table>
+<style>
+  @media (prefers-color-scheme: dark) {
+    .wayclo-light { display: none !important; }
+    .wayclo-dark  { display: block !important; }
+  }
+
+  @media (prefers-color-scheme: light) {
+    .wayclo-light { display: block !important; }
+    .wayclo-dark  { display: none !important; }
+  }
+</style>
+
 `,
 
       });
