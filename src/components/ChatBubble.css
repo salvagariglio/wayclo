@@ -32,6 +32,10 @@
     }
 }
 
+.chat-bubble {
+    transition: padding 0.18s ease, background 0.18s ease;
+}
+
 .orbit-layer {
     background:
         radial-gradient(circle at 50% 50%,
@@ -58,4 +62,35 @@
 
 .spinning-orbit {
     box-shadow: 0 0 18px rgba(0, 224, 255, 0.35);
+}
+
+/* ===== Scrollbar CyberCloud Dark (10px) ===== */
+.cyber-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(30, 60, 90, 0.85) rgba(255, 255, 255, 0.04);
+}
+
+/* Chrome, Edge & Safari */
+.cyber-scroll::-webkit-scrollbar {
+    width: 10px;
+    /* más ancho */
+}
+
+.cyber-scroll::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 12px;
+}
+
+.cyber-scroll::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg,
+            rgba(20, 40, 60, 0.95),
+            rgba(15, 30, 45, 0.95));
+    border-radius: 12px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.55);
+}
+
+.cyber-scroll::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg,
+            rgba(35, 70, 105, 1),
+            rgba(25, 50, 80, 1));
 }

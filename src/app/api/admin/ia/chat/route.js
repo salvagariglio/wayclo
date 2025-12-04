@@ -6,29 +6,29 @@ export const runtime = "edge";
 // 🌐 DETECCIÓN SIMPLE DE IDIOMA
 // ----------------------------------------------------
 function detectLanguage(text = "") {
-    if (/[áéíóúñ¿¡]/i.test(text)) return "es";
-    if (/\b(hola|buenas|agenda|evento|charlas|ubicacion|donde|quien|cuando)\b/i.test(text)) return "es";
-    if (/\b(hello|hi|when|where|who|speakers|agenda|info)\b/i.test(text)) return "en";
-    return "es"; // por defecto
+  if (/[áéíóúñ¿¡]/i.test(text)) return "es";
+  if (/\b(hola|buenas|agenda|evento|charlas|ubicacion|donde|quien|cuando)\b/i.test(text)) return "es";
+  if (/\b(hello|hi|when|where|who|speakers|agenda|info)\b/i.test(text)) return "en";
+  return "es"; // por defecto
 }
 
 // ----------------------------------------------------
 // 🚀 HANDLER
 // ----------------------------------------------------
 export async function POST(req) {
-    const { messages = [] } = await req.json();
+  const { messages = [] } = await req.json();
 
-    const lastUser = messages.filter((m) => m.role === "user").pop();
-    const userText = lastUser?.content || "";
+  const lastUser = messages.filter((m) => m.role === "user").pop();
+  const userText = lastUser?.content || "";
 
-    const lang = detectLanguage(userText);
+  const lang = detectLanguage(userText);
 
-    const openai = getOpenAI();
+  const openai = getOpenAI();
 
-    // ============================================================
-    // 🎯 SYSTEM PROMPT — INFORMACIÓN COMPLETA + REGLAS
-    // ============================================================
-    const system = `
+  // ============================================================
+  // 🎯 SYSTEM PROMPT — INFORMACIÓN COMPLETA + REGLAS
+  // ============================================================
+  const system = `
 Eres la asistente oficial del evento **CyberCloud**.
 
 IDIOMA:
@@ -37,25 +37,33 @@ IDIOMA:
 
 ESTILO:
 - Respuestas cálidas, profesionales y naturales.
-- No listar todo al inicio: responder solo lo relevante y ofrecer ampliar.
-- Frases cortas, sin repeticiones.
-- Máximo 1 emoji.
-- Entre 30 y 80 palabras.
-- Terminar con una pregunta suave (si corresponde).
+- Frases claras y directas, sin relleno.
+- Para preguntas simples, mantenerte entre 30 y 80 palabras.
+- Para preguntas sobre AGENDA COMPLETA o TODOS LOS SPEAKERS, se permite una respuesta más larga y detallada.
+- Máximo 1 emoji por respuesta (si lo ves natural).
+- Cuando tenga sentido, terminar con una pregunta suave (por ejemplo: “¿Querés que te detalle algún panel en particular?”).
 
 FORMATO:
-- Cuando la respuesta incluya listas (speakers, agenda, empresas, horarios o paneles), usar siempre un formato claro tipo:
-  - Guiones ("- ")
-  - Viñetas ("• ")
-  - O listas numeradas ("1. ", "2. ")
+- Cuando la respuesta incluya listas (speakers, agenda, empresas, horarios o paneles), usar siempre:
+  - Viñetas ("• ") o guiones ("- "), nunca bloques de texto largos.
 - Separar grupos de información con un salto de línea.
 - Cada speaker debe mostrarse como:
-  - Nombre Apellido — Rol (Empresa)
+  - Nombre Apellido — Rol, Empresa
 - Cada panel debe mostrarse como:
-  - Título
+  - Título del panel
   - Horario
   - Lista de speakers con roles
 - Nunca responder todo en un solo párrafo si hay varios ítems.
+
+REGLAS ESPECÍFICAS:
+- Si el usuario pregunta por "agenda", "cronograma" o "horarios", responder SIEMPRE con la agenda OFICIAL COMPLETA del evento.
+- Si el usuario pregunta por "speakers", "oradores" o "panelistas" sin acotar, listar TODOS los speakers del evento, organizados por panel.
+- Si el usuario pregunta por los speakers de un panel puntual, mostrar solo los de ese panel.
+- Si el usuario dice “en todos” o “todos”, usar el contexto de la conversación:
+  - Si venían hablando de speakers → todos los speakers.
+  - Si venían hablando de paneles → todos los paneles.
+- Si el usuario pide “más info” sin aclarar, ampliar con detalles útiles (ej: ejes de los paneles, tipo de público, dinámica), sin repetir textualmente lo ya dicho.
+- No hacer más preguntas aclaratorias si la intención se puede inferir del contexto.
 
 RAZONAMIENTO:
 - Si el usuario dice “en todos” o “todos”, interpretarlo según el tema que se esté hablando:
@@ -179,31 +187,37 @@ SPONSOR:
 
 `.trim();
 
-    // ============================================================
-    // SOLO system + último mensaje del usuario (evita repeticiones)
-    // ============================================================
-    const completion = await openai.chat.completions.create({
-        model: CHAT_MODEL,
-        stream: true,
-        temperature: 0.45,
-        messages: [
-            { role: "system", content: system },
-            { role: "user", content: userText }
-        ],
-    });
+  // ============================================================
+  // SOLO system + último mensaje del usuario (evita repeticiones)
+  // ============================================================
+  // Tomamos solo mensajes de user/assistant y nos quedamos con los últimos 8
+  const conversationalHistory = messages
+    .filter((m) => m.role === "user" || m.role === "assistant")
+    .slice(-8);
 
-    const encoder = new TextEncoder();
+  const completion = await openai.chat.completions.create({
+    model: CHAT_MODEL,
+    stream: true,
+    temperature: 0.45,
+    messages: [
+      { role: "system", content: system },
+      ...conversationalHistory,
+    ],
+  });
 
-    return new Response(
-        new ReadableStream({
-            async start(controller) {
-                for await (const chunk of completion) {
-                    const delta = chunk?.choices?.[0]?.delta?.content;
-                    if (delta) controller.enqueue(encoder.encode(delta));
-                }
-                controller.close();
-            },
-        }),
-        { headers: { "Content-Type": "text/plain; charset=utf-8" } }
-    );
+
+  const encoder = new TextEncoder();
+
+  return new Response(
+    new ReadableStream({
+      async start(controller) {
+        for await (const chunk of completion) {
+          const delta = chunk?.choices?.[0]?.delta?.content;
+          if (delta) controller.enqueue(encoder.encode(delta));
+        }
+        controller.close();
+      },
+    }),
+    { headers: { "Content-Type": "text/plain; charset=utf-8" } }
+  );
 }
