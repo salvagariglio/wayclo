@@ -86,11 +86,11 @@ MUY IMPORTANTE:
   },
   "diet_care": {
     "general": ["...", "..."],
-    "celiac": ["...", "..."],
-    "vegan": ["...", "..."],
-    "vegetarian": ["...", "..."],
+    "celiacos": ["...", "..."],
+    "veganos": ["...", "..."],
+    "vegetarianos": ["...", "..."],
     "lactose_free": ["...", "..."],
-    "other": ["...", "..."]
+    "otros": ["...", "..."]
   },
   "extra_insights": ["...", "..."]
 }
