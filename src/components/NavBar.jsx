@@ -20,7 +20,6 @@ const ADMIN_LINKS = [
   { href: "/admin/registrations", label: "INVITADOS" },
   { href: "/admin/validations", label: "VALIDACIONES" },
   { href: "/admin/ia", label: "IA" },
-
 ];
 
 // safelist tailwind
@@ -50,8 +49,8 @@ export default function NavBar() {
       ? "shadow-none"
       : "shadow-[0_0_22px_rgba(255,255,255,0.22)]"
     : scrolled && !open
-      ? "shadow-[0_2px_10px_rgba(15,23,42,0.12)]"
-      : "shadow-none";
+    ? "shadow-[0_2px_10px_rgba(15,23,42,0.12)]"
+    : "shadow-none";
 
   return (
     <header
@@ -67,20 +66,17 @@ export default function NavBar() {
         {/* LOGO */}
         <Link href="/" className="flex items-center gap-3">
           <Image
-            src={isAdmin ? LogoAdmin : LogoSlogan}   // 👈 Cambia el logo según ruta
-            width={300}              // 👈 Opcional: distinto tamaño
+            src={isAdmin ? LogoAdmin : LogoSlogan}
+            width={300}
             height={180}
             alt="CyberCloud"
             priority
             className={[
-              "object-contain transition-all",
-              isAdmin ? "drop-shadow-[0_0_1px_white]" : ""
+              "object-contain transition-all h-auto", // 👈 agregado h-auto
+              isAdmin ? "drop-shadow-[0_0_1px_white]" : "",
             ].join(" ")}
           />
-
-
         </Link>
-
 
         {/* LINKS DESKTOP */}
         <div className="hidden md:flex items-center gap-6">

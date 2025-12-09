@@ -3,6 +3,14 @@ import { NextResponse } from "next/server";
 import { getSupabaseServer } from "@/lib/supabaseServer";
 import { sendEmailGraph } from "@/lib/sendEmailGraph";
 
+// 🔐 Bloqueo básico de caracteres típicos de SQLi (pedido del cliente)
+const FORBIDDEN_PATTERN = /['";]|--|\/\*/;
+
+function containsForbidden(value) {
+  if (typeof value !== "string") return false;
+  return FORBIDDEN_PATTERN.test(value);
+}
+
 // --- helper: verificar Turnstile ---
 async function verifyTurnstile(token, ip) {
   if (!token) return { ok: false, reason: "missing-token" };
@@ -10,14 +18,17 @@ async function verifyTurnstile(token, ip) {
   const secret = process.env.TURNSTILE_SECRET_KEY || "";
   if (!secret) return { ok: false, reason: "missing-secret" };
 
-  const res = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
-    method: "POST",
-    body: new URLSearchParams({
-      secret,
-      response: token,
-      remoteip: ip || "",
-    }),
-  });
+  const res = await fetch(
+    "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+    {
+      method: "POST",
+      body: new URLSearchParams({
+        secret,
+        response: token,
+        remoteip: ip || "",
+      }),
+    }
+  );
 
   const data = await res.json();
   return { ok: !!data?.success, data };
@@ -40,7 +51,8 @@ export async function GET(req) {
     if (status) q = q.eq("status", status);
 
     const { data, error } = await q;
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error)
+      return NextResponse.json({ error: error.message }, { status: 500 });
 
     return NextResponse.json({ items: data || [] });
   } catch (e) {
@@ -72,6 +84,36 @@ export async function POST(req) {
 
     const ip =
       (req.headers.get("x-forwarded-for") || "").split(",")[0]?.trim() || "";
+
+    // 🔐 0) Validar caracteres no permitidos antes de seguir
+    const forbiddenFieldErrors = {};
+    const textFields = {
+      first_name,
+      last_name,
+      email,
+      phone,
+      company,
+      role,
+      diet,
+      diet_other,
+    };
+
+    for (const [field, value] of Object.entries(textFields)) {
+      if (value && containsForbidden(String(value).trim())) {
+        forbiddenFieldErrors[field] =
+          "Este campo contiene caracteres no permitidos (', \", ;, --, etc.).";
+      }
+    }
+
+    if (Object.keys(forbiddenFieldErrors).length > 0) {
+      return NextResponse.json(
+        {
+          detail: "Hay caracteres no permitidos en algunos campos.",
+          field_errors: forbiddenFieldErrors,
+        },
+        { status: 400 }
+      );
+    }
 
     // 1) Verificar Turnstile
     const ver = await verifyTurnstile(turnstileToken, ip);
@@ -172,7 +214,7 @@ export async function POST(req) {
       );
     }
 
-    // 5) Enviar email
+    // 5) Enviar email (SIN CAMBIOS)
     try {
       await sendEmailGraph({
         to: email.trim(),
@@ -277,26 +319,52 @@ export async function POST(req) {
 
 
         <!-- ACOMPAÑA -->
-        <tr>
-          <td align="center" style="padding-top: 36px; font-size: 14px; font-weight: bold; letter-spacing: 1px; opacity: 0.8;">
-            ACOMPAÑA
-          </td>
-        </tr>
+<tr>
+  <td align="center" style="padding-top: 36px; font-size: 14px; font-weight: bold; letter-spacing: 1px; opacity: 0.8;">
+    ACOMPAÑA
+  </td>
+</tr>
 
-        <tr>
-          <td align="center" style="padding-top: 16px;">
-            <img 
-              src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/lenovo.png"
-              width="130"
-              alt="Lenovo"
-            />
-          </td>
-        </tr>
+<tr>
+  <td align="center" style="padding-top: 16px;">
+    <table cellpadding="0" cellspacing="0" border="0">
+      <tr>
 
-      </table>
+        <!-- LENOVO -->
+        <td align="center" style="padding: 0 20px;">
+          <img
+            src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/lenovo.png"
+            width="120"
+            alt="Lenovo"
+            style="display:block; margin:auto;"
+          />
+        </td>
 
-    </td>
-  </tr>
+        <!-- CLUSTER TECNOLÓGICO -->
+        <td align="center" style="padding: 0 20px;">
+          <img
+            src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/cluster-logo.png"
+            width="120"
+            alt="Cluster Tecnológico"
+            style="display:block; margin:auto;"
+          />
+        </td>
+
+        <!-- VMUG -->
+        <td align="center" style="padding: 0 20px;">
+          <img
+            src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/vmug-logo.jpeg"
+            width="120"
+            alt="VMUG"
+            style="display:block; margin:auto;"
+          />
+        </td>
+
+      </tr>
+    </table>
+  </td>
+</tr>
+
 </table>
 <style>
   @media (prefers-color-scheme: dark) {
@@ -311,7 +379,6 @@ export async function POST(req) {
 </style>
 
 `,
-
       });
     } catch (mailErr) {
       console.error("❌ Error enviando mail:", mailErr);

@@ -3,6 +3,11 @@
 import { useMemo, useState, useEffect } from "react";
 import Script from "next/script";
 
+// 🔐 Sanitización básica de caracteres "peligrosos"
+const FORBIDDEN_CHARS_REGEX = /['";]/g;
+
+const sanitizeText = (value = "") => value.replace(FORBIDDEN_CHARS_REGEX, "");
+
 export default function RegisterForm({ onSuccess, onClose }) {
   const PHONE_PREFIX = "+54 9 ";
 
@@ -84,14 +89,11 @@ export default function RegisterForm({ onSuccess, onClose }) {
     if (digits.length < 8 || digits.length > 12)
       e.phoneRest = "Ingresá un teléfono válido (8–12 dígitos).";
 
-    if (!form.empresa.trim())
-      e.empresa = "Este campo es obligatorio.";
+    if (!form.empresa.trim()) e.empresa = "Este campo es obligatorio.";
 
-    if (!form.puesto.trim())
-      e.puesto = "Este campo es obligatorio.";
+    if (!form.puesto.trim()) e.puesto = "Este campo es obligatorio.";
 
-    if (!form.dietas.length)
-      e.dietas = "Seleccioná al menos una opción.";
+    if (!form.dietas.length) e.dietas = "Seleccioná al menos una opción.";
 
     if (form.dietas.includes("otro") && !form.dietaOtro.trim())
       e.dietaOtro = "Especificá tu dieta.";
@@ -99,20 +101,22 @@ export default function RegisterForm({ onSuccess, onClose }) {
     return e;
   }, [form]);
 
-  // Solo se muestran errores del server si el server mandó algo.  
+  // Solo se muestran errores del server si el server mandó algo.
   // Sino local.
   const mergedErrors =
-    Object.keys(serverFieldErrors).length > 0
-      ? serverFieldErrors
-      : localErrors;
+    Object.keys(serverFieldErrors).length > 0 ? serverFieldErrors : localErrors;
 
   const hasErrors = Object.keys(mergedErrors).length > 0;
 
   // ---------------------------
   // HANDLERS
   // ---------------------------
-  const handleChange = (e) =>
-    setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    // No tocamos email con regex, solo resto de textos
+    const clean = name === "email" ? value : sanitizeText(value);
+    setForm((f) => ({ ...f, [name]: clean }));
+  };
 
   const handleBlur = (e) =>
     setTouched((t) => ({ ...t, [e.target.name]: true }));
@@ -177,14 +181,16 @@ export default function RegisterForm({ onSuccess, onClose }) {
     setLoading(true);
 
     const payload = {
-      first_name: form.name.trim(),
-      last_name: form.lastname.trim(),
+      first_name: sanitizeText(form.name.trim()),
+      last_name: sanitizeText(form.lastname.trim()),
       email: form.email.trim(),
       phone: `${PHONE_PREFIX}${form.phoneRest}`.trim(),
-      company: form.empresa.trim(),
-      role: form.puesto.trim(),
+      company: sanitizeText(form.empresa.trim()),
+      role: sanitizeText(form.puesto.trim()),
       diet: form.dietas.join(","),
-      diet_other: form.dietas.includes("otro") ? form.dietaOtro.trim() : null,
+      diet_other: form.dietas.includes("otro")
+        ? sanitizeText(form.dietaOtro.trim())
+        : null,
       status: "pending",
       turnstileToken: captchaToken,
     };
@@ -210,7 +216,6 @@ export default function RegisterForm({ onSuccess, onClose }) {
 
       setLoading(false);
       onSuccess?.(out);
-
     } catch (err) {
       setGeneralServerError("Error inesperado. Intentá de nuevo.");
       if (window.turnstile) window.turnstile.reset();
@@ -286,7 +291,6 @@ export default function RegisterForm({ onSuccess, onClose }) {
 
       {/* --- FORM --- */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 min-w-0">
-
         {/* Nombre */}
         <div className="min-w-0">
           <label className="text-sm">Nombre*</label>
@@ -313,7 +317,9 @@ export default function RegisterForm({ onSuccess, onClose }) {
             className={inputClass(touched.lastname && !!mergedErrors.lastname)}
           />
           {touched.lastname && mergedErrors.lastname && (
-            <p className="mt-1 text-xs text-rose-500">{mergedErrors.lastname}</p>
+            <p className="mt-1 text-xs text-rose-500">
+              {mergedErrors.lastname}
+            </p>
           )}
         </div>
 
@@ -406,9 +412,7 @@ export default function RegisterForm({ onSuccess, onClose }) {
                     value={opt.value}
                     checked={active}
                     onChange={() => toggleDiet(opt.value)}
-                    onBlur={() =>
-                      setTouched((t) => ({ ...t, dietas: true }))
-                    }
+                    onBlur={() => setTouched((t) => ({ ...t, dietas: true }))}
                     className="sr-only peer"
                   />
                   <span

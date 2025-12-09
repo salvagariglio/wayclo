@@ -16,7 +16,7 @@ export async function POST(request) {
     // ✅ ACCESO MÁS ROBUSTO: Extraer el ID del pathname de la URL
     // Esto es compatible y no genera el error de Next.js
     const pathname = new URL(request.url).pathname;
-    const segments = pathname.split('/');
+    const segments = pathname.split("/");
     // El ID es el segmento anterior a 'approve'
     const id = segments[segments.length - 2];
 
@@ -42,7 +42,9 @@ export async function POST(request) {
       );
     }
 
-    const fullName = [reg.first_name, reg.last_name].filter(Boolean).join(" ") || "participante";
+    const fullName =
+      [reg.first_name, reg.last_name].filter(Boolean).join(" ") ||
+      "participante";
 
     // --- Lógica del QR ---
 
@@ -56,7 +58,7 @@ export async function POST(request) {
     const qrBuffer = await QRCode.toBuffer(qrValue, {
       type: "png",
       width: 600,
-      margin: 1
+      margin: 1,
     });
 
     // 5) Subir QR a Storage
@@ -227,26 +229,52 @@ export async function POST(request) {
 
 
         <!-- ACOMPAÑA -->
-        <tr>
-          <td align="center" style="padding-top: 36px; font-size: 14px; font-weight: bold; letter-spacing: 1px; opacity: 0.8;">
-            ACOMPAÑA
-          </td>
-        </tr>
+<tr>
+  <td align="center" style="padding-top: 36px; font-size: 14px; font-weight: bold; letter-spacing: 1px; opacity: 0.8;">
+    ACOMPAÑA
+  </td>
+</tr>
 
-        <tr>
-          <td align="center" style="padding-top: 16px;">
-            <img 
-              src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/lenovo.png"
-              width="130"
-              alt="Lenovo"
-            />
-          </td>
-        </tr>
+<tr>
+  <td align="center" style="padding-top: 16px;">
+    <table cellpadding="0" cellspacing="0" border="0">
+      <tr>
 
-      </table>
+        <!-- LENOVO -->
+        <td align="center" style="padding: 0 20px;">
+          <img
+            src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/lenovo.png"
+            width="120"
+            alt="Lenovo"
+            style="display:block; margin:auto;"
+          />
+        </td>
 
-    </td>
-  </tr>
+        <!-- CLUSTER TECNOLÓGICO -->
+        <td align="center" style="padding: 0 20px;">
+          <img
+            src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/cluster-logo.png"
+            width="120"
+            alt="Cluster Tecnológico"
+            style="display:block; margin:auto;"
+          />
+        </td>
+
+        <!-- VMUG -->
+        <td align="center" style="padding: 0 20px;">
+          <img
+            src="https://stazbtfqsejoolkdnlgb.supabase.co/storage/v1/object/public/email_assets/vmug-logo.jpeg"
+            width="120"
+            alt="VMUG"
+            style="display:block; margin:auto;"
+          />
+        </td>
+
+      </tr>
+    </table>
+  </td>
+</tr>
+
 </table>
 <style>
   @media (prefers-color-scheme: dark) {
@@ -261,16 +289,13 @@ export async function POST(request) {
 </style>
 
 `,
-
       });
-
     } catch (mailErr) {
       console.error("❌ Error enviando mail con Graph:", mailErr);
       // El error de envío de mail no impide la respuesta OK de la aprobación
     }
 
     return NextResponse.json({ ok: true }, { status: 200 });
-
   } catch (e) {
     console.error("POST /approve ERROR:", e);
     return NextResponse.json(

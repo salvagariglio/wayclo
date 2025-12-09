@@ -3,6 +3,8 @@ import { Inter, Outfit } from "next/font/google";
 import SiteShell from "@/components/SiteShell";
 
 export const metadata = {
+  // 👇 agrega esto
+  metadataBase: new URL("https://cybercloud.ar"), // o el dominio que vayas a usar
   title: "CyberCloud Río Cuarto – 15 de diciembre",
   description:
     "La nueva era de la ciberseguridad empresarial: panel, charla sobre IA y networking. Organiza Wayclo.",
