@@ -7,26 +7,36 @@ export default function AdminRegistrations() {
   const [status, setStatus] = useState("pending");
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [auth, setAuth] = useState("checking");
+  const [auth, setAuth] = useState("checking"); // "checking" | "ok" | "unauth"
   const router = useRouter();
 
-  // 🔐 Verificar cookie de sesión
+  // 🔐 Verificar cookie de sesión al montar
   useEffect(() => {
     (async () => {
-      const res = await fetch("/api/admin/session", { method: "GET" });
-      if (!res.ok) {
+      try {
+        const res = await fetch("/api/admin/session", { method: "GET" });
+        if (!res.ok) {
+          setAuth("unauth");
+        } else {
+          setAuth("ok");
+        }
+      } catch (e) {
         setAuth("unauth");
-      } else {
-        setAuth("ok");
       }
     })();
   }, []);
 
+  // 🔁 Redirigir a /admin/login SOLO desde un effect, no durante el render
+  useEffect(() => {
+    if (auth === "unauth") {
+      router.replace("/admin/login");
+    }
+  }, [auth, router]);
+
   // 🔄 Cargar lista de registros
   const load = async () => {
     setLoading(true);
-
-    setItems([]); // ←🔥 FIX: evita parpadeo de usuarios previos
+    setItems([]); // limpia resultados previos para evitar parpadeo
 
     const res = await fetch(`/api/admin/registrations?status=${status}`, {
       cache: "no-store",
@@ -40,9 +50,10 @@ export default function AdminRegistrations() {
   // ⏳ Reaccionar al cambio de estado o auth
   useEffect(() => {
     if (auth === "ok") {
-      setItems([]); // ←🔥 FIX: limpiar inmediatamente
+      setItems([]);
       load();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status, auth]);
 
   const act = async (id, action) => {
@@ -70,16 +81,15 @@ export default function AdminRegistrations() {
     );
   }
 
-  // 🔒 Si no hay sesión, redirigir a login
+  // 🔒 Si no hay sesión, no renderizamos nada (el redirect ya se disparó)
   if (auth === "unauth") {
-    router.push("/admin/login");
     return null;
   }
 
+  // ✅ Si está autenticado, render normal
   return (
     <main className="min-h-screen bg-[#021728] text-white px-4 py-8 md:px-8">
       <div className="max-w-6xl mx-auto">
-
         {/* HEADER + CONTROLES */}
         <section className="mb-8">
           <div className="bg-white/5 border border-white/10 rounded-2xl px-5 py-4 md:px-6 md:py-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -101,16 +111,17 @@ export default function AdminRegistrations() {
                   key={s}
                   onClick={() => setStatus(s)}
                   className={`capitalize px-4 py-2 rounded-full border text-xs md:text-sm font-medium transition
-                    ${status === s
-                      ? "bg-white text-[#021728] border-white shadow-sm"
-                      : "bg-transparent text-white border-white/40 hover:bg-white/10"
+                    ${
+                      status === s
+                        ? "bg-white text-[#021728] border-white shadow-sm"
+                        : "bg-transparent text-white border-white/40 hover:bg-white/10"
                     }`}
                 >
                   {s === "pending"
                     ? "Pendientes"
                     : s === "approved"
-                      ? "Aprobados"
-                      : "Rechazados"}
+                    ? "Aprobados"
+                    : "Rechazados"}
                 </button>
               ))}
 
@@ -120,10 +131,11 @@ export default function AdminRegistrations() {
               >
                 <RotateCcw
                   size={18}
-                  className={`transition-transform ${loading ? "animate-spin" : ""
-                    }`}
+                  className={`transition-transform ${
+                    loading ? "animate-spin" : ""
+                  }`}
                 />
-                {!loading}
+                {loading ? "Actualizando..." : "Actualizar"}
               </button>
             </div>
           </div>
@@ -162,9 +174,7 @@ export default function AdminRegistrations() {
                 </p>
 
                 {r.diet && (
-                  <p className="text-xs text-slate-500 mt-1">
-                    Dieta: {r.diet}
-                  </p>
+                  <p className="text-xs text-slate-500 mt-1">Dieta: {r.diet}</p>
                 )}
               </div>
 

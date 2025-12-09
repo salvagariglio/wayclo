@@ -4,58 +4,35 @@ import { verifyAdminJWT, createAdminJWT } from "./src/lib/auth";
 export async function middleware(req) {
   const { pathname } = req.nextUrl;
 
-  // Rutas protegidas nuevas (AUDIO/IA)
-  const protectedPanelAPIs = [
-    "/api/admin/ia/panels/process",
-    "/api/admin/ia/panels/list",
-    "/api/admin/ia/panels/update",
-    "/api/admin/ia/panels/download",
-  ];
-
-  // Rutas ya protegidas por vos
+  // Rutas que queremos proteger SIEMPRE
   const isAdminRoute =
     pathname.startsWith("/admin") || pathname.startsWith("/api/admin");
 
-  const isPanelRoute = protectedPanelAPIs.some((p) =>
-    pathname.startsWith(p)
-  );
-
-  // ————————————————————————————————
-  // 1) SI NO ES ADMIN NI PANEL ROUTE → permitir
-  // ————————————————————————————————
-  if (!isAdminRoute && !isPanelRoute) {
+  // Si no es admin ni api admin, dejar pasar
+  if (!isAdminRoute) {
     return NextResponse.next();
   }
 
-  // ————————————————————————————————
-  // 2) Obtener JWT admin
-  // ————————————————————————————————
   const token = req.cookies.get("admin")?.value;
   const verify = token ? await verifyAdminJWT(token) : { ok: false };
 
-  // ————————————————————————————————
-  // 3) PUBLIC ROUTE: /admin/login
-  // ————————————————————————————————
   const isLogin = pathname.startsWith("/admin/login");
 
-  // Si NO está autenticado y NO está en login → bloquear/redirect
+  // ❌ No autenticado y no está en login
   if (!verify.ok && !isLogin) {
-    // Si es API → devolver 401
-    if (isPanelRoute || pathname.startsWith("/api/admin")) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+    // APIs → 401
+    if (pathname.startsWith("/api/admin")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Si es página → redirigir
+    // Páginas → redirect a login
     const loginUrl = req.nextUrl.clone();
     loginUrl.pathname = "/admin/login";
     loginUrl.search = "";
     return NextResponse.redirect(loginUrl);
   }
 
-  // Si está autenticado e intenta ir a login → mandar a dashboard
+  // ✅ Ya autenticado y quiere ir a login → mandarlo al panel
   if (isLogin && verify.ok) {
     const dash = req.nextUrl.clone();
     dash.pathname = "/admin/panels";
@@ -63,9 +40,7 @@ export async function middleware(req) {
     return NextResponse.redirect(dash);
   }
 
-  // ————————————————————————————————
-  // 4) Rolling session: renovar token si faltan <30 min
-  // ————————————————————————————————
+  // 🔁 Rolling session
   const res = NextResponse.next();
 
   if (verify.ok) {
@@ -89,9 +64,5 @@ export async function middleware(req) {
 }
 
 export const config = {
-  matcher: [
-    "/admin/:path*",
-    "/api/admin/:path*",
-    "/api/admin/ia/panels/:path*", // 👈 Ahora está protegido
-  ],
+  matcher: ["/admin/:path*", "/api/admin/:path*"],
 };
