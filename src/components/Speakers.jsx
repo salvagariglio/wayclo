@@ -33,7 +33,7 @@ export const speakers = [
     companyLogo: "/salas.png",
     companyLogoWidth: 140,
     linkedin: "",
-    img: "/speakers/silueta.png",
+    img: "/speakers/martin.png",
   },
   {
     name: "Pablo",
@@ -73,7 +73,7 @@ export const speakers = [
     companyLogo: "/logo-wayclo-speakers.png",
     companyLogoWidth: 130,
     linkedin: "https://www.linkedin.com/in/gustavo-matuk-66b96613/",
-    img: "/speakers/martin.png",
+    img: "/speakers/gustavo.png",
   },
   {
     name: "Luciano",
@@ -141,7 +141,6 @@ export function SpeakerCard({ speaker, index }) {
         gap-6
       `}
     >
-
       <div
         className={`
           flex flex-col md:flex-row 
@@ -176,10 +175,7 @@ export function SpeakerCard({ speaker, index }) {
     object-top md:object-bottom
   `}
           />
-
         </div>
-
-
 
         {/* TEXTO + LOGO */}
         <div className="w-full md:w-[40%] flex flex-col justify-end pb-6">
@@ -187,7 +183,7 @@ export function SpeakerCard({ speaker, index }) {
             <Image
               src={speaker.companyLogo}
               alt={speaker.company}
-              width={speaker.companyLogoWidth || 100}  // 👈 ancho dinámico
+              width={speaker.companyLogoWidth || 100} // 👈 ancho dinámico
               height={120}
               className="object-contain mb-4 drop-shadow-lg"
             />
@@ -231,7 +227,8 @@ export default function SpeakersSection() {
       </h2>
 
       <p className="text-base md:text-lg text-slate-700 text-center mt-2">
-        Profesionales que comparten su mirada para potenciar el presente y futuro de las PYMES.
+        Profesionales que comparten su mirada para potenciar el presente y
+        futuro de las PYMES.
       </p>
 
       <div className="mt-10 w-full max-w-7xl mx-auto flex flex-col gap-10">
